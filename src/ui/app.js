@@ -1,8 +1,10 @@
 // 主畫面：輸入題目 → 四階段逐步提示 → 最後才看答案；解不出來時進入引導思考模式
 import concepts from '../../data/concepts.json';
-import { solve, TYPES, GENERAL } from '../engine/index.js';
+import { solve, TYPES } from '../engine/index.js';
 import { toolEvaluate, toolRoots } from '../engine/tools.js';
 import { recordUnsolved, listUnsolved, clearUnsolved, downloadJson } from './storage.js';
+import { newTutorState, renderTutor, handleTutorClick, typeLabel } from './tutor.js';
+import { mountAI } from './ai-settings.js';
 
 const CONCEPT_NAME = new Map(concepts.concepts.map((c) => [c.id, c.name]));
 
@@ -33,7 +35,7 @@ const STAGES = [
 const esc = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-const state = { text: '', result: null, shown: 0, showAnswer: false };
+const state = { text: '', result: null, shown: 0, showAnswer: false, mode: 'tutor', ts: null };
 
 export function mountApp(root) {
   root.innerHTML = `
@@ -58,7 +60,40 @@ export function mountApp(root) {
       </details>
     </section>
     <section id="out" aria-live="polite"></section>
+    <section class="card" id="ai-card"></section>
   `;
+  mountAI(root.querySelector('#ai-card'));
+  const out = root.querySelector('#out');
+  // 老師模式的按鈕都用事件委派處理
+  out.addEventListener('click', (e) => {
+    const modeBtn = e.target.closest('[data-mode]');
+    if (modeBtn) {
+      state.mode = modeBtn.dataset.mode;
+      render(root);
+      return;
+    }
+    const el = e.target.closest('[data-act]');
+    if (!el || !state.result?.ok || state.mode !== 'tutor') return;
+    const before = state.ts.stepIdx;
+    if (handleTutorClick(el, state.result, state.ts, out, () => render(root))) {
+      render(root);
+      if (el.dataset.act === 'next-step' || el.dataset.act === 'to-stage' || state.ts.stepIdx !== before) {
+        out.querySelector('.steps li.current, .card.answer, .card.stage:last-of-type')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  });
+  out.addEventListener('input', (e) => {
+    const name = e.target.dataset?.input;
+    if (!name || !state.ts) return;
+    if (name.startsWith('step-')) state.ts.steps[Number(name.slice(5))].input = e.target.value;
+    if (name === 'final') state.ts.final.input = e.target.value;
+  });
+  // 在輸入框按 Enter 等於按旁邊的按鈕
+  out.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || !e.target.dataset?.input) return;
+    e.preventDefault();
+    e.target.closest('.row')?.querySelector('button')?.click();
+  });
   const ta = root.querySelector('#q');
   root.querySelectorAll('.key').forEach((b) =>
     b.addEventListener('click', () => {
@@ -86,7 +121,7 @@ export function mountApp(root) {
   root.querySelector('#solve').addEventListener('click', () => run(root, ta.value));
   root.querySelector('#clear').addEventListener('click', () => {
     ta.value = '';
-    Object.assign(state, { text: '', result: null, shown: 0, showAnswer: false });
+    Object.assign(state, { text: '', result: null, shown: 0, showAnswer: false, ts: null });
     render(root);
     ta.focus();
   });
@@ -95,7 +130,7 @@ export function mountApp(root) {
 function run(root, text, type) {
   if (!text.trim()) return;
   const result = solve(text, { type });
-  Object.assign(state, { text, result, shown: 1, showAnswer: false });
+  Object.assign(state, { text, result, shown: 1, showAnswer: false, ts: result.ok ? newTutorState(result) : null });
   if (!result.ok) recordUnsolved(text, result.reason);
   render(root);
   root.querySelector('#out').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -113,7 +148,12 @@ function render(root) {
     bindGuided(root, out);
     return;
   }
-  out.innerHTML = renderStages(r);
+  if (state.mode === 'tutor') {
+    out.innerHTML = renderHeader(r) + renderTutor(r, state.ts);
+    out.querySelector('#retype')?.addEventListener('click', () => showTypePicker(root, out));
+    return;
+  }
+  out.innerHTML = renderHeader(r) + renderStages(r);
   out.querySelector('#next')?.addEventListener('click', () => {
     if (state.shown < STAGES.length) state.shown++;
     else state.showAnswer = true;
@@ -121,10 +161,29 @@ function render(root) {
     const cards = out.querySelectorAll('.stage, .answer');
     cards[cards.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
-  out.querySelector('#retype')?.addEventListener('click', () => {
-    out.innerHTML = `<div class="card">${renderTypePicker()}</div>`;
-    out.querySelectorAll('[data-type]').forEach((b) => b.addEventListener('click', () => run(root, state.text, b.dataset.type)));
-  });
+  out.querySelector('#retype')?.addEventListener('click', () => showTypePicker(root, out));
+}
+
+function showTypePicker(root, out) {
+  out.innerHTML = `<div class="card">${renderTypePicker()}</div>`;
+  out.querySelectorAll('[data-type]').forEach((b) => b.addEventListener('click', () => run(root, state.text, b.dataset.type)));
+}
+
+/** 題型、模式切換、通用解法說明、需要確認的地方 */
+function renderHeader(r) {
+  const d = r.data;
+  let html = `<div class="meta">題型：${esc(typeLabel(r))} <button type="button" id="retype" class="link">不對？改選題型</button></div>
+    <div class="modes" role="tablist">
+      <button type="button" role="tab" class="mode ${state.mode === 'tutor' ? 'on' : ''}" data-mode="tutor" aria-selected="${state.mode === 'tutor'}">老師帶我做</button>
+      <button type="button" role="tab" class="mode ${state.mode === 'read' ? 'on' : ''}" data-mode="read" aria-selected="${state.mode === 'read'}">直接看講解</button>
+    </div>`;
+  if (r.type === 'general') {
+    html += `<div class="card note"><p class="mini">這題沒有專用的講解模板，改用通用解法：答案一樣經過驗算，但講解步驟比較簡略。${r.note ? `<br />${esc(r.note)}` : ''}</p></div>`;
+  }
+  if (d.uncertain.length) {
+    html += `<div class="card warn"><p class="label">請確認</p><ul>${d.uncertain.map((u) => `<li>${esc(u)}</li>`).join('')}</ul></div>`;
+  }
+  return html;
 }
 
 function renderTypePicker() {
@@ -205,14 +264,7 @@ function stageBody(key, d) {
 
 function renderStages(r) {
   const d = r.data;
-  const type = r.type === 'general' ? GENERAL : TYPES.find((t) => t.id === r.type);
-  let html = `<div class="meta">題型：${esc(type?.unit)}・${esc(type?.label)} <button type="button" id="retype" class="link">不對？改選題型</button></div>`;
-  if (r.type === 'general') {
-    html += `<div class="card note"><p class="mini">這題沒有專用的講解模板，改用通用解法：答案一樣經過驗算，但講解步驟比較簡略。${r.note ? `<br />${esc(r.note)}` : ''}</p></div>`;
-  }
-  if (d.uncertain.length) {
-    html += `<div class="card warn"><p class="label">請確認</p><ul>${d.uncertain.map((u) => `<li>${esc(u)}</li>`).join('')}</ul></div>`;
-  }
+  let html = '';
   STAGES.slice(0, state.shown).forEach((s) => {
     html += `<article class="card stage"><h2>${s.title}</h2>${stageBody(s.key, d)}</article>`;
   });
