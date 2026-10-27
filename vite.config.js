@@ -23,9 +23,22 @@ export default defineConfig({
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
         ],
       },
-      workbox: { globPatterns: ['**/*.{js,css,html,svg,png}'] },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png}'],
+        // 本機 AI 的程式很大，只有啟用 AI 的人才需要：不預先快取，用到時再存起來
+        globIgnores: ['**/webllm-*.js'],
+        runtimeCaching: [{ urlPattern: /webllm-.*\.js$/, handler: 'CacheFirst', options: { cacheName: 'webllm-lib' } }],
+      },
     }),
   ],
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: { groups: [{ name: 'webllm', test: /node_modules[\\/]@mlc-ai/ }] },
+      },
+    },
+    chunkSizeWarningLimit: 7000,
+  },
   test: {
     include: ['tests/**/*.test.js'],
   },
