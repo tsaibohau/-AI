@@ -26,6 +26,8 @@ jobs:
       - run: npm ci
       - name: 金鑰掃描
         run: npm run scan
+      - name: 評測題格式檢查
+        run: node eval/score.mjs --check
       - name: 單元測試
         run: npm test
       - name: 建置

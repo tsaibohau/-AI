@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "note": "只收自創或改編題，不收學校考卷、補習班、出版社原題。詳見 eval/README.md。",
+  "problems": [
+    {
+      "id": "q001",
+      "source": "自創",
+      "text": "求二次函數 f(x) = 2x² − 8x + 3 的最小值。",
+      "answer": { "type": "number", "value": "-5" },
+      "concepts": ["quad.completing_square", "quad.max_min"],
+      "needs_diagram": true
+    },
+    {
+      "id": "q002",
+      "source": "自創",
+      "text": "解不等式 x² − x − 6 < 0。",
+      "answer": { "type": "interval", "value": "(-2, 3)" },
+      "concepts": ["base.factoring", "qineq.factored"],
+      "needs_diagram": true
+    },
+    {
+      "id": "q003",
+      "source": "自創",
+      "text": "若對所有實數 x，不等式 x² + 2kx + 3k + 4 > 0 恆成立，求實數 k 的範圍。",
+      "answer": { "type": "interval", "value": "(-1, 4)" },
+      "concepts": ["qineq.always_true", "quad.discriminant", "qineq.parameter"],
+      "needs_diagram": false
+    },
+    {
+      "id": "q004",
+      "source": "自創",
+      "text": "解方程式 4^x − 6·2^x + 8 = 0。",
+      "answer": { "type": "set", "value": "{1, 2}" },
+      "concepts": ["exp.equation", "exp.rules", "base.substitution"],
+      "needs_diagram": false
+    },
+    {
+      "id": "q005",
+      "source": "自創",
+      "text": "解方程式 log₂(x − 1) + log₂(x + 1) = 3。",
+      "answer": { "type": "set", "value": "{3}" },
+      "concepts": ["log.rules", "log.domain", "log.equation"],
+      "needs_diagram": false
+    }
+  ]
+}

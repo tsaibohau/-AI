@@ -1,0 +1,52 @@
+{
+  "note": "示範用的假模型輸出，只用於測試評分腳本，不是真實模型結果。",
+  "model": "fixture",
+  "records": [
+    {
+      "id": "q001",
+      "attempts": [
+        {
+          "raw": "{\"problem\":\"求 f(x) 的最小值\",\"knowns\":{\"explicit\":[\"f(x)=2x^2-8x+3\"],\"implicit\":[\"a=2>0，開口向上\"]},\"concepts\":[{\"id\":\"quad.completing_square\",\"why\":\"化成標準式找頂點\"},{\"id\":\"quad.max_min\",\"why\":\"開口向上，頂點為最小值\"}],\"extension\":[{\"step\":\"配方\",\"reason\":\"提出 2 後配方\",\"expr\":\"2*x^2-8*x+3 = 2*(x-2)^2-5\"},{\"step\":\"代入頂點\",\"reason\":\"x=2 時最小\",\"expr\":\"2*(2)^2-8*2+3 = -5\"}],\"diagram\":{\"type\":\"function_graph\",\"x\":[-1,5],\"y\":[-6,6],\"elements\":[{\"kind\":\"curve\",\"expr\":\"2*x^2-8*x+3\",\"stage\":2},{\"kind\":\"point\",\"x\":2,\"y\":-5,\"role\":\"vertex\",\"label\":\"頂點\",\"stage\":4}]},\"answer\":\"-5\",\"check\":\"f(2)=-5，且 f(x)-(-5)=2(x-2)^2≥0\",\"uncertain\":[]}"
+        }
+      ]
+    },
+    {
+      "id": "q002",
+      "attempts": [
+        {
+          "raw": "{\"problem\":\"解不等式\",\"knowns\":{\"explicit\":[],\"implicit\":[]},\"concepts\":[{\"id\":\"qineq.factored\",\"why\":\"顯然可以分解\"}],\"extension\":[{\"step\":\"分解\",\"reason\":\"\",\"expr\":\"\"}],\"diagram\":null,\"answer\":\"(-2,3)\",\"check\":\"\",\"uncertain\":[]}"
+        },
+        {
+          "raw": "```json\n{\"problem\":\"解不等式\",\"knowns\":{\"explicit\":[],\"implicit\":[]},\"concepts\":[{\"id\":\"qineq.factored\",\"why\":\"左式可分解\"},{\"id\":\"base.factoring\",\"why\":\"十字交乘\"}],\"extension\":[{\"step\":\"分解\",\"reason\":\"十字交乘\",\"expr\":\"x^2-x-6 = (x-3)*(x+2)\"}],\"diagram\":{\"type\":\"number_line\",\"x\":[-4,5],\"elements\":[{\"kind\":\"interval\",\"from\":-2,\"to\":3,\"closedFrom\":false,\"closedTo\":false,\"stage\":4}]},\"answer\":\"-2 < x < 3\",\"check\":\"\",\"uncertain\":[]}\n```"
+        }
+      ]
+    },
+    {
+      "id": "q003",
+      "attempts": [
+        {
+          "raw": "{\"problem\":\"求 k 範圍\",\"knowns\":{\"explicit\":[],\"implicit\":[]},\"concepts\":[{\"id\":\"qineq.always_true\",\"why\":\"恆正\"},{\"id\":\"quad.discriminant\",\"why\":\"D<0\"}],\"extension\":[{\"step\":\"判別式\",\"reason\":\"開口向上且恆正\",\"expr\":\"\"}],\"diagram\":null,\"answer\":\"(-4, 1)\",\"check\":\"\",\"uncertain\":[]}"
+        }
+      ]
+    },
+    {
+      "id": "q004",
+      "attempts": [
+        {
+          "raw": "{\"problem\": \"解方程式\","
+        },
+        {
+          "raw": "抱歉，我無法回答"
+        }
+      ]
+    },
+    {
+      "id": "q005",
+      "attempts": [
+        {
+          "raw": "{\"problem\":\"解對數方程式\",\"knowns\":{\"explicit\":[],\"implicit\":[\"x-1>0\",\"x+1>0\"]},\"concepts\":[{\"id\":\"log.rules\",\"why\":\"合併\"},{\"id\":\"log.domain\",\"why\":\"真數大於 0\"}],\"extension\":[{\"step\":\"合併\",\"reason\":\"log 加法\",\"expr\":\"(3-1)*(3+1) = 8\"}],\"diagram\":null,\"answer\":\"x = 3（x = -3 不合）\",\"check\":\"\",\"uncertain\":[]}"
+        }
+      ]
+    }
+  ]
+}
