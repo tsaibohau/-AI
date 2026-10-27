@@ -1,5 +1,4 @@
-const app = document.querySelector('#app');
-app.innerHTML = `
-  <h1>數學解惑</h1>
-  <p>原型開發中。</p>
-`;
+import './style.css';
+import { mountApp } from './ui/app.js';
+
+mountApp(document.querySelector('#app'));
