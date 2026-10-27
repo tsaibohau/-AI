@@ -1,7 +1,57 @@
 // 受限的 mathjs 實例：關閉可能被濫用的函式（依 mathjs 官方安全建議）
-import { create, all } from 'mathjs';
+// 只載入用得到的函式，縮小手機下載量
+import {
+  create,
+  evaluateDependencies,
+  parseDependencies,
+  addDependencies,
+  subtractDependencies,
+  multiplyDependencies,
+  divideDependencies,
+  powDependencies,
+  unaryMinusDependencies,
+  unaryPlusDependencies,
+  sqrtDependencies,
+  cbrtDependencies,
+  nthRootDependencies,
+  logDependencies,
+  log10Dependencies,
+  log2Dependencies,
+  expDependencies,
+  absDependencies,
+  piDependencies,
+  eDependencies,
+  InfinityDependencies,
+  smallerDependencies,
+  largerDependencies,
+  equalDependencies,
+} from 'mathjs';
 
-export const math = create(all);
+export const math = create({
+  evaluateDependencies,
+  parseDependencies,
+  addDependencies,
+  subtractDependencies,
+  multiplyDependencies,
+  divideDependencies,
+  powDependencies,
+  unaryMinusDependencies,
+  unaryPlusDependencies,
+  sqrtDependencies,
+  cbrtDependencies,
+  nthRootDependencies,
+  logDependencies,
+  log10Dependencies,
+  log2Dependencies,
+  expDependencies,
+  absDependencies,
+  piDependencies,
+  eDependencies,
+  InfinityDependencies,
+  smallerDependencies,
+  largerDependencies,
+  equalDependencies,
+});
 const limitedEvaluate = math.evaluate;
 const limitedParse = math.parse;
 
@@ -11,8 +61,6 @@ math.import(
     createUnit: () => { throw new Error('已停用 createUnit'); },
     evaluate: () => { throw new Error('已停用 evaluate'); },
     parse: () => { throw new Error('已停用 parse'); },
-    simplify: () => { throw new Error('已停用 simplify'); },
-    derivative: () => { throw new Error('已停用 derivative'); },
   },
   { override: true },
 );
@@ -26,8 +74,8 @@ export function parseExpr(expr) {
 export function evalReal(expr, scope = {}) {
   try {
     let v = limitedEvaluate(String(expr), { ...scope });
-    if (v && typeof v === 'object' && typeof v.valueOf === 'function' && !math.isComplex(v)) v = Number(v.valueOf());
-    if (math.isComplex(v)) return Math.abs(v.im) < 1e-12 ? v.re : NaN;
+    if (v && typeof v === 'object' && typeof v.valueOf === 'function' && !(v && v.isComplex === true)) v = Number(v.valueOf());
+    if ((v && v.isComplex === true)) return Math.abs(v.im) < 1e-12 ? v.re : NaN;
     return typeof v === 'number' ? v : NaN;
   } catch {
     return NaN;
