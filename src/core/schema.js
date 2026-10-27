@@ -108,3 +108,11 @@ export function parseModelJson(text) {
     return { ok: false, error: `JSON 解析失敗：${e.message}` };
   }
 }
+
+/** 檢查一段 JSON 文字輸出，回傳 { ok, data, errors } */
+export function checkRaw(raw, validate) {
+  const parsed = parseModelJson(raw);
+  if (!parsed.ok) return { ok: false, errors: [parsed.error] };
+  const v = validate(parsed.value);
+  return { ok: v.ok, data: parsed.value, errors: v.errors };
+}
