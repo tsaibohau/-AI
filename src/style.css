@@ -117,3 +117,19 @@ li { margin: 4px 0; overflow-wrap: anywhere; }
 .reason { color: var(--muted); font-size: 0.9rem; }
 .expr summary { font-size: 0.8rem; color: var(--muted); cursor: pointer; }
 .expr code { display: block; font-size: 0.8rem; overflow-x: auto; white-space: pre; padding: 4px 0; }
+.card.note { background: transparent; }
+.hint-sum { color: var(--accent); cursor: pointer; font-size: 0.9rem; }
+.inp {
+  width: 100%;
+  font: inherit;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+}
+.inp.small { width: 30%; min-width: 70px; }
+.tool-row { margin-top: 8px; flex-wrap: wrap; }
+.tool-row .ghost { flex: 1; }
+.tool-out { margin: 8px 0 0; font-weight: 600; overflow-wrap: anywhere; }
+details.card > summary { cursor: pointer; }

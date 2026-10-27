@@ -1,21 +1,26 @@
-// 主畫面：輸入題目 → 四階段逐步提示 → 最後才看答案
+// 主畫面：輸入題目 → 四階段逐步提示 → 最後才看答案；解不出來時進入引導思考模式
 import concepts from '../../data/concepts.json';
-import { solve, TYPES } from '../engine/index.js';
+import { solve, TYPES, GENERAL } from '../engine/index.js';
+import { toolEvaluate, toolRoots } from '../engine/tools.js';
+import { recordUnsolved, listUnsolved, clearUnsolved, downloadJson } from './storage.js';
 
 const CONCEPT_NAME = new Map(concepts.concepts.map((c) => [c.id, c.name]));
 
 const KEYS = [
-  ['x²', 'x²'], ['²', '²'], ['³', '³'], ['√', '√('], ['(', '('], [')', ')'],
+  ['x²', 'x²'], ['²', '²'], ['³', '³'], ['^', '^'], ['√', '√('], ['π', 'π'],
+  ['log', 'log('], ['logₐ', 'log_'], ['ln', 'ln('], ['(', '('], [')', ')'], ['/', '/'],
   ['≤', ' ≤ '], ['≥', ' ≥ '], ['<', ' < '], ['>', ' > '], ['=', ' = '], ['≠', ' ≠ '],
-  ['−', ' − '], ['+', ' + '], ['·', '·'], ['/', '/'], ['x', 'x'], ['k', 'k'],
+  ['−', ' − '], ['+', ' + '], ['·', '·'], ['x', 'x'], ['k', 'k'], ['⌫', null],
 ];
 
 // 範例皆為自創題
 const EXAMPLES = [
   '求二次函數 f(x) = 2x² − 8x + 3 的最小值',
   '解不等式 x² − x − 6 < 0',
-  '在 1 ≤ x ≤ 4 時，求 f(x) = −x² + 2x + 5 的最大值與最小值',
   '若對所有實數 x，x² + 2kx + 3k + 4 > 0 恆成立，求 k 的範圍',
+  '解方程式 4^x − 6·2^x + 8 = 0',
+  '解 log₂(x − 1) + log₂(x + 1) = 3',
+  '解 (x − 1)/(x + 2) ≥ 0',
 ];
 
 const STAGES = [
@@ -28,7 +33,7 @@ const STAGES = [
 const esc = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-const state = { text: '', result: null, shown: 0, showAnswer: false, chosenType: null };
+const state = { text: '', result: null, shown: 0, showAnswer: false };
 
 export function mountApp(root) {
   root.innerHTML = `
@@ -40,8 +45,9 @@ export function mountApp(root) {
       <label for="q" class="label">輸入題目</label>
       <textarea id="q" rows="3" placeholder="例如：解不等式 x² − x − 6 < 0" autocomplete="off" spellcheck="false"></textarea>
       <div class="keys" role="group" aria-label="數學符號">
-        ${KEYS.map(([label, ins]) => `<button type="button" class="key" data-ins="${esc(ins)}">${esc(label)}</button>`).join('')}
+        ${KEYS.map(([label, ins]) => `<button type="button" class="key" data-ins="${esc(ins ?? '')}" ${ins === null ? 'data-back="1" aria-label="刪除"' : ''}>${esc(label)}</button>`).join('')}
       </div>
+      <p class="mini">logₐ 的用法：輸入 log_2(x − 1) 代表以 2 為底；只寫 log 是以 10 為底。</p>
       <div class="row">
         <button type="button" id="solve" class="primary">開始解題</button>
         <button type="button" id="clear" class="ghost">清除</button>
@@ -56,15 +62,22 @@ export function mountApp(root) {
   const ta = root.querySelector('#q');
   root.querySelectorAll('.key').forEach((b) =>
     b.addEventListener('click', () => {
-      const ins = b.dataset.ins;
       const s = ta.selectionStart ?? ta.value.length;
       const e = ta.selectionEnd ?? ta.value.length;
+      if (b.dataset.back) {
+        const from = s === e ? Math.max(0, s - 1) : s;
+        ta.value = ta.value.slice(0, from) + ta.value.slice(e);
+        ta.focus();
+        ta.selectionStart = ta.selectionEnd = from;
+        return;
+      }
+      const ins = b.dataset.ins;
       ta.value = ta.value.slice(0, s) + ins + ta.value.slice(e);
       ta.focus();
       ta.selectionStart = ta.selectionEnd = s + ins.length;
     }),
   );
-  root.querySelectorAll('.chip').forEach((b) =>
+  root.querySelectorAll('.chip[data-ex]').forEach((b) =>
     b.addEventListener('click', () => {
       ta.value = b.dataset.ex;
       run(root, ta.value);
@@ -73,14 +86,17 @@ export function mountApp(root) {
   root.querySelector('#solve').addEventListener('click', () => run(root, ta.value));
   root.querySelector('#clear').addEventListener('click', () => {
     ta.value = '';
-    Object.assign(state, { text: '', result: null, shown: 0, showAnswer: false, chosenType: null });
+    Object.assign(state, { text: '', result: null, shown: 0, showAnswer: false });
     render(root);
     ta.focus();
   });
 }
 
 function run(root, text, type) {
-  Object.assign(state, { text, result: solve(text, { type }), shown: 1, showAnswer: false, chosenType: type || null });
+  if (!text.trim()) return;
+  const result = solve(text, { type });
+  Object.assign(state, { text, result, shown: 1, showAnswer: false });
+  if (!result.ok) recordUnsolved(text, result.reason);
   render(root);
   root.querySelector('#out').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -93,8 +109,8 @@ function render(root) {
     return;
   }
   if (!r.ok) {
-    out.innerHTML = renderFailure(r);
-    out.querySelectorAll('[data-type]').forEach((b) => b.addEventListener('click', () => run(root, state.text, b.dataset.type)));
+    out.innerHTML = renderGuided(r);
+    bindGuided(root, out);
     return;
   }
   out.innerHTML = renderStages(r);
@@ -102,31 +118,71 @@ function render(root) {
     if (state.shown < STAGES.length) state.shown++;
     else state.showAnswer = true;
     render(root);
-    out.querySelector('.stage:last-of-type, .answer')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const cards = out.querySelectorAll('.stage, .answer');
+    cards[cards.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
   out.querySelector('#retype')?.addEventListener('click', () => {
-    state.result = { ok: false, needType: true, reason: '請選擇這題屬於哪一種題型', uncertain: [] };
-    render(root);
+    out.innerHTML = `<div class="card">${renderTypePicker()}</div>`;
+    out.querySelectorAll('[data-type]').forEach((b) => b.addEventListener('click', () => run(root, state.text, b.dataset.type)));
   });
-}
-
-function renderFailure(r) {
-  let html = `<div class="card warn"><p>${esc(r.reason)}</p>`;
-  if (r.uncertain?.length) html += `<ul>${r.uncertain.map((u) => `<li>${esc(u)}</li>`).join('')}</ul>`;
-  html += '</div>';
-  if (r.needType) html += renderTypePicker();
-  return html;
 }
 
 function renderTypePicker() {
   const units = [...new Set(TYPES.map((t) => t.unit))];
-  return `<div class="card"><p class="label">這題屬於哪一種？</p>${units
+  return `<p class="label">這題屬於哪一種？</p>${units
     .map(
       (u) => `<div class="unit"><span class="unit-name">${esc(u)}</span>${TYPES.filter((t) => t.unit === u)
-        .map((t) => `<button type="button" class="chip" data-type="${t.id}" ${t.solve ? '' : 'disabled'}>${esc(t.label)}${t.solve ? '' : '（開發中）'}</button>`)
+        .map((t) => `<button type="button" class="chip" data-type="${t.id}">${esc(t.label)}</button>`)
         .join('')}</div>`,
     )
-    .join('')}</div>`;
+    .join('')}<div class="unit"><span class="unit-name">其他</span><button type="button" class="chip" data-type="general">通用解法（方程式、不等式、最值、求值）</button></div>`;
+}
+
+function renderGuided(r) {
+  const g = r.guided;
+  const n = listUnsolved().length;
+  let html = `<div class="card warn"><p><b>這題系統還沒辦法完整解出來。</b>不過我們可以一起拆題，你自己動手會學得更多。</p>
+    <details><summary class="mini">原因</summary><p class="mini">${esc(r.reason)}</p></details></div>`;
+  g.stages.forEach((s) => {
+    html += `<article class="card stage"><h2>${esc(s.title)}</h2><p>${esc(s.question)}</p>${
+      s.hints.length
+        ? `<details><summary class="hint-sum">提示（${s.hints.length}）</summary><ul>${s.hints.map((h) => `<li>${esc(h)}</li>`).join('')}</ul></details>`
+        : ''
+    }</article>`;
+  });
+  html += `<article class="card"><h2>計算工具</h2>
+    <p class="mini">輸入算式（變數用 x），可以代值或找出等於 0 的地方。</p>
+    <input id="tool-expr" class="inp" value="${esc(g.expr || '')}" placeholder="例如 x² − 3x + 2" autocomplete="off" spellcheck="false" />
+    <div class="row tool-row">
+      <input id="tool-val" class="inp small" placeholder="x = ?" inputmode="decimal" />
+      <button type="button" id="tool-eval" class="ghost">代入計算</button>
+      <button type="button" id="tool-roots" class="ghost">找 = 0</button>
+    </div>
+    <p id="tool-out" class="tool-out" aria-live="polite"></p></article>`;
+  html += `<details class="card"><summary class="label">如果你知道題型，也可以自己選</summary>${renderTypePicker()}</details>`;
+  html += `<div class="card note"><p class="mini">這題已記錄在這台裝置（共 ${n} 題解不出的題目），方便之後補上新題型。資料不會上傳。</p>
+    <div class="row"><button type="button" id="exp-unsolved" class="ghost">匯出紀錄</button><button type="button" id="clr-unsolved" class="ghost">清除紀錄</button></div></div>`;
+  return html;
+}
+
+function bindGuided(root, out) {
+  out.querySelectorAll('[data-type]').forEach((b) => b.addEventListener('click', () => run(root, state.text, b.dataset.type)));
+  const expr = out.querySelector('#tool-expr');
+  const res = out.querySelector('#tool-out');
+  out.querySelector('#tool-eval').addEventListener('click', () => {
+    res.textContent = toolEvaluate(expr.value, out.querySelector('#tool-val').value.trim());
+  });
+  out.querySelector('#tool-roots').addEventListener('click', () => {
+    res.textContent = toolRoots(expr.value);
+  });
+  out.querySelector('#exp-unsolved').addEventListener('click', () => {
+    const d = new Date().toISOString().slice(0, 10);
+    downloadJson(`unsolved-${d}.json`, { exportedAt: new Date().toISOString(), items: listUnsolved() });
+  });
+  out.querySelector('#clr-unsolved').addEventListener('click', (e) => {
+    clearUnsolved();
+    e.target.closest('.note').querySelector('.mini').textContent = '紀錄已清除。';
+  });
 }
 
 function stageBody(key, d) {
@@ -149,8 +205,11 @@ function stageBody(key, d) {
 
 function renderStages(r) {
   const d = r.data;
-  const type = TYPES.find((t) => t.id === r.type);
+  const type = r.type === 'general' ? GENERAL : TYPES.find((t) => t.id === r.type);
   let html = `<div class="meta">題型：${esc(type?.unit)}・${esc(type?.label)} <button type="button" id="retype" class="link">不對？改選題型</button></div>`;
+  if (r.type === 'general') {
+    html += `<div class="card note"><p class="mini">這題沒有專用的講解模板，改用通用解法：答案一樣經過驗算，但講解步驟比較簡略。${r.note ? `<br />${esc(r.note)}` : ''}</p></div>`;
+  }
   if (d.uncertain.length) {
     html += `<div class="card warn"><p class="label">請確認</p><ul>${d.uncertain.map((u) => `<li>${esc(u)}</li>`).join('')}</ul></div>`;
   }
