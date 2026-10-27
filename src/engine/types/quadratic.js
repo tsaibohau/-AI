@@ -120,6 +120,8 @@ export function solveRangeExtreme(an) {
   const { p } = quadOf(an);
   const r = an.range;
   if (!r) throw new EngineError('找不到範圍限制，例如 1 ≤ x ≤ 4');
+  if (!r.lo || !r.hi) throw new EngineError('範圍只有一邊');
+  an.usedRange = true;
   if (r.lo.cmp(r.hi) >= 0) throw new EngineError('範圍的下界要小於上界');
   const x = an.x;
   const name = fnName(an);
