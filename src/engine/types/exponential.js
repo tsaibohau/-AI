@@ -99,7 +99,15 @@ function checkText(an, s, xs) {
     .join('；');
 }
 
-const curve = (F) => ({ kind: 'curve', expr: toMath(F), label: `y = ${pretty(F)}`, stage: 2 });
+// 右邊是 0 時標籤只寫左邊，避免出現「− 0」
+const curve = (s) => ({ kind: 'curve', expr: toMath(s.F), label: `y = ${pretty(isZeroNode(s.rhs) ? s.lhs : s.F)}`, stage: 2 });
+const isZeroNode = (n) => n.type === 'ConstantNode' && Number(n.value) === 0;
+
+/** 依解的端點決定 x 顯示範圍 */
+function xRangeOf(set) {
+  const ends = set.flatMap((r) => [r.lo.value(), r.hi.value()]).filter(Number.isFinite);
+  return [Math.floor(Math.min(-2, ...ends)) - 2, Math.ceil(Math.max(2, ...ends)) + 2];
+}
 
 /** 題型 7：指數方程式 */
 export function solveExpEquation(an) {
@@ -150,7 +158,7 @@ export function solveExpEquation(an) {
       type: 'function_graph',
       x: [Math.floor(Math.min(-2, ...xs.map((v) => v.value())) - 1), Math.ceil(Math.max(2, ...xs.map((v) => v.value())) + 1)],
       y: [-6, 6],
-      elements: [curve(s.F), ...xs.map((v) => ({ kind: 'point', x: v.value(), y: 0, role: 'root', label: v.pretty(), stage: 4 }))],
+      elements: [curve(s), ...xs.map((v) => ({ kind: 'point', x: v.value(), y: 0, role: 'root', label: v.pretty(), stage: 4 }))],
     },
     answer: xs.length ? `{${xs.map((v) => v.pretty()).join(', ')}}` : '無實數解',
     check: xs.length ? checkText(an, s, xs) : `t 的解都不是正數，所以 ${b}^${x} 不可能等於它們，無實數解`,
@@ -191,7 +199,12 @@ export function solveExpInequality(an) {
     implicit: [`${x} 是實數`, `${b}^${x} 一定大於 0`],
     concepts,
     steps,
-    diagram: { type: 'function_graph', x: [-4, 4], y: [-6, 6], elements: [curve(s.F), { kind: 'shade', expr: toMath(s.F), sign: `${op}0`, stage: 4 }] },
+    diagram: {
+      type: 'function_graph',
+      x: xRangeOf(xSet),
+      y: [-6, 6],
+      elements: [curve(s), { kind: 'shade', expr: toMath(s.F), sign: `${op}0`, stage: 4 }],
+    },
     answer: formatSet(xSet, x),
     check: '在範圍內外各取一個 x 代回原不等式，前者成立、後者不成立',
     uncertain: an.uncertain,

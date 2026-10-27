@@ -40,7 +40,7 @@ export function solveQuadIneq(an) {
       ...graphBox(p, [h.value(), ...roots]),
       elements: [
         { kind: 'curve', expr: mathPoly(p, 'x'), label: `y = ${prettyPoly(p, x)}`, stage: 2 },
-        ...roots.map((r) => ({ kind: 'point', x: r, y: 0, role: 'root', label: String(Math.round(r * 100) / 100), stage: 4 })),
+        ...roots.map((r) => ({ kind: 'point', x: r, y: 0, role: 'root', label: String(Math.round(r * 100) / 100).replace('-', '−'), stage: 4 })),
         { kind: 'shade', expr: mathPoly(p, 'x'), sign: `${rel}0`, stage: 4 },
       ],
     },

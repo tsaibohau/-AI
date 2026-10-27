@@ -58,9 +58,12 @@ function graph(F, x, roots, extra = []) {
   const lo = Math.floor(Math.min(-1, ...pts) - 2);
   const hi = Math.ceil(Math.max(1, ...pts) + 2);
   const f = compile(F);
+  // y 範圍只看關鍵點附近，避免三次以上函數兩端太大把重點壓扁
+  const clo = pts.length ? Math.min(...pts) - 1 : lo;
+  const chi = pts.length ? Math.max(...pts) + 1 : hi;
   const ys = [];
   for (let i = 0; i <= 60; i++) {
-    const v = f({ [x]: lo + ((hi - lo) * i) / 60 });
+    const v = f({ [x]: clo + ((chi - clo) * i) / 60 });
     if (Number.isFinite(v)) ys.push(v);
   }
   const sorted = ys.sort((a, b) => a - b);
@@ -197,7 +200,7 @@ function inequality(an, { lhs, rhs, op }) {
     steps,
     diagram: {
       type: 'function_graph',
-      ...graph(F, x, sol.roots, sol.poles),
+      ...graph(F, x, sol.roots, [...sol.poles, ...sol.runs.flatMap((r) => [r.lo, r.hi]).filter(Number.isFinite)]),
       elements: [
         { kind: 'curve', expr: toMath(F), label: `y = ${pretty(F)}`, stage: 2 },
         ...sol.roots.map((r) => ({ kind: 'point', x: r, y: 0, role: 'root', label: show(r), stage: 3 })),
