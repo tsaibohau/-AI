@@ -239,7 +239,49 @@ function equalParsed(type, a, b) {
  * gold: { type: 'number' | 'set' | 'interval' | 'point', value: string }
  * 回傳 { ok, reason }
  */
+/** 把算式文字整理成可計算的 mathjs 字串；有等號時取「左 − 右」 */
+export function exprToMath(s) {
+  let t = normalize(s).replace(/^[a-zA-Z]\([a-zA-Z]\)=/, '').replace(/^y=/, '');
+  // t(t-1) 這種單一字母後面接括號，當成相乘
+  t = t.replace(/(^|[^a-zA-Z])([a-zA-Z])\(/g, '$1$2*(');
+  const parts = splitTop(t, ['=']);
+  if (parts.length === 2) t = `(${parts[0]})-(${parts[1]})`;
+  else if (parts.length > 2) return null;
+  return t;
+}
+
+/** 隨機代值比較兩個算式；proportional 為 true 時允許差一個非零倍數 */
+export function compareExpr(goldStr, studentStr, v = 'x', proportional = false) {
+  const g = exprToMath(goldStr);
+  const st = exprToMath(studentStr);
+  if (!g || !st) return { ok: false, reason: '無法解析', ratio: null };
+  const pts = [-2.3, -1.1, 0.4, 1.7, 2.9, 3.6, 0.9];
+  let ratio = null;
+  let used = 0;
+  let allClose = true;
+  for (const p of pts) {
+    const a = evalReal(g, { [v]: p });
+    const b = evalReal(st, { [v]: p });
+    if (!Number.isFinite(a) || !Number.isFinite(b)) continue;
+    used++;
+    if (Math.abs(a - b) > 1e-7 * Math.max(1, Math.abs(a))) allClose = false;
+    if (Math.abs(a) > 1e-9) {
+      const r = b / a;
+      if (ratio === null) ratio = r;
+      else if (Math.abs(r - ratio) > 1e-7 * Math.max(1, Math.abs(ratio))) ratio = NaN;
+    }
+  }
+  if (used < 3) return { ok: false, reason: '無法解析', ratio: null };
+  if (allClose) return { ok: true, reason: '等價', ratio: 1 };
+  const prop = Number.isFinite(ratio) && Math.abs(ratio) > 1e-9;
+  if (proportional && prop) return { ok: true, reason: '差一個倍數，等價', ratio };
+  return { ok: false, reason: '不等價', ratio: prop ? ratio : null };
+}
+
 export function compareAnswer(gold, modelAnswer) {
+  if (gold.type === 'expr' || gold.type === 'expr_prop') {
+    return compareExpr(gold.value, modelAnswer ?? '', gold.var || 'x', gold.type === 'expr_prop');
+  }
   const parse = PARSERS[gold.type];
   if (!parse) throw new Error(`未知的答案類型：${gold.type}`);
   const g = parse(gold.value);

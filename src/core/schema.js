@@ -36,7 +36,26 @@ export function buildOutputSchema(conceptIds) {
           type: 'object',
           additionalProperties: false,
           required: ['step', 'reason', 'expr'],
-          properties: { step: { type: 'string', minLength: 1 }, reason: str, expr: str },
+          properties: {
+            step: { type: 'string', minLength: 1 },
+            reason: str,
+            expr: str,
+            // 以下為老師模式用的選填欄位
+            concept: { enum: conceptIds },
+            detail: str,
+            ask: {
+              type: 'object',
+              additionalProperties: false,
+              required: ['q', 'type', 'value'],
+              properties: {
+                q: { type: 'string', minLength: 1 },
+                type: { enum: ['number', 'set', 'interval', 'point', 'expr', 'expr_prop'] },
+                value: { type: 'string', minLength: 1 },
+                var: str,
+                domain: str,
+              },
+            },
+          },
         },
       },
       // 圖解規格的細部驗證由渲染器負責；不合法時退回純文字，不影響整份輸出
