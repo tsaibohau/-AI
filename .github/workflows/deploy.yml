@@ -29,7 +29,7 @@ jobs:
       - name: 評測題格式檢查
         run: node eval/score.mjs --check
       - name: 評測（解題引擎）
-        run: node eval/score.mjs --min-accuracy 0.6
+        run: node eval/score.mjs --min-accuracy 0.8
       - name: 單元測試
         run: npm test
       - name: 建置

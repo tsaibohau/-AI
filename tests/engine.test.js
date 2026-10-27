@@ -74,14 +74,16 @@ describe('解題引擎：無法作答時', () => {
     expect(r2.ok).toBe(true);
     expect(r2.data.answer).toBe('(2, −1)');
   });
-  it('指數、對數題型回報開發中', () => {
-    expect(solve('解方程式 4^x − 6·2^x + 8 = 0').reason).toContain('開發中');
-    expect(solve('解方程式 log₂(x − 1) + log₂(x + 1) = 3').reason).toContain('開發中');
-  });
-  it('不是二次式', () => {
+  it('沒寫到的題型改用通用解法', () => {
     const r = solve('解 x^3 - 1 > 0');
+    expect(r).toMatchObject({ ok: true, type: 'general' });
+    expect(r.data.answer).toBe('(1, ∞)');
+  });
+  it('通用解法也不行時進入引導思考模式', () => {
+    const r = solve('三角形 ABC 中，AB = 3，AC = 4，∠A = 90°，求 BC');
     expect(r.ok).toBe(false);
-    expect(r.reason).toContain('二次');
+    expect(r.guided.stages).toHaveLength(4);
+    expect(r.guided.stages[3].hints.join()).toContain('幾何');
   });
   it('11 種題型都有列出', () => expect(TYPES).toHaveLength(11));
 });
