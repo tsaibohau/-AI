@@ -1,7 +1,7 @@
 // 解題器共用：取得二次式、求根步驟、解不等式步驟、組合四階段結果
 import { Q, Surd, quadRoots, toIntCoeffs, gcd } from './num.js';
 import { EngineError, MPoly, deg, mathPoly, parseText, prettyPoly, toMPoly, ueval, uscale } from './poly.js';
-import { ALL, describeSet, iv, point } from './interval.js';
+import { ALL, describeSet, formatSet, iv, point } from './interval.js';
 import { NEG_INF, POS_INF } from './num.js';
 
 export const REL_PRETTY = { '<': '<', '<=': '≤', '>': '>', '>=': '≥', '=': '=', '!=': '≠' };
@@ -69,6 +69,10 @@ export const vertexFormMath = (a, h, k, v = 'x') => `${a.toMath()}*(${v} - ${h.t
 export const subst = (p, val, v = 'x') =>
   mathPoly(p, v).replace(new RegExp(`\\b${v}\\b`, 'g'), `(${val.plain()})`);
 
+/** 老師模式的提問 */
+export const ask = (q, type, value, extra = {}) => ({ q, type, value, ...extra });
+export const setPlain = (rs) => (rs.length ? `{${rs.map((r) => r.plain()).join(', ')}}` : '無解');
+
 /** 配方步驟 */
 export function completingSquareStep(p, v = 'x', name = 'f(x)') {
   const { a, h, k } = vertexOf(p);
@@ -78,6 +82,9 @@ export function completingSquareStep(p, v = 'x', name = 'f(x)') {
       ? `把 ${v} 的一次項係數除以 2 再平方，加上再減去，湊成完全平方`
       : `先提出二次項係數 ${a.pretty()}，再把括號內湊成完全平方`,
     expr: `${mathPoly(p, v)} = ${vertexFormMath(a, h, k, v)}`,
+    concept: 'quad.completing_square',
+    detail: `h = −b/(2a) = −(${p[1].pretty()})/(2 × ${a.pretty()}) = ${h.pretty()}；把 ${v} = ${h.pretty()} 代回原式，得 k = ${k.pretty()}`,
+    ask: ask(`配方後寫成 a(${v} − h)² + k，頂點 (h, k) 是多少？`, 'point', `(${h.plain()}, ${k.plain()})`),
   };
 }
 
@@ -104,6 +111,9 @@ export function rootSteps(p, v = 'x', { showDisc = false } = {}) {
     step: `計算判別式 D = b² − 4ac = (${b.pretty()})² − 4 × (${a.pretty()}) × (${c.pretty()}) = ${disc.pretty()}`,
     reason: 'D > 0 有兩相異實根，D = 0 有重根，D < 0 沒有實根',
     expr: `(${b.plain()})^2 - 4*${a.toMath()}*${c.toMath()} = ${disc.plain()}`,
+    concept: 'quad.discriminant',
+    detail: `a = ${a.pretty()}、b = ${b.pretty()}、c = ${c.pretty()}；b² = ${b.mul(b).pretty()}，4ac = ${a.mul(c).mul(4).pretty()}，相減得 ${disc.pretty()}`,
+    ask: ask('判別式 D = b² − 4ac 是多少？', 'number', disc.plain()),
   };
   const rational = roots.length && roots.every((r) => r.isRational());
   if (showDisc || !rational) {
@@ -122,18 +132,28 @@ export function rootSteps(p, v = 'x', { showDisc = false } = {}) {
       step: `因式分解：${poly} = ${leadStr}${body}`,
       reason: '找兩數使乘積與和符合係數（十字交乘），可直接看出根',
       expr: `${mathPoly(p, v)} = ${lead.toMath()}*${bodyMath}`,
+      concept: 'base.factoring',
+      detail: a.eq(1)
+        ? `要找兩個數：相乘等於 ${c.pretty()}、相加等於 ${b.pretty()}，就是 ${(roots.length === 1 ? [roots[0], roots[0]] : roots).map((r) => r.toQ().neg().pretty()).join(' 和 ')}`
+        : `十字交乘：把 ${a.pretty()}${v}² 和 ${c.pretty()} 各拆成兩數相乘，交叉相乘再相加要等於 ${b.pretty()}${v}`,
     });
     concepts.set('base.factoring', '把二次式分解成一次因式的乘積');
     steps.push({
       step: roots.length === 1 ? `重根 ${v} = ${roots[0].pretty()}` : `兩根為 ${v} = ${roots[0].pretty()} 或 ${v} = ${roots[1].pretty()}`,
       reason: '乘積為 0 時，至少有一個因式為 0',
       expr: `${subst(p, roots[0].toQ(), v)} = 0`,
+      concept: 'base.factoring',
+      detail: `令每個因式等於 0：${fs.map((f, i) => `${f.pretty} = 0 → ${v} = ${roots[i].pretty()}`).join('；')}`,
+      ask: ask(`這個方程式的${roots.length === 1 ? '根' : '兩個根'}是多少？`, 'set', setPlain(roots)),
     });
   } else {
     steps.push({
       step: `用公式解 ${v} = (−b ± √D) / (2a)，得 ${v} = ${roots[0].pretty()} 或 ${v} = ${roots[1].pretty()}`,
       reason: 'D 不是完全平方數，無法用整數因式分解，改用公式解',
       expr: `${a.toMath()}*${roots[1].toMath()}^2 + ${b.toMath()}*${roots[1].toMath()} + ${c.toMath()} = 0`,
+      concept: 'quad.discriminant',
+      detail: `${v} = (−(${b.pretty()}) ± √${disc.pretty()}) / (2 × ${a.pretty()})，再把根號化簡`,
+      ask: ask('用公式解，兩個根是多少？（可以用 √ 表示）', 'set', setPlain(roots)),
     });
     concepts.set('quad.forms', '用兩根表示二次式');
   }
@@ -169,6 +189,7 @@ export function solveIneq(p, rel, v = 'x') {
       step: `移項後除以 ${b.pretty()}：${v} ${REL_PRETTY[rr]} ${r.pretty()}`,
       reason: b.sign() < 0 ? '除以負數，不等號要反向' : '除以正數，不等號方向不變',
       expr: `${b.toMath()}*${r.toMath()} + ${c.toMath()} = 0`,
+      concept: 'base.linear_ineq',
     });
     concepts.set('base.linear_ineq', '一次不等式移項求解');
     const set = { '<': [iv(NEG_INF, r)], '<=': [iv(NEG_INF, r, false, true)], '>': [iv(r, POS_INF)], '>=': [iv(r, POS_INF, true)] }[rr];
@@ -185,6 +206,8 @@ export function solveIneq(p, rel, v = 'x') {
       step: `兩邊同乘以 −1：${prettyPoly(q, v)} ${REL_PRETTY[rr]} 0`,
       reason: '讓二次項係數變成正的比較好判斷；乘以負數時不等號要反向',
       expr: '',
+      concept: 'base.linear_ineq',
+      detail: '每一項都變號，不等號也要反過來，例如 > 變成 <',
     });
   }
   const prim = primitive(q);
@@ -208,6 +231,8 @@ export function solveIneq(p, rel, v = 'x') {
       step: `二次項係數為正，拋物線開口向上：在兩根 ${roots[0].pretty()} 與 ${roots[1].pretty()} 之間，值小於 0；在兩根外側，值大於 0`,
       reason: '開口向上的拋物線只有在兩根之間會落在橫軸下方',
       expr: '',
+      concept: 'qineq.graph_method',
+      detail: `可以取數字驗證：兩根之間取一個數代入會得到負數，兩根外側取一個數代入會得到正數`,
     });
     const [r1, r2] = roots;
     set = {
@@ -235,7 +260,13 @@ export function solveIneq(p, rel, v = 'x') {
     concepts.set('qineq.always_true', '判別式小於 0 時二次式恆正或恆負');
   }
   concepts.set('qineq.graph_method', '用拋物線與橫軸的位置判斷正負');
-  steps.push({ step: `所以解為：${describeSet(set, v)}`, reason: '取出符合不等號方向的部分', expr: '' });
+  steps.push({
+    step: `所以解為：${describeSet(set, v)}`,
+    reason: '取出符合不等號方向的部分',
+    expr: '',
+    concept: 'base.interval_notation',
+    ask: ask(`${prettyPoly(q, v)} ${REL_PRETTY[rr]} 0 的解是什麼範圍？`, 'interval', formatSet(set, v)),
+  });
   return { set, steps, concepts };
 }
 

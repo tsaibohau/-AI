@@ -8,6 +8,7 @@ import { solveExpEquation, solveExpInequality } from './types/exponential.js';
 import { solveLogEquation, solveLogInequality, solveLogEvaluate } from './types/logarithm.js';
 import { solveGeneral } from './general/solve.js';
 import { buildGuided } from './guided.js';
+import { compareAnswer } from '../core/answer.js';
 
 export const TYPES = [
   { id: 'quad.extreme', unit: '二次函數', label: '求最大值或最小值', solve: solveExtreme },
@@ -44,10 +45,58 @@ export function detectType(an) {
   return null;
 }
 
+// 每種題型最後答案的格式（依序嘗試）
+const FINAL_TYPES = {
+  'quad.extreme': ['number'],
+  'quad.vertex': ['point', 'number'],
+  'quad.range_extreme': ['number'],
+  'quad.roots': ['set', 'number'],
+  'qineq.solve': ['interval'],
+  'qineq.always': ['interval'],
+  'exp.equation': ['set'],
+  'exp.inequality': ['interval'],
+  'log.equation': ['set'],
+  'log.inequality': ['interval'],
+  'log.evaluate': ['number'],
+  general: ['set', 'interval', 'number'],
+};
+
+/** 學生最後作答要比對的答案；答案是文字敘述（例如同時問最大最小值）時回傳 null */
+export function finalAsk(type, data) {
+  for (const t of FINAL_TYPES[type] || []) {
+    try {
+      if (compareAnswer({ type: t, value: data.answer }, data.answer).ok) return { q: '你的最後答案是？', type: t, value: data.answer };
+    } catch {
+      /* 這個格式解析不了，試下一個 */
+    }
+  }
+  return null;
+}
+
+// 題目要求的類型（給「審題」選擇題用）
+export const GOALS = ['求最大值或最小值', '求頂點或對稱軸', '解方程式（找出所有解）', '解不等式（找出範圍）', '求參數的範圍', '求一個式子的值'];
+
+export function goalOf(type, data) {
+  const map = {
+    'quad.extreme': 0, 'quad.range_extreme': 0, 'quad.vertex': 1, 'quad.roots': 2, 'exp.equation': 2, 'log.equation': 2,
+    'qineq.solve': 3, 'exp.inequality': 3, 'log.inequality': 3, 'qineq.always': 4, 'log.evaluate': 5,
+  };
+  if (type in map) return GOALS[map[type]];
+  const p = data.problem;
+  if (/^解方程式|^求使/.test(p)) return GOALS[2];
+  if (/^找出所有使/.test(p)) return GOALS[3];
+  if (/最大值|最小值/.test(p)) return GOALS[0];
+  return GOALS[5];
+}
+
 /** 題目有範圍限制但解法沒用到時提醒學生 */
 function checkRange(an, res) {
   if (res.ok && an.range && !an.usedRange) {
     res.data.uncertain.push(`題目中的條件「${rangeText(an.range)}」沒有用在這個解法裡，請確認答案是否要再和它取交集`);
+  }
+  if (res.ok) {
+    res.final = finalAsk(res.type, res.data);
+    res.goal = goalOf(res.type, res.data);
   }
   return res;
 }

@@ -2,7 +2,7 @@
 import { parseText, EngineError } from '../poly.js';
 import { Q, NEG_INF, POS_INF } from '../num.js';
 import { formatSet, describeSet, iv, normalizeSet } from '../interval.js';
-import { buildResult, REL_PRETTY } from '../common.js';
+import { ask, buildResult, REL_PRETTY } from '../common.js';
 import { compile, containsVar, domainConditions, features, logInfo, pretty, toMath } from './ast.js';
 import { domainRuns, extrema, findRoots, signSolve } from './numeric.js';
 import { identify, Approx } from './identify.js';
@@ -93,6 +93,8 @@ function equation(an, { lhs, rhs }) {
       step: `先確定定義域：${conds.map((c) => c.text).join('、')}，所以 ${describeSet(domainSet(runs), x)}`,
       reason: '式子要有意義，求出的解也必須落在定義域內',
       expr: '',
+      concept: 'base.domain',
+      ask: ask(`定義域（${x} 的範圍）是什麼？`, 'interval', formatSet(domainSet(runs), x)),
     });
   }
   if (!isZero(rhs)) {
@@ -107,6 +109,9 @@ function equation(an, { lhs, rhs }) {
       step: `觀察 F(${x}) 的正負變化，找出等於 0 的位置：${x} = ${rs.map((r) => r.pretty()).join('、')}`,
       reason: '這題沒有固定公式可套，找出函數值由正變負或碰到 0 的地方，再化成精確值',
       expr: '',
+      concept: 'base.function_graph',
+      detail: '可以先代幾個整數看看函數值的正負，變號的地方中間就有根；整數試不出來時再用公式或因式分解',
+      ...(rs.every((r) => !r.approx) ? { ask: ask(`使方程式成立的 ${x} 是哪些？`, 'set', `{${rs.map((r) => r.plain()).join(', ')}}`, conds.length ? { domain: formatSet(domainSet(runs), x) } : {}) } : {}),
     });
     for (const r of rs) {
       steps.push({
@@ -156,6 +161,8 @@ function inequality(an, { lhs, rhs, op }) {
       step: `先確定定義域：${conds.map((c) => c.text).join('、')}，所以 ${describeSet(domainSet(sol.runs), x)}`,
       reason: '只能在定義域內找解',
       expr: '',
+      concept: 'base.domain',
+      ask: ask(`定義域（${x} 的範圍）是什麼？`, 'interval', formatSet(domainSet(sol.runs), x)),
     });
   }
   if (!isZero(rhs)) steps.push({ step: `移項：令 F(${x}) = ${pretty(F)}，判斷 F(${x}) ${REL_PRETTY[op]} 0`, reason: '和 0 比較最容易判斷', expr: '' });
@@ -174,8 +181,14 @@ function inequality(an, { lhs, rhs, op }) {
     const v = g(at);
     return `${show(t.lo).replace('−∞', '−∞')} 到 ${show(t.hi)} 之間取 ${x} = ${show(at)}：F ${v > 0 ? '> 0' : v < 0 ? '< 0' : '= 0'}`;
   });
-  steps.push({ step: `逐段判斷正負：${tests.join('；')}`, reason: '每一段內正負不變，取一點代表整段', expr: '' });
-  steps.push({ step: `取符合「${REL_PRETTY[op]} 0」的部分：${describeSet(set, x)}`, reason: '把成立的區段合併寫出', expr: '' });
+  steps.push({ step: `逐段判斷正負：${tests.join('；')}`, reason: '每一段內正負不變，取一點代表整段', expr: '', concept: 'base.sign_analysis' });
+  steps.push({
+    step: `取符合「${REL_PRETTY[op]} 0」的部分：${describeSet(set, x)}`,
+    reason: '把成立的區段合併寫出',
+    expr: '',
+    concept: 'base.interval_notation',
+    ...(set.every((s) => !s.lo.approx && !s.hi.approx) ? { ask: ask(`${x} 的範圍是什麼？`, 'interval', formatSet(set, x), conds.length ? { domain: formatSet(domainSet(sol.runs), x) } : {}) } : {}),
+  });
   return buildResult({
     problem: `找出所有使 ${text} 成立的實數 ${x}`,
     explicit: [`不等式 ${text}`],

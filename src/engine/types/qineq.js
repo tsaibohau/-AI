@@ -2,7 +2,7 @@
 import { Q } from '../num.js';
 import { EngineError, deg, mathPoly, prettyPoly, uadd, ueval, umul, uscale } from '../poly.js';
 import { ALL, contains, formatSet, intersect, pickPoint, point, union, describeSet } from '../interval.js';
-import { REL_PRETTY, buildResult, graphBox, holds, mainPoly, prettyText, quadOf, solveIneq, vertexOf } from '../common.js';
+import { REL_PRETTY, ask, buildResult, graphBox, holds, mainPoly, prettyText, quadOf, solveIneq, vertexOf } from '../common.js';
 
 const INEQ = ['<', '<=', '>', '>='];
 
@@ -123,6 +123,9 @@ export function solveAlwaysTrue(an) {
     step: `判別式 D = b² − 4ac = (${prettyPoly(B, k)})² − 4(${aText})(${prettyPoly(C, k)}) = ${prettyPoly(D, k)}`,
     reason: '把係數代入判別式，得到參數的式子',
     expr: `(${bMath})^2 - 4*(${aMath})*(${cMath}) = ${mathPoly(D, k)}`,
+    concept: 'quad.discriminant',
+    detail: `這裡 a = ${aText}、b = ${prettyPoly(B, k)}、c = ${prettyPoly(C, k)}，代入 b² − 4ac 後展開`,
+    ask: ask(`判別式 D 寫成 ${k} 的式子是什麼？`, 'expr', mathPoly(D, k), { var: k }),
   });
   steps.push({ step: `解 ${prettyPoly(D, k)} ${REL_PRETTY[dRel]} 0`, reason: '判別式條件', expr: '' });
   const sd = solveIneq(D, dRel, k);
@@ -134,6 +137,8 @@ export function solveAlwaysTrue(an) {
     step: `兩個條件同時成立${degenerate.length ? `，再加上 ${k} = ${degenerate[0].lo.pretty()}` : ''}：${describeSet(set, k)}`,
     reason: '恆成立需要所有條件都滿足，取交集',
     expr: '',
+    concept: 'qineq.parameter',
+    ask: ask(`${k} 的範圍是什麼？`, 'interval', formatSet(set, k)),
   });
 
   const inK = pickPoint(set, true);

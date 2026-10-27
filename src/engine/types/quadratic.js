@@ -2,7 +2,7 @@
 import { Q } from '../num.js';
 import { EngineError, mathPoly, prettyPoly, ueval } from '../poly.js';
 import {
-  buildResult, completingSquareStep, graphBox, mainPoly, prettyText, quadOf, rootSteps, subst, vertexOf,
+  ask, buildResult, completingSquareStep, graphBox, mainPoly, prettyText, quadOf, rootSteps, subst, vertexOf,
 } from '../common.js';
 
 function fnName(an) {
@@ -39,6 +39,9 @@ export function solveExtreme(an) {
     step: `因為 (${x} − ${h.pretty()})² ≥ 0，所以 ${name} ${up ? '≥' : '≤'} ${k.pretty()}，等號在 ${x} = ${h.pretty()} 時成立`,
     reason: `平方一定 ≥ 0，乘上${up ? '正數' : '負數'} ${a.pretty()} 後${up ? '仍 ≥ 0' : '變成 ≤ 0'}`,
     expr: `${subst(p, h, x)} = ${k.plain()}`,
+    concept: 'quad.max_min',
+    detail: `把 ${x} = ${h.pretty()} 代入：${subst(p, h, x).replace(/\*/g, '·')} = ${k.pretty()}`,
+    ask: ask(`${up ? '最小值' : '最大值'}是多少？`, 'number', k.plain()),
   });
   steps.push({
     step: up
@@ -88,6 +91,8 @@ export function solveVertex(an) {
       step: `標準式 a(${x} − h)² + k 的頂點是 (h, k)，所以頂點為 (${h.pretty()}, ${k.pretty()})，對稱軸為 ${x} = ${h.pretty()}`,
       reason: `(${x} − h)² 在 ${x} = h 時最小（等於 0），圖形對這條直線左右對稱`,
       expr: `${subst(p, h, x)} = ${k.plain()}`,
+      concept: 'quad.vertex_axis',
+      ...(wantA && !wantV ? { ask: ask('對稱軸是 x = 多少？', 'number', h.plain()) } : {}),
     },
   ];
   const vText = `(${h.pretty()}, ${k.pretty()})`;
@@ -136,16 +141,21 @@ export function solveRangeExtreme(an) {
     step: `頂點的 ${x} = ${h.pretty()}，${inside ? '在' : '不在'}範圍 ${rangeText} ${inside ? '內' : '的內部'}`,
     reason: '最值只可能出現在頂點（若在範圍內）或範圍的兩端',
     expr: '',
+    concept: 'quad.max_min_interval',
   });
   steps.push({
     step: `計算兩端：${x} = ${r.lo.pretty()} 時為 ${fl.pretty()}${r.loC ? '' : '（端點取不到）'}`,
     reason: '端點的函數值是最值的候選',
     expr: `${subst(p, r.lo, x)} = ${fl.plain()}`,
+    concept: 'quad.max_min_interval',
+    ask: ask(`${x} = ${r.lo.pretty()} 時，函數值是多少？`, 'number', fl.plain()),
   });
   steps.push({
     step: `${x} = ${r.hi.pretty()} 時為 ${fh.pretty()}${r.hiC ? '' : '（端點取不到）'}`,
     reason: '另一端也要算',
     expr: `${subst(p, r.hi, x)} = ${fh.plain()}`,
+    concept: 'quad.max_min_interval',
+    ask: ask(`${x} = ${r.hi.pretty()} 時，函數值是多少？`, 'number', fh.plain()),
   });
   const cands = [
     { x: r.lo, v: fl, ok: r.loC },

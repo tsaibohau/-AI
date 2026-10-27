@@ -2,7 +2,7 @@
 import { Q, NEG_INF, POS_INF } from '../num.js';
 import { EngineError, deg, mathPoly, prettyPoly, trim } from '../poly.js';
 import { iv, intersect, formatSet, describeSet, normalizeSet } from '../interval.js';
-import { REL_PRETTY, buildResult, rootSteps, solveIneq } from '../common.js';
+import { REL_PRETTY, ask, buildResult, rootSteps, solveIneq } from '../common.js';
 import { compile, containsVar, pretty, toMath } from '../general/ast.js';
 import { sides } from '../general/solve.js';
 import { logOf } from '../general/identify.js';
@@ -84,6 +84,9 @@ function rewriteStep(an, { F, b, m, P, op }) {
     step: `令 t = ${b}^${x}（t > 0）。式中的指數都能寫成 ${b} 的次方，${m ? `兩邊同乘以 t${m > 1 ? '²' : ''}（t > 0，不改變${op && op !== '=' ? '不等號方向' : '等式'}）後，` : ''}原式變成 ${prettyPoly(P, 't')} ${rel} 0`,
     reason: `例如 ${b * b}^${x} = (${b}^${x})² = t²；換元後就是熟悉的 t 的${deg(P) === 2 ? '二次' : '一次'}式`,
     expr: `(${toMath(F)})*${tPow}^${m} = ${rhsMath}`,
+    concept: 'base.substitution',
+    detail: `把每一個指數項都寫成 (${b}^${x}) 的次方，例如 ${b * b}^${x} = (${b}²)^${x} = (${b}^${x})²、${b}^(${x}+1) = ${b}·${b}^${x}，再把 ${b}^${x} 換成 t`,
+    ask: ask(`令 t = ${b}^${x}，原式會變成 t 的哪個式子？（寫出「… = 0」的左邊）`, 'expr_prop', mathPoly(P, 't'), { var: 't' }),
   };
 }
 
@@ -132,6 +135,8 @@ export function solveExpEquation(an) {
       step: `${b}^${x} = ${t.pretty()}，所以 ${x} = ${xv.pretty()}`,
       reason: xv instanceof Q ? `${t.pretty()} 是 ${b} 的 ${xv.pretty()} 次方，同底比較指數` : '不是整數次方，用對數表示',
       expr: `${b}^${xv.toMath()} = ${t.toMath()}`,
+      concept: 'exp.equation',
+      ask: ask(`${b}^${x} = ${t.pretty()}，${x} 是多少？`, 'number', xv.plain()),
     });
   }
   xs.sort((u, v) => u.value() - v.value());
@@ -170,6 +175,8 @@ export function solveExpInequality(an) {
     step: `底數 ${b} > 1，y = ${b}^${x} 是遞增函數，t 的範圍直接換回 ${x}：${describeSet(xSet, x)}`,
     reason: `${b}^${x} 越大，${x} 就越大，不等號方向不變`,
     expr: '',
+    concept: 'exp.function_graph',
+    ask: ask(`${x} 的範圍是什麼？`, 'interval', formatSet(xSet, x)),
   });
   const concepts = [
     ['exp.rules', `把各項化成以 ${b} 為底`],

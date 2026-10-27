@@ -2,7 +2,7 @@
 import { Q, lcm } from '../num.js';
 import { EngineError, deg, mathPoly, parseText, prettyPoly, toMPoly, umul, usub, uscale, ueval } from '../poly.js';
 import { ALL, contains, describeSet, formatSet, intersect } from '../interval.js';
-import { REL_PRETTY, buildResult, rootSteps, solveIneq } from '../common.js';
+import { REL_PRETTY, ask, buildResult, rootSteps, solveIneq } from '../common.js';
 import { compile, containsVar, logInfo, pretty, toMath } from '../general/ast.js';
 import { sides, num } from '../general/solve.js';
 
@@ -172,6 +172,9 @@ function prepare(an, op) {
     step: `先找定義域：真數都要大於 0（${logs.map((l) => `${prettyPoly(l.g, x)} > 0`).join('、')}），所以 ${describeSet(dom.set, x)}`,
     reason: '對數的真數必須是正數，最後要用來檢查解',
     expr: '',
+    concept: 'log.domain',
+    detail: `每個真數各自大於 0，再取交集（同時成立的部分）`,
+    ask: ask(`定義域（${x} 的範圍）是什麼？`, 'interval', formatSet(dom.set, x)),
   });
   if (A.changed.length) {
     steps.push({
@@ -187,6 +190,7 @@ function prepare(an, op) {
     step: `用對數律合併：${left} ${REL_PRETTY[op]} ${right}`,
     reason: 'log M + log N = log(MN)，n·log M = log Mⁿ；係數為負的移到另一邊',
     expr: '',
+    concept: 'log.rules',
   });
   return { ...A, pos, neg, K: Ki, BK, P, dom, steps };
 }
@@ -206,6 +210,8 @@ export function solveLogEquation(an) {
     step: `展開移項：${prettyPoly(P, x)} = 0`,
     reason: '整理成多項式方程式',
     expr: `${productMath(pos, x)} - ${BK.toMath()}*${productMath(neg, x)} = ${mathPoly(P, x)}`,
+    concept: 'log.definition',
+    ask: ask('去掉 log 並展開移項後，得到哪個方程式？（寫出「… = 0」的左邊）', 'expr_prop', mathPoly(P, x), { var: x }),
   });
   const concepts = [
     ['log.domain', '真數要大於 0'],
@@ -231,6 +237,8 @@ export function solveLogEquation(an) {
     step: `檢查定義域：${[...good.map((r) => `${x} = ${r.pretty()} 符合`), ...bad.map((r) => `${x} = ${r.pretty()} 不合（真數會小於或等於 0）`)].join('；')}`,
     reason: '化成多項式時可能多出不合的根，一定要代回檢查',
     expr: '',
+    concept: 'log.domain',
+    ask: ask('檢查定義域後，真正的解是哪些？', 'set', good.length ? `{${good.map((r) => r.plain()).join(', ')}}` : '無解', { domain: formatSet(dom.set, x) }),
   });
   const f = compile(d.F);
   return buildResult({
@@ -265,6 +273,7 @@ export function solveLogInequality(an) {
     step: `底數 ${B} > 1，${logName(B)} 是遞增函數，去掉對數時不等號方向不變：${product(pos, x)} ${REL_PRETTY[op]} ${neg.length ? `${BK.pretty()} · ${product(neg, x)}` : BK.pretty()}`,
     reason: `真數越大，對數值越大；${neg.length ? `在定義域內 ${product(neg, x)} > 0，` : ''}${B}^${K} = ${BK.pretty()}`,
     expr: '',
+    concept: 'log.function_graph',
   });
   steps.push({
     step: `移項整理：${prettyPoly(P, x)} ${REL_PRETTY[op]} 0`,
@@ -274,7 +283,13 @@ export function solveLogInequality(an) {
   const sol = solveIneq(P, op, x);
   steps.push(...sol.steps);
   const set = intersect(sol.set, dom.set);
-  steps.push({ step: `和定義域取交集：${describeSet(set, x)}`, reason: '解必須同時讓真數大於 0', expr: '' });
+  steps.push({
+    step: `和定義域取交集：${describeSet(set, x)}`,
+    reason: '解必須同時讓真數大於 0',
+    expr: '',
+    concept: 'log.domain',
+    ask: ask(`和定義域取交集後，${x} 的範圍是什麼？`, 'interval', formatSet(set, x), { domain: formatSet(dom.set, x) }),
+  });
   const concepts = [
     ['log.domain', '真數要大於 0'],
     ['log.rules', '用對數律合併'],
