@@ -13,6 +13,9 @@
     { "id": "base.linear_ineq", "name": "一次不等式", "unit": "base", "prereq": [] },
     { "id": "base.interval_notation", "name": "區間與解集合表示", "unit": "base", "prereq": ["base.linear_ineq"] },
     { "id": "base.substitution", "name": "換元（令 t = …）", "unit": "base", "prereq": [] },
+    { "id": "base.domain", "name": "定義域（使式子有意義的範圍）", "unit": "base", "prereq": [] },
+    { "id": "base.sign_analysis", "name": "分段判斷正負（符號表）", "unit": "base", "prereq": ["base.interval_notation"] },
+    { "id": "base.function_graph", "name": "從函數圖形判讀根、正負與最值", "unit": "base", "prereq": [] },
 
     { "id": "quad.forms", "name": "二次函數一般式、標準式與兩根式", "unit": "quad", "prereq": ["base.factoring"] },
     { "id": "quad.completing_square", "name": "配方法", "unit": "quad", "prereq": ["base.factoring"] },

@@ -5,12 +5,53 @@ const EPS = 1e-9;
 const near = (a, b) =>
   a === b || (Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= EPS * Math.max(1, Math.abs(a), Math.abs(b)));
 
+/** 找到 s[i] 這個左括號對應的右括號位置 */
+function matchParen(s, i) {
+  let d = 0;
+  for (let j = i; j < s.length; j++) {
+    if (s[j] === '(') d++;
+    else if (s[j] === ')' && --d === 0) return j;
+  }
+  return -1;
+}
+
+/** log₂ 3、log 3、ln 2 等寫法轉成 mathjs：log(3, 2)、log(3, 10)、log(2) */
+function normalizeLogs(t) {
+  t = t
+    .replace(/(log_\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?(?:\/\d+)?)/g, '$1($2)')
+    .replace(/\b(log|ln)\s+(\d+(?:\.\d+)?(?:\/\d+)?)/g, '$1($2)')
+    .replace(/(log_\d+(?:\.\d+)?)\s+\(/g, '$1(');
+  let out = '';
+  for (let i = 0; i < t.length; i++) {
+    const m = t.slice(i).match(/^(log_(\d+(?:\.\d+)?)|log|ln)\(/);
+    if (!m || /[a-zA-Z_]/.test(t[i - 1] || '')) {
+      out += t[i];
+      continue;
+    }
+    const open = i + m[1].length;
+    const close = matchParen(t, open);
+    if (close < 0) {
+      out += t[i];
+      continue;
+    }
+    const inner = normalizeLogs(t.slice(open + 1, close));
+    const hasComma = splitTop(inner, [',']).length > 1;
+    if (m[2]) out += `log(${inner}, ${m[2]})`;
+    else if (m[1] === 'ln') out += `log(${inner})`;
+    else out += hasComma ? `log(${inner})` : `log(${inner}, 10)`;
+    i = close;
+  }
+  return out;
+}
+
 export function normalize(s) {
   let t = String(s ?? '');
   // 去掉含中文的全形括號補充說明，例如「（-3 不合）」；「（2，-5）」這種座標保留
   t = t.replace(/（[^）]*[㐀-鿿][^）]*）/g, '');
   t = t.replace(/²/g, '^2').replace(/³/g, '^3');
+  t = t.replace(/[₀₁₂₃₄₅₆₇₈₉]+/g, (m) => `_${[...m].map((c) => c.charCodeAt(0) - 0x2080).join('')} `);
   t = t.normalize('NFKC');
+  t = normalizeLogs(t);
   t = t
     .replace(/^\s*(答案|答)\s*[:：]?/, '')
     .replace(/[≤≦]/g, '<=')

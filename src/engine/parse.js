@@ -12,9 +12,10 @@ export function normalizeProblem(text) {
     const s = [...m].map((c) => SUP[c]).join('');
     return s.length > 1 ? `^(${s})` : `^${s}`;
   });
-  t = t.replace(/[₀₁₂₃₄₅₆₇₈₉]+/g, (m) => `_${[...m].map((c) => SUB[c]).join('')}`);
+  // log₂8 → log_2 8（加空白，避免和後面的數字黏成 log_28）
+  t = t.replace(/[₀₁₂₃₄₅₆₇₈₉]+/g, (m) => `_${[...m].map((c) => SUB[c]).join('')} `);
   t = t.normalize('NFKC');
-  return t
+  t = t
     .replace(/[−–—﹣]/g, '-')
     .replace(/[≤≦⩽]/g, '<=')
     .replace(/[≥≧⩾]/g, '>=')
@@ -22,7 +23,37 @@ export function normalizeProblem(text) {
     .replace(/[×·⋅∙]/g, '*')
     .replace(/÷/g, '/')
     .replace(/√\(/g, 'sqrt(')
-    .replace(/√(\d+(?:\.\d+)?|[a-zA-Z])/g, 'sqrt($1)');
+    .replace(/√(\d+(?:\.\d+)?|[a-zA-Z])/g, 'sqrt($1)')
+    // log_2 8 → log_2(8)；log 2 → log(2)；ln x → ln(x)
+    .replace(/(log_\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?|[a-zA-Z](?![a-zA-Z(]))/g, '$1($2)')
+    .replace(/\b(log|ln)\s+(\d+(?:\.\d+)?|[a-zA-Z](?![a-zA-Z(]))/g, '$1($2)')
+    .replace(/(log_\d+(?:\.\d+)?)\s+\(/g, '$1(');
+  return fixBaseLogs(t);
+}
+
+/** log_(1/2)(x − 1) → log((x − 1), (1/2))：底數用括號寫的對數 */
+function fixBaseLogs(t) {
+  let i = t.indexOf('log_(');
+  while (i >= 0) {
+    const b0 = i + 4;
+    const b1 = matchParen(t, b0);
+    if (b1 < 0 || t[b1 + 1] !== '(') break;
+    const a1 = matchParen(t, b1 + 1);
+    if (a1 < 0) break;
+    const rep = `log(${t.slice(b1 + 2, a1)}, ${t.slice(b0 + 1, b1)})`;
+    t = t.slice(0, i) + rep + t.slice(a1 + 1);
+    i = t.indexOf('log_(', i + rep.length);
+  }
+  return t;
+}
+
+function matchParen(s, i) {
+  let d = 0;
+  for (let j = i; j < s.length; j++) {
+    if (s[j] === '(') d++;
+    else if (s[j] === ')' && --d === 0) return j;
+  }
+  return -1;
 }
 
 function splitTopComma(s) {
@@ -84,6 +115,17 @@ export function classifyRun(run) {
     const hi = asConstant(m[4]);
     if (lo && hi) return { kind: 'range', var: m[1], lo, hi, loC: m[2] === '[', hiC: m[5] === ']' };
   }
+  // 單邊範圍：x > 0、x ≤ 3、2 < x
+  m = run.match(/^([a-zA-Z])(<=|<|>=|>)(.+)$/);
+  if (m) {
+    const c = asConstant(m[3]);
+    if (c) return m[2].startsWith('<') ? { kind: 'range', var: m[1], lo: null, hi: c, loC: false, hiC: m[2] === '<=' } : { kind: 'range', var: m[1], lo: c, hi: null, loC: m[2] === '>=', hiC: false };
+  }
+  m = run.match(/^(.+?)(<=|<|>=|>)([a-zA-Z])$/);
+  if (m) {
+    const c = asConstant(m[1]);
+    if (c) return m[2].startsWith('<') ? { kind: 'range', var: m[3], lo: c, hi: null, loC: m[2] === '<=', hiC: false } : { kind: 'range', var: m[3], lo: null, hi: c, loC: false, hiC: m[2] === '>=' };
+  }
   // 函數定義：f(x)=…、y=…
   m = run.match(/^(?:([a-zA-Z])\(([a-zA-Z])\)|y)=([^<>=!]+)$/);
   if (m) return { kind: 'def', name: m[1] || 'y', var: m[2] || null, expr: m[3] };
@@ -131,8 +173,7 @@ export function analyze(text) {
   const exprText = main.kind === 'rel' ? `(${main.lhs})-(${main.rhs})` : main.expr;
   const node = parseText(exprText);
   const syms = symbolsOf(node).filter((s) => !['pi', 'e'].includes(s));
-  let x = main.var || (syms.includes('x') ? 'x' : syms[0]);
-  if (!x) throw new EngineError('算式中沒有變數');
+  const x = main.var || (syms.includes('x') ? 'x' : syms[0]) || null; // 沒有變數：求值題
   const params = syms.filter((s) => s !== x);
   if (params.length > 1) throw new EngineError(`算式中有太多未知數（${syms.join('、')}），目前只支援一個參數`);
 
@@ -150,3 +191,10 @@ export function analyze(text) {
 }
 
 export const ZERO = new Q(0n);
+
+/** 範圍限制的文字，例如 1 ≤ x ≤ 4、x > 0 */
+export function rangeText(r) {
+  if (r.lo && r.hi) return `${r.lo.pretty()} ${r.loC ? '≤' : '<'} ${r.var} ${r.hiC ? '≤' : '<'} ${r.hi.pretty()}`;
+  if (r.lo) return `${r.var} ${r.loC ? '≥' : '>'} ${r.lo.pretty()}`;
+  return `${r.var} ${r.hiC ? '≤' : '<'} ${r.hi.pretty()}`;
+}
