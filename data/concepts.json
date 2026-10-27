@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "note": "第一版範圍：二次函數與二次不等式、指數與對數。prereq 為先備概念 id。",
+  "units": [
+    { "id": "base", "name": "基礎代數" },
+    { "id": "quad", "name": "二次函數" },
+    { "id": "qineq", "name": "二次不等式" },
+    { "id": "exp", "name": "指數" },
+    { "id": "log", "name": "對數" }
+  ],
+  "concepts": [
+    { "id": "base.factoring", "name": "因式分解", "unit": "base", "prereq": [] },
+    { "id": "base.linear_ineq", "name": "一次不等式", "unit": "base", "prereq": [] },
+    { "id": "base.interval_notation", "name": "區間與解集合表示", "unit": "base", "prereq": ["base.linear_ineq"] },
+    { "id": "base.substitution", "name": "換元（令 t = …）", "unit": "base", "prereq": [] },
+
+    { "id": "quad.forms", "name": "二次函數一般式、標準式與兩根式", "unit": "quad", "prereq": ["base.factoring"] },
+    { "id": "quad.completing_square", "name": "配方法", "unit": "quad", "prereq": ["base.factoring"] },
+    { "id": "quad.vertex_axis", "name": "頂點與對稱軸", "unit": "quad", "prereq": ["quad.completing_square"] },
+    { "id": "quad.opening", "name": "開口方向與 a 的正負", "unit": "quad", "prereq": ["quad.forms"] },
+    { "id": "quad.max_min", "name": "二次函數的最大值與最小值", "unit": "quad", "prereq": ["quad.vertex_axis", "quad.opening"] },
+    { "id": "quad.max_min_interval", "name": "限定區間上的最值", "unit": "quad", "prereq": ["quad.max_min"] },
+    { "id": "quad.discriminant", "name": "判別式與實根個數", "unit": "quad", "prereq": ["quad.completing_square"] },
+    { "id": "quad.vieta", "name": "根與係數的關係", "unit": "quad", "prereq": ["quad.forms"] },
+    { "id": "quad.intercepts", "name": "圖形與座標軸的交點", "unit": "quad", "prereq": ["quad.discriminant"] },
+    { "id": "quad.translation", "name": "圖形平移", "unit": "quad", "prereq": ["quad.vertex_axis"] },
+
+    { "id": "qineq.factored", "name": "可因式分解的二次不等式", "unit": "qineq", "prereq": ["base.factoring", "base.interval_notation"] },
+    { "id": "qineq.graph_method", "name": "用圖形判斷不等式的解", "unit": "qineq", "prereq": ["quad.intercepts", "quad.opening"] },
+    { "id": "qineq.always_true", "name": "恆正、恆負與判別式", "unit": "qineq", "prereq": ["quad.discriminant", "quad.opening"] },
+    { "id": "qineq.parameter", "name": "含參數的二次不等式", "unit": "qineq", "prereq": ["qineq.always_true"] },
+
+    { "id": "exp.rules", "name": "指數律", "unit": "exp", "prereq": [] },
+    { "id": "exp.rational", "name": "根式與分數指數", "unit": "exp", "prereq": ["exp.rules"] },
+    { "id": "exp.function_graph", "name": "指數函數圖形與單調性", "unit": "exp", "prereq": ["exp.rules"] },
+    { "id": "exp.equation", "name": "指數方程式", "unit": "exp", "prereq": ["exp.rules"] },
+    { "id": "exp.inequality", "name": "指數不等式", "unit": "exp", "prereq": ["exp.function_graph"] },
+
+    { "id": "log.definition", "name": "對數的定義", "unit": "log", "prereq": ["exp.rules"] },
+    { "id": "log.domain", "name": "底數與真數的限制", "unit": "log", "prereq": ["log.definition"] },
+    { "id": "log.rules", "name": "對數運算律", "unit": "log", "prereq": ["log.definition"] },
+    { "id": "log.change_base", "name": "換底公式", "unit": "log", "prereq": ["log.rules"] },
+    { "id": "log.function_graph", "name": "對數函數圖形與單調性", "unit": "log", "prereq": ["log.definition", "exp.function_graph"] },
+    { "id": "log.equation", "name": "對數方程式", "unit": "log", "prereq": ["log.rules", "log.domain"] },
+    { "id": "log.inequality", "name": "對數不等式", "unit": "log", "prereq": ["log.function_graph", "log.domain"] },
+    { "id": "log.common", "name": "常用對數與位數估計", "unit": "log", "prereq": ["log.rules"] }
+  ]
+}
