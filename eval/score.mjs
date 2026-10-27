@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // 評分腳本。用法見 eval/README.md
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { compareAnswer } from '../src/core/answer.js';
 import { createValidator } from '../src/core/schema.js';
-import { checkRaw, solveProblem } from '../src/core/solve.js';
-import { DEFAULT_MODEL } from '../src/core/gemini.js';
+import { checkRaw } from '../src/core/schema.js';
+import { solve } from '../src/engine/index.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = (p) => JSON.parse(readFileSync(p, 'utf8'));
@@ -80,6 +80,7 @@ export function scoreRun(problems, concepts, records) {
     rows,
     summary: {
       count: rows.length,
+      answeredRate: avg((r) => !byId.get(r.id).error),
       jsonValidRate: avg((r) => r.jsonFinal),
       jsonFirstTryRate: avg((r) => r.jsonFirst),
       answerAccuracy: avg((r) => r.answerOk),
@@ -97,12 +98,12 @@ export function formatReport({ rows, summary }) {
   const lines = ['題號   JSON  答案  概念命中  圖  備註'];
   for (const r of rows) {
     lines.push(
-      `${r.id.padEnd(6)} ${mark(r.jsonFinal)}${r.jsonFirst ? ' ' : '*'}   ${mark(r.answerOk)}    ${pct(r.conceptRecall).padStart(6)}   ${mark(r.diagramMatch)}  ${r.note}`,
+      `${r.id.padEnd(6)} ${mark(r.jsonFinal)}    ${mark(r.answerOk)}    ${pct(r.conceptRecall).padStart(6)}   ${mark(r.diagramMatch)}  ${r.note}`,
     );
   }
-  lines.push('（* 表示首次輸出不合法、重試後才通過或仍失敗）', '');
-  lines.push(`題數：${summary.count}`);
-  lines.push(`JSON 合法率：${pct(summary.jsonValidRate)}（首次 ${pct(summary.jsonFirstTryRate)}）`);
+  lines.push('');
+  lines.push(`題數：${summary.count}（可作答 ${pct(summary.answeredRate)}）`);
+  lines.push(`JSON 合法率：${pct(summary.jsonValidRate)}`);
   lines.push(`答案正確率：${pct(summary.answerAccuracy)}`);
   lines.push(`概念標籤命中率：${pct(summary.conceptHitRate)}（精確率 ${pct(summary.conceptPrecision)}）`);
   lines.push(`圖解需求一致率：${pct(summary.diagramMatchRate)}`);
@@ -110,49 +111,26 @@ export function formatReport({ rows, summary }) {
 }
 
 function parseArgs(argv) {
-  const a = { delay: 4000 };
+  const a = {};
   for (let i = 0; i < argv.length; i++) {
     const k = argv[i];
     if (k === '--from') a.from = argv[++i];
     else if (k === '--only') a.only = argv[++i].split(',');
-    else if (k === '--model') a.model = argv[++i];
-    else if (k === '--delay') a.delay = Number(argv[++i]);
+    else if (k === '--min-accuracy') a.minAccuracy = Number(argv[++i]);
     else if (k === '--check') a.checkOnly = true;
   }
   return a;
 }
 
-async function runLive({ problems, concepts, model, delay }) {
-  const envFile = join(ROOT, '.env');
-  if (existsSync(envFile)) process.loadEnvFile(envFile);
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    console.error('找不到 GEMINI_API_KEY。請複製 .env.example 成 .env 並填入金鑰，或用 --from 重新評分已存的輸出。');
-    process.exit(2);
-  }
-  model = model || process.env.GEMINI_MODEL || DEFAULT_MODEL;
-  const records = [];
-  for (const [i, p] of problems.entries()) {
-    process.stdout.write(`(${i + 1}/${problems.length}) ${p.id} … `);
-    try {
-      const r = await solveProblem({ apiKey, model, concepts, text: p.text });
-      records.push({ id: p.id, attempts: r.attempts });
-      console.log(r.ok ? '完成' : '格式不合法');
-    } catch (e) {
-      records.push({ id: p.id, attempts: [], error: e.message });
-      console.log(`失敗：${e.message}`);
-    }
-    if (i < problems.length - 1) await new Promise((res) => setTimeout(res, delay));
-  }
-  const dir = join(ROOT, 'eval/runs');
-  mkdirSync(dir, { recursive: true });
-  const file = join(dir, `run-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
-  writeFileSync(file, JSON.stringify({ model, createdAt: new Date().toISOString(), records }, null, 2));
-  console.log(`\n模型輸出已存到 ${file}\n`);
-  return records;
+/** 用解題引擎作答，產生與評分格式相同的紀錄 */
+export function runEngine(problems) {
+  return problems.map((p) => {
+    const r = solve(p.text);
+    return r.ok ? { id: p.id, attempts: [{ raw: JSON.stringify(r.data) }] } : { id: p.id, attempts: [], error: r.reason };
+  });
 }
 
-async function main() {
+function main() {
   const args = parseArgs(process.argv.slice(2));
   const { concepts, problems: all } = loadData();
   const bad = checkProblems(all, concepts);
@@ -162,10 +140,13 @@ async function main() {
   }
   if (args.checkOnly) return console.log(`評測題檢查通過（${all.length} 題）`);
   const problems = args.only ? all.filter((p) => args.only.includes(p.id)) : all;
-  const records = args.from
-    ? readJson(args.from).records
-    : await runLive({ problems, concepts, model: args.model, delay: args.delay });
-  console.log(formatReport(scoreRun(problems, concepts, records)));
+  const records = args.from ? readJson(args.from).records : runEngine(problems);
+  const result = scoreRun(problems, concepts, records);
+  console.log(formatReport(result));
+  if (args.minAccuracy !== undefined && result.summary.answerAccuracy < args.minAccuracy) {
+    console.error(`\n✗ 答案正確率 ${pct(result.summary.answerAccuracy)} 低於門檻 ${pct(args.minAccuracy)}`);
+    process.exit(1);
+  }
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) main();
