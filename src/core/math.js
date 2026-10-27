@@ -3,6 +3,7 @@ import { create, all } from 'mathjs';
 
 export const math = create(all);
 const limitedEvaluate = math.evaluate;
+const limitedParse = math.parse;
 
 math.import(
   {
@@ -15,6 +16,11 @@ math.import(
   },
   { override: true },
 );
+
+/** 解析算式成語法樹（只解析不執行） */
+export function parseExpr(expr) {
+  return limitedParse(String(expr));
+}
 
 /** 計算算式，回傳實數；失敗或非實數回傳 NaN */
 export function evalReal(expr, scope = {}) {

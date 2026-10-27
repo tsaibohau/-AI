@@ -9,6 +9,7 @@ export function normalize(s) {
   let t = String(s ?? '');
   // 去掉含中文的全形括號補充說明，例如「（-3 不合）」；「（2，-5）」這種座標保留
   t = t.replace(/（[^）]*[㐀-鿿][^）]*）/g, '');
+  t = t.replace(/²/g, '^2').replace(/³/g, '^3');
   t = t.normalize('NFKC');
   t = t
     .replace(/^\s*(答案|答)\s*[:：]?/, '')
@@ -29,7 +30,7 @@ export function normalize(s) {
   return t;
 }
 
-const isEmptyWord = (t) => /^(無解|空集合|∅|\{\}|empty)$/i.test(t);
+const isEmptyWord = (t) => /^(無解|無實數解|無實根|沒有實數解|空集合|∅|\{\}|empty)$/i.test(t);
 const isAllReal = (t) => /^(R|ℝ|所有實數|全體實數|實數|任意實數|\(-inf,\+?inf\))$/.test(t);
 const stripCjk = (t) => t.replace(/[㐀-鿿：:]/g, '');
 
@@ -164,6 +165,13 @@ export function parseIntervals(s) {
       const hi = num(parts[1]);
       if (Number.isNaN(lo) || Number.isNaN(hi)) return null;
       out.push(iv(lo, hi, m[1] === '[', m[3] === ']'));
+      continue;
+    }
+    const eqm = piece.match(/^[a-zA-Z]=(.+)$/) || piece.match(/^\{(.+)\}$/);
+    if (eqm) {
+      const vals = splitTop(eqm[1], [',']).map(num);
+      if (vals.some((v) => !Number.isFinite(v))) return null;
+      for (const v of vals) out.push(iv(v, v, true, true));
       continue;
     }
     const r = parseInequality(piece);
