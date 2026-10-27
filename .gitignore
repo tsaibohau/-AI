@@ -1,0 +1,24 @@
+# 機密與個人資料（公開儲存庫，絕不提交）
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+private/
+
+# 使用者匯出的回饋、錯題本
+exports/
+
+# 評測的模型輸出（可能含使用者自填題目，預設不提交）
+eval/runs/
+
+# 建置產物與相依套件
+node_modules/
+dist/
+coverage/
+.vite/
+
+# 系統與編輯器
+.DS_Store
+Thumbs.db
+*.log
