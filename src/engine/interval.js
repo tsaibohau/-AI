@@ -94,6 +94,7 @@ export function pickPoint(set, inside = true) {
   const center = ends.length ? Math.round(ends.reduce((a, b) => a + b, 0) / ends.length) : 0;
   for (let d = 0; d <= 30; d++) {
     for (const c of d ? [center + d, center - d] : [center]) {
+      if (ends.some((e) => Math.abs(e - c) < EPS)) continue; // 避開端點，測試點才有說服力
       if (contains(set, c) === inside) return c;
     }
   }
