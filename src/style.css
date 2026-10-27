@@ -167,3 +167,10 @@ details.card > summary { cursor: pointer; }
 .bar { height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; }
 .bar > div { height: 100%; background: var(--accent); transition: width 0.3s; }
 select.inp { margin-top: 4px; }
+
+/* 圖解 */
+.card.diagram .board { width: 100%; aspect-ratio: 4 / 3; border: 1px solid var(--border); border-radius: 8px; background: var(--card); touch-action: pan-y; }
+.card.diagram .board.number_line { aspect-ratio: 4 / 1.3; }
+.card.diagram .board.geometry { aspect-ratio: 1 / 1; }
+.card.diagram .cap { margin-top: 0; }
+.jxgbox { border-radius: 8px; }

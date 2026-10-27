@@ -5,6 +5,7 @@ import { toolEvaluate, toolRoots } from '../engine/tools.js';
 import { recordUnsolved, listUnsolved, clearUnsolved, downloadJson } from './storage.js';
 import { newTutorState, renderTutor, handleTutorClick, typeLabel } from './tutor.js';
 import { mountAI } from './ai-settings.js';
+import { createDiagram } from './diagram.js';
 
 const CONCEPT_NAME = new Map(concepts.concepts.map((c) => [c.id, c.name]));
 
@@ -36,6 +37,8 @@ const esc = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 const state = { text: '', result: null, shown: 0, showAnswer: false, mode: 'tutor', ts: null };
+// 圖解卡片在每次重畫時搬回原位，不重建，JSXGraph 的圖才不會閃
+const diag = { result: null, card: null };
 
 export function mountApp(root) {
   root.innerHTML = `
@@ -149,11 +152,13 @@ function render(root) {
     return;
   }
   if (state.mode === 'tutor') {
-    out.innerHTML = renderHeader(r) + renderTutor(r, state.ts);
+    out.innerHTML = renderHeader(r) + '<div id="diagram-slot"></div>' + renderTutor(r, state.ts);
     out.querySelector('#retype')?.addEventListener('click', () => showTypePicker(root, out));
+    placeDiagram(out, r);
     return;
   }
-  out.innerHTML = renderHeader(r) + renderStages(r);
+  out.innerHTML = renderHeader(r) + '<div id="diagram-slot"></div>' + renderStages(r);
+  placeDiagram(out, r);
   out.querySelector('#next')?.addEventListener('click', () => {
     if (state.shown < STAGES.length) state.shown++;
     else state.showAnswer = true;
@@ -162,6 +167,28 @@ function render(root) {
     cards[cards.length - 1]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
   out.querySelector('#retype')?.addEventListener('click', () => showTypePicker(root, out));
+}
+
+/** 把圖解卡片放進版面，並依目前階段決定哪些元素要出現 */
+function placeDiagram(out, r) {
+  if (diag.result !== r) {
+    diag.result = r;
+    diag.card = createDiagram(r.data.diagram);
+  }
+  const slot = out.querySelector('#diagram-slot');
+  if (!diag.card || !slot) return;
+  slot.replaceWith(diag.card.el);
+  if (state.mode === 'tutor') {
+    const ts = state.ts;
+    const done = ts.stage >= 4;
+    // 老師模式：關鍵點（根、頂點、解的範圍）等學生自己算完才出現，避免先被圖洩漏答案
+    diag.card.setVisible((e) => (e.stage <= 2 ? e.stage <= ts.stage + 1 : done));
+    diag.card.caption(done ? '對照你的答案：圖上標出了關鍵點與範圍。' : '先看圖想一想；關鍵點會在你算完後出現在圖上。');
+  } else {
+    const all = state.showAnswer;
+    diag.card.setVisible((e) => all || e.stage <= state.shown);
+    diag.card.caption(all || state.shown >= 4 ? '完整的圖解。' : '圖會隨著提示階段逐步加上更多東西。');
+  }
 }
 
 function showTypePicker(root, out) {

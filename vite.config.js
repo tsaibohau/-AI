@@ -34,7 +34,7 @@ export default defineConfig({
   build: {
     rolldownOptions: {
       output: {
-        codeSplitting: { groups: [{ name: 'webllm', test: /node_modules[\\/]@mlc-ai/ }] },
+        codeSplitting: { groups: [{ name: 'webllm', test: /node_modules[\\/]@mlc-ai/ }, { name: 'jsxgraph', test: /node_modules[\\/]jsxgraph/ }] },
       },
     },
     chunkSizeWarningLimit: 7000,
