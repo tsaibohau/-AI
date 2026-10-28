@@ -28,7 +28,7 @@ def predict(node,reply):
 def evaluate():
     return sum(predict(t['node'],t['reply'])==t['option'] for t in test)
 t0=time.time()
-for ep in range(4):
+for ep in range(3):
     model.train(); random.shuffle(data)
     for i in range(0,len(data),32):
         b=data[i:i+32]

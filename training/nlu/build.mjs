@@ -17,7 +17,11 @@ const BATCHES = [['point'], ['equidistant'], ['perp'], ['intersect']];
 const PER_OPTION = 20;
 const IRRELEVANT = 15;
 
-const norm = (t) => String(t || '').normalize('NFKC').replace(/[\s，。,.!！?？~～、…]+/g, '').toLowerCase();
+// 比對重複用；全是標點的回答（「？？？」「...」）也是有效的無關話，保留原樣
+const norm = (t) => {
+  const s = String(t || '').normalize('NFKC').toLowerCase();
+  return s.replace(/[\s，。,.!！?？~～、…]+/g, '') || s.replace(/\s+/g, '');
+};
 
 /** 所有要聽懂學生的話的問題（不含要學生算數字的題目） */
 export function listNodes() {
