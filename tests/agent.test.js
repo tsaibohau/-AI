@@ -186,3 +186,13 @@ describe('對話排版', () => {
     expect(html).not.toContain('<img');
   });
 });
+
+describe('本機模型寫壞的工具指令不顯示給學生', () => {
+  it('少了大括號的 tool> 指令被藏起來', async () => {
+    const { parseToolCalls } = await import('../src/agent/local.js');
+    const r = parseToolCalls('所以 y = x − 4。\n```text\ntool>"name": "line", "args": "mode": "point_slope"\n```');
+    expect(r.text).toBe('所以 y = x − 4。');
+    expect(r.toolCalls).toEqual([]);
+    expect(r.garbled).toBe(true);
+  });
+});

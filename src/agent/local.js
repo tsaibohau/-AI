@@ -38,7 +38,15 @@ export function parseToolCalls(raw) {
   if (!calls.length) {
     text = text.replace(/```(?:json)?\s*(\{[\s\S]*?"name"[\s\S]*?\})\s*```/g, (m, json) => (grab(json) ? '' : m));
   }
-  return { text: text.trim(), toolCalls: calls };
+  // 小模型常把工具指令寫壞（例如少了大括號）：認不出來的一律藏起來，不讓學生看到亂碼
+  const before = text;
+  text = text
+    .replace(/```[a-z]*\s*[\s\S]*?(tool|"name"|"args")[\s\S]*?```/gi, '')
+    .replace(/<\/?tool[^>]*>/gi, '')
+    .replace(/^.*(\btool\s*>|"name"\s*:|"args"\s*:).*$/gim, '')
+    .replace(/```[a-z]*/gi, '')
+    .replace(/\n{3,}/g, '\n\n');
+  return { text: text.trim(), toolCalls: calls, garbled: !calls.length && text !== before };
 }
 
 /** 通用訊息 → WebLLM 對話格式（純函式，可測試） */
