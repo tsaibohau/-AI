@@ -1,0 +1,646 @@
+[
+ {
+  "node": "point.n1",
+  "reply": "一個點",
+  "option": 1,
+  "options": [
+   "一個點",
+   "還是一塊地",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n1",
+  "reply": "點吧",
+  "option": 1,
+  "options": [
+   "一個點",
+   "還是一塊地",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n1",
+  "reply": "小小的一點",
+  "option": 1,
+  "options": [
+   "一個點",
+   "還是一塊地",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n1",
+  "reply": "變成一個小圓點",
+  "option": 1,
+  "options": [
+   "一個點",
+   "還是一塊地",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n1",
+  "reply": "還是一大片土地",
+  "option": 2,
+  "options": [
+   "一個點",
+   "還是一塊地",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n1",
+  "reply": "一個區塊",
+  "option": 2,
+  "options": [
+   "一個點",
+   "還是一塊地",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n1",
+  "reply": "看起來是一塊地",
+  "option": 2,
+  "options": [
+   "一個點",
+   "還是一塊地",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n1",
+  "reply": "不曉得",
+  "option": 3,
+  "options": [
+   "一個點",
+   "還是一塊地",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n1",
+  "reply": "沒概念",
+  "option": 3,
+  "options": [
+   "一個點",
+   "還是一塊地",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n1",
+  "reply": "我想吃雞排",
+  "option": 0,
+  "options": [
+   "一個點",
+   "還是一塊地",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n1",
+  "reply": "哈哈",
+  "option": 0,
+  "options": [
+   "一個點",
+   "還是一塊地",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n2",
+  "reply": "坐標",
+  "option": 1,
+  "options": [
+   "三個點的坐標",
+   "村莊的名字",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n2",
+  "reply": "那些數字",
+  "option": 1,
+  "options": [
+   "三個點的坐標",
+   "村莊的名字",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n2",
+  "reply": "A B C 的位置",
+  "option": 1,
+  "options": [
+   "三個點的坐標",
+   "村莊的名字",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n2",
+  "reply": "點的座標啊",
+  "option": 1,
+  "options": [
+   "三個點的坐標",
+   "村莊的名字",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n2",
+  "reply": "村莊叫什麼",
+  "option": 2,
+  "options": [
+   "三個點的坐標",
+   "村莊的名字",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n2",
+  "reply": "名字吧",
+  "option": 2,
+  "options": [
+   "三個點的坐標",
+   "村莊的名字",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n2",
+  "reply": "不知道耶",
+  "option": 3,
+  "options": [
+   "三個點的坐標",
+   "村莊的名字",
+   "不知道"
+  ]
+ },
+ {
+  "node": "point.n2",
+  "reply": "今天好熱",
+  "option": 0,
+  "options": [
+   "三個點的坐標",
+   "村莊的名字",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n1",
+  "reply": "只有一個",
+  "option": 1,
+  "options": [
+   "只有一個，就是正中間",
+   "不只一個",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n1",
+  "reply": "就中間那個點",
+  "option": 1,
+  "options": [
+   "只有一個，就是正中間",
+   "不只一個",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n1",
+  "reply": "中點吧",
+  "option": 1,
+  "options": [
+   "只有一個，就是正中間",
+   "不只一個",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n1",
+  "reply": "應該只有正中間",
+  "option": 1,
+  "options": [
+   "只有一個，就是正中間",
+   "不只一個",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n1",
+  "reply": "很多個",
+  "option": 2,
+  "options": [
+   "只有一個，就是正中間",
+   "不只一個",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n1",
+  "reply": "不只一個",
+  "option": 2,
+  "options": [
+   "只有一個，就是正中間",
+   "不只一個",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n1",
+  "reply": "有無限多個",
+  "option": 2,
+  "options": [
+   "只有一個，就是正中間",
+   "不只一個",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n1",
+  "reply": "好像是一條線",
+  "option": 2,
+  "options": [
+   "只有一個，就是正中間",
+   "不只一個",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n1",
+  "reply": "不確定",
+  "option": 3,
+  "options": [
+   "只有一個，就是正中間",
+   "不只一個",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n1",
+  "reply": "我不會",
+  "option": 3,
+  "options": [
+   "只有一個，就是正中間",
+   "不只一個",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n1",
+  "reply": "可以去看電影嗎",
+  "option": 0,
+  "options": [
+   "只有一個，就是正中間",
+   "不只一個",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n2",
+  "reply": "一樣遠",
+  "option": 1,
+  "options": [
+   "一樣遠",
+   "不一樣",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n2",
+  "reply": "還是相等",
+  "option": 1,
+  "options": [
+   "一樣遠",
+   "不一樣",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n2",
+  "reply": "對",
+  "option": 1,
+  "options": [
+   "一樣遠",
+   "不一樣",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n2",
+  "reply": "會一樣",
+  "option": 1,
+  "options": [
+   "一樣遠",
+   "不一樣",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n2",
+  "reply": "距離一樣吧",
+  "option": 1,
+  "options": [
+   "一樣遠",
+   "不一樣",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n2",
+  "reply": "不一樣",
+  "option": 2,
+  "options": [
+   "一樣遠",
+   "不一樣",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n2",
+  "reply": "離比較近的那個人比較近",
+  "option": 2,
+  "options": [
+   "一樣遠",
+   "不一樣",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n2",
+  "reply": "應該會變吧",
+  "option": 2,
+  "options": [
+   "一樣遠",
+   "不一樣",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n2",
+  "reply": "不知道",
+  "option": 3,
+  "options": [
+   "一樣遠",
+   "不一樣",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n2",
+  "reply": "嗯？",
+  "option": 0,
+  "options": [
+   "一樣遠",
+   "不一樣",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n5",
+  "reply": "交點",
+  "option": 1,
+  "options": [
+   "兩條中垂線的交點",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n5",
+  "reply": "兩條線交叉的地方",
+  "option": 1,
+  "options": [
+   "兩條中垂線的交點",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n5",
+  "reply": "兩條中垂線相交的點",
+  "option": 1,
+  "options": [
+   "兩條中垂線的交點",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n5",
+  "reply": "不知道",
+  "option": 2,
+  "options": [
+   "兩條中垂線的交點",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n5",
+  "reply": "我忘了",
+  "option": 2,
+  "options": [
+   "兩條中垂線的交點",
+   "不知道"
+  ]
+ },
+ {
+  "node": "equidistant.n5",
+  "reply": "好想睡",
+  "option": 0,
+  "options": [
+   "兩條中垂線的交點",
+   "不知道"
+  ]
+ },
+ {
+  "node": "perp.n1",
+  "reply": "上面",
+  "option": 1,
+  "options": [
+   "上面",
+   "左邊",
+   "下面",
+   "不知道"
+  ]
+ },
+ {
+  "node": "perp.n1",
+  "reply": "往上",
+  "option": 1,
+  "options": [
+   "上面",
+   "左邊",
+   "下面",
+   "不知道"
+  ]
+ },
+ {
+  "node": "perp.n1",
+  "reply": "朝上",
+  "option": 1,
+  "options": [
+   "上面",
+   "左邊",
+   "下面",
+   "不知道"
+  ]
+ },
+ {
+  "node": "perp.n1",
+  "reply": "十二點方向",
+  "option": 1,
+  "options": [
+   "上面",
+   "左邊",
+   "下面",
+   "不知道"
+  ]
+ },
+ {
+  "node": "perp.n1",
+  "reply": "左邊",
+  "option": 2,
+  "options": [
+   "上面",
+   "左邊",
+   "下面",
+   "不知道"
+  ]
+ },
+ {
+  "node": "perp.n1",
+  "reply": "往左",
+  "option": 2,
+  "options": [
+   "上面",
+   "左邊",
+   "下面",
+   "不知道"
+  ]
+ },
+ {
+  "node": "perp.n1",
+  "reply": "下面",
+  "option": 3,
+  "options": [
+   "上面",
+   "左邊",
+   "下面",
+   "不知道"
+  ]
+ },
+ {
+  "node": "perp.n1",
+  "reply": "朝下",
+  "option": 3,
+  "options": [
+   "上面",
+   "左邊",
+   "下面",
+   "不知道"
+  ]
+ },
+ {
+  "node": "perp.n1",
+  "reply": "不知道",
+  "option": 4,
+  "options": [
+   "上面",
+   "左邊",
+   "下面",
+   "不知道"
+  ]
+ },
+ {
+  "node": "perp.n1",
+  "reply": "手機會當機",
+  "option": 0,
+  "options": [
+   "上面",
+   "左邊",
+   "下面",
+   "不知道"
+  ]
+ },
+ {
+  "node": "intersect.n1",
+  "reply": "兩個都要滿足",
+  "option": 1,
+  "options": [
+   "同時滿足兩個方程式",
+   "滿足其中一個就好",
+   "不知道"
+  ]
+ },
+ {
+  "node": "intersect.n1",
+  "reply": "同時代進兩條式子都成立",
+  "option": 1,
+  "options": [
+   "同時滿足兩個方程式",
+   "滿足其中一個就好",
+   "不知道"
+  ]
+ },
+ {
+  "node": "intersect.n1",
+  "reply": "聯立",
+  "option": 1,
+  "options": [
+   "同時滿足兩個方程式",
+   "滿足其中一個就好",
+   "不知道"
+  ]
+ },
+ {
+  "node": "intersect.n1",
+  "reply": "兩個方程式都對",
+  "option": 1,
+  "options": [
+   "同時滿足兩個方程式",
+   "滿足其中一個就好",
+   "不知道"
+  ]
+ },
+ {
+  "node": "intersect.n1",
+  "reply": "滿足其中一個就好",
+  "option": 2,
+  "options": [
+   "同時滿足兩個方程式",
+   "滿足其中一個就好",
+   "不知道"
+  ]
+ },
+ {
+  "node": "intersect.n1",
+  "reply": "只要在一條上",
+  "option": 2,
+  "options": [
+   "同時滿足兩個方程式",
+   "滿足其中一個就好",
+   "不知道"
+  ]
+ },
+ {
+  "node": "intersect.n1",
+  "reply": "不知道",
+  "option": 3,
+  "options": [
+   "同時滿足兩個方程式",
+   "滿足其中一個就好",
+   "不知道"
+  ]
+ },
+ {
+  "node": "intersect.n1",
+  "reply": "路口有紅綠燈",
+  "option": 0,
+  "options": [
+   "同時滿足兩個方程式",
+   "滿足其中一個就好",
+   "不知道"
+  ]
+ }
+]
