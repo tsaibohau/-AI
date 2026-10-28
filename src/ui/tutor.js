@@ -6,7 +6,7 @@ import { answerFollowUp, INTENTS, LESSON } from '../tutor/followup.js';
 import * as llm from '../tutor/llm.js';
 import { validateDiagram } from '../core/diagram.js';
 import { explainGraph } from '../tutor/graph.js';
-import { startCheck, currentConcept, checkDone, conceptQuestion, answerCheck } from '../tutor/conceptCheck.js';
+import { startDialogue, reply as talkReply, optionsOf, answersOf, matchAnswer, classifyPrompt, fromClassify } from '../tutor/dialogue.js';
 
 const CONCEPTS = concepts.concepts;
 const CONCEPT_NAME = new Map(CONCEPTS.map((c) => [c.id, c.name]));
@@ -15,18 +15,19 @@ const esc = (s) =>
 
 const MAX_TRIES = 3;
 
+/** 這一步有引導對話就開始 */
+const openTalk = (s) => (s.talk ? startDialogue(s.talk.script, s.talk.vars) : null);
+
 /** 建立一題的老師模式狀態 */
 export function newTutorState(result) {
-  const known = new Set(); // 學生說知道、或已經講解過的概念（整題共用）
   const ext = result.data.extension;
   return {
-    knownConcepts: known,
     stage: 0, // 0 審題、1 已知、2 觀念、3 推導、4 答案
     goal: { pick: null, tries: 0, done: false },
     known: { revealed: false },
     concept: { picks: new Set(), checked: false, options: conceptOptions(result.data) },
     stepIdx: 0,
-    steps: ext.map((s, i) => ({ tries: 0, solved: false, revealed: false, input: '', feedback: null, hint: false, check: i === 0 ? startCheck(s.defs, known) : null })),
+    steps: ext.map((s, i) => ({ tries: 0, solved: false, revealed: false, input: '', feedback: null, hint: false, talk: i === 0 ? openTalk(s) : null })),
     final: { input: '', feedback: null, revealed: false },
     chats: {}, // key → [{ q, a, ai, pending }]
     openAsk: null,
@@ -79,30 +80,34 @@ function askPanel(key, ts) {
   return html + '</div>';
 }
 
-/** 「你知道這個概念嗎？」：講過的內容 + 目前要問的概念 */
-function checkView(st, i) {
-  const c = st.check;
+/** 引導對話：老師與學生的對話紀錄、輸入框、選項 */
+function talkView(st, i, current) {
+  const c = st.talk;
   if (!c) return '';
-  let html = '';
-  for (const ex of c.shown) {
-    html += `<div class="bubble tutor"><b>${esc(ex.name)}</b>${ex.paras.map((p) => `<p>${esc(p)}</p>`).join('')}</div>`;
+  let html = '<div class="talk">';
+  for (const m of c.log) html += `<div class="bubble ${m.who === 't' ? 'tutor' : 'me'}">${esc(m.text)}</div>`;
+  if (c.thinking) html += '<div class="bubble tutor mini">想一想你的意思…</div>';
+  if (!c.done && !c.skipped && current) {
+    const opts = optionsOf(c);
+    const typed = answersOf(c).some((a) => a.type);
+    // 需要算數字的問題先讓學生自己打；聽不懂時才給選項
+    if (opts.length && (c.pick || !typed)) {
+      html += `<div class="chips">${opts.map((o, k) => `<button type="button" class="chip-s" data-act="talk-pick" data-i="${i}" data-o="${k}">${esc(o)}</button>`).join('')}</div>`;
+    }
+    html += `<div class="row ask-row"><input class="inp" data-input="talk-${i}" placeholder="${typed ? '寫下你的答案' : '用自己的話回答也可以'}" autocomplete="off" spellcheck="false" />
+      <button type="button" class="primary small" data-act="talk-send" data-i="${i}">回答</button></div>
+      <button type="button" class="link small" data-act="talk-skip" data-i="${i}">我會了，直接算</button>`;
   }
-  const id = currentConcept(c);
-  if (id) {
-    html += `<div class="q">${esc(conceptQuestion(id))}</div><div class="chips">
-      <button type="button" class="chip-s" data-act="concept-know" data-i="${i}" data-v="1">知道</button>
-      <button type="button" class="chip-s" data-act="concept-know" data-i="${i}" data-v="0">不知道</button></div>`;
-  }
-  return html;
+  return html + '</div>';
 }
 
 function stepView(s, i, ts, current) {
   const st = ts.steps[i];
-  const checking = st.check && !checkDone(st.check);
-  const showBody = !checking && (!s.ask || st.solved || st.revealed);
-  let html = `<li class="${current ? 'current' : ''}">` + checkView(st, i);
-  if (checking) {
-    // 先確認概念，再做這一步
+  const talking = st.talk && !st.talk.done && !st.talk.skipped;
+  const showBody = !talking && (!s.ask || st.solved || st.revealed);
+  let html = `<li class="${current ? 'current' : ''}">` + talkView(st, i, current);
+  if (talking) {
+    // 先聊完，再看這一步的整理
   } else if (!showBody) {
     html += `<div class="q">${esc(s.ask.q)}</div>
       <div class="row ask-row"><input class="inp" data-input="step-${i}" value="${esc(st.input)}" placeholder="寫下你的答案" autocomplete="off" spellcheck="false" />
@@ -112,7 +117,7 @@ function stepView(s, i, ts, current) {
     html += `<div class="row tools">${st.hint ? '' : `<button type="button" class="link small" data-act="hint" data-i="${i}">給我提示</button>`}
       <button type="button" class="link small" data-act="reveal-step" data-i="${i}">${st.tries >= MAX_TRIES ? '看這一步怎麼做' : '直接看這一步'}</button></div>`;
   } else {
-    if (st.solved) html += '<p class="fb ok">你自己算出來了！</p>';
+    if (st.solved) html += `<p class="fb ok">${s.ask ? '你自己算出來了！' : '你自己想通了！'}</p>`;
     html += `<div>${esc(s.step)}</div><div class="reason">為什麼：${esc(s.reason)}</div>`;
     if (s.detail) html += `<details class="expr"><summary>計算細節</summary><p>${esc(s.detail)}</p></details>`;
     if (s.expr) html += `<details class="expr"><summary>驗算式</summary><code>${esc(s.expr)}</code></details>`;
@@ -186,6 +191,8 @@ export function renderTutor(r, ts) {
   } else {
     if (ts.final.feedback?.ok) html += '<p class="fb ok">完全正確！你自己做出來了。</p>';
     html += `<p class="ans">${esc(d.answer)}</p><p class="mini">怎麼檢查：</p><p>${esc(d.check)}</p>`;
+    const stucks = stucksOf(ts);
+    if (stucks.length) html += `<p class="mini">老師的筆記：這題你在這些地方卡過，可以多練習</p><ul>${stucks.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`;
   }
   html += askPanel('answer', ts) + '</article>';
   return html;
@@ -230,6 +237,17 @@ async function askAI(r, ts, key, q, msg, rerender) {
   msg.pending = false;
   rerender();
 }
+
+/** 對話結束：最後一題自己答對就算解出這一步，否則這一步已經帶著做完了 */
+function afterTalk(st) {
+  const c = st.talk;
+  if (!c?.done) return;
+  if (c.lastOk) st.solved = true;
+  else st.revealed = true;
+}
+
+/** 整題對話中老師注意到的卡點（不重複） */
+export const stucksOf = (ts) => [...new Set(ts.steps.flatMap((s) => s.talk?.stucks || []))];
 
 /** 處理老師模式的點擊；回傳 true 代表需要重畫 */
 export function handleTutorClick(el, r, ts, out, rerender) {
@@ -277,14 +295,44 @@ export function handleTutorClick(el, r, ts, out, rerender) {
       if (ts.stepIdx < ts.steps.length - 1) {
         ts.stepIdx++;
         const st = ts.steps[ts.stepIdx];
-        st.check ||= startCheck(r.data.extension[ts.stepIdx].defs, ts.knownConcepts);
+        st.talk ||= openTalk(r.data.extension[ts.stepIdx]);
       } else ts.stage = 4;
       return true;
-    case 'concept-know': {
+    case 'talk-pick': {
       const st = ts.steps[i];
-      st.check = answerCheck(st.check, el.dataset.v === '1', ts.knownConcepts);
+      const a = answersOf(st.talk).filter((x) => x.label)[Number(el.dataset.o)];
+      talkReply(st.talk, optionsOf(st.talk)[Number(el.dataset.o)], a);
+      afterTalk(st);
       return true;
     }
+    case 'talk-send': {
+      const st = ts.steps[i];
+      const text = val(`talk-${i}`).trim();
+      if (!text) return false;
+      const m = matchAnswer(st.talk, text);
+      // 劇本對不上、本機 AI 有啟用時，請 AI 判斷學生的意思比較接近哪個選項
+      if (!m && llm.isReady() && optionsOf(st.talk).length) {
+        st.talk.thinking = true;
+        rerender();
+        llm
+          .chatRaw(classifyPrompt(st.talk, text), { maxTokens: 5, temperature: 0 })
+          .then((out) => fromClassify(st.talk, out))
+          .catch(() => null)
+          .then((a) => {
+            st.talk.thinking = false;
+            talkReply(st.talk, text, a);
+            afterTalk(st);
+            rerender();
+          });
+        return false;
+      }
+      talkReply(st.talk, text, m);
+      afterTalk(st);
+      return true;
+    }
+    case 'talk-skip':
+      ts.steps[i].talk.skipped = true;
+      return true;
     case 'check-final':
       ts.final.input = val('final');
       ts.final.feedback = diagnose(r.final, ts.final.input);

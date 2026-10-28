@@ -62,9 +62,30 @@ function bisector(P, R) {
 const slopeDetail = (b) =>
   `${b.side} 的斜率 ＝ Δy／Δx ＝ (${fmt(b.R.y)} ${MINUS} ${par(b.P.y)})／(${fmt(b.R.x)} ${MINUS} ${par(b.P.x)}) ＝ ${fmt(b.dy)}／${par(b.dx)}${b.slope && !b.dx.eq(1) ? ` ＝ ${fmt(b.slope)}` : ''}`;
 
+/** 引導對話用的變數（顯示用的文字已排好負號與括號；value 類的用 plain） */
+function talkVars(b, label) {
+  const v = {
+    side: b.side, P: b.P.name, R: b.R.name,
+    x1: fmt(b.P.x), y1: fmt(b.P.y), x2: fmt(b.R.x), y2: fmt(b.R.y),
+    x1p: par(b.P.x), y1p: par(b.P.y), x2p: par(b.R.x), y2p: par(b.R.y),
+    dx: fmt(b.dx), dy: fmt(b.dy), dxp: par(b.dx),
+    mx: fmt(b.M.x), my: fmt(b.M.y), mxv: b.M.x.plain(), myv: b.M.y.plain(), mxp: par(b.M.x), myp: par(b.M.y), M: b.M.text,
+    xMinus: `x ${MINUS} ${par(b.M.x)}`, yMinus: `y ${MINUS} ${par(b.M.y)}`,
+    eq: b.equation,
+    subLabel: label.startsWith('第 (1)') ? '這就是第 (1) 小題的答案。' : '',
+  };
+  if (b.slope) {
+    Object.assign(v, { m: fmt(b.slope), mp: par(b.slope), run: String(b.slope.d), rise: new Q(b.slope.n).pretty(), nrun: new Q(-b.slope.n).pretty() });
+    if (!b.dy.isZero()) v.minv = fmt(b.dx.div(b.dy));
+  }
+  if (b.perp) Object.assign(v, { perp: fmt(b.perp), perpp: par(b.perp), perpNeg: fmt(b.perp.neg()) });
+  return v;
+}
+
 /** 中垂線的四個小步驟（第 1 小題要學生一步一步做） */
 function bisectorSteps(b, label) {
   const steps = [];
+  const vars = talkVars(b, label);
   const ptOf = (P) => `${P.name}${ptText(P.x, P.y)}`;
   if (b.slope === null) {
     steps.push({
@@ -85,6 +106,7 @@ function bisectorSteps(b, label) {
       detail: slopeDetail(b),
       ask: ask(`先算 ${b.side} 的斜率是多少？`, 'number', b.slope.plain()),
       defs: ['geo.slope'],
+      talk: { script: 'slope', vars },
     });
     if (b.perp === null) {
       steps.push({
@@ -98,6 +120,7 @@ function bisectorSteps(b, label) {
         reason: `垂直 → 兩線斜率相乘 ＝ −1，所以取負倒數：${par(b.slope)} × ${par(b.perp)} ＝ −1`,
         ask: ask(`中垂線和 ${b.side} 垂直，中垂線的斜率是多少？`, 'number', b.perp.plain()),
         defs: ['geo.perpendicular', 'geo.slope_perpendicular'],
+        talk: { script: 'perp', vars },
       });
     }
   }
@@ -107,6 +130,7 @@ function bisectorSteps(b, label) {
     detail: `x：(${fmt(b.P.x)} ＋ ${par(b.R.x)})／2 ＝ ${fmt(b.M.x)}；y：(${fmt(b.P.y)} ＋ ${par(b.R.y)})／2 ＝ ${fmt(b.M.y)}`,
     ask: ask(`中垂線通過 ${b.side} 的中點，中點坐標是？`, 'point', `(${b.M.x.plain()}, ${b.M.y.plain()})`),
     defs: ['geo.midpoint', 'geo.midpoint_formula'],
+    talk: { script: 'midpoint', vars },
   });
   const ps =
     b.slope === null
@@ -123,6 +147,7 @@ function bisectorSteps(b, label) {
     detail: b.slope === null || b.perp === null ? `中垂線通過中點 ${b.M.text}：${ps}，也就是 ${b.equation}` : `點斜式：${ps}，移項整理得 ${b.equation}`,
     ask: ask(b.slope === null || b.perp === null ? `寫出 ${b.side} 的中垂線方程式：` : `用點斜式寫出 ${b.side} 的中垂線方程式：`, 'line', b.equation),
     defs: ['geo.perp_bisector', 'geo.point_slope', 'geo.general_form'],
+    ...(b.slope !== null && b.perp !== null ? { talk: { script: 'pointslope', vars } } : {}),
   });
   return steps;
 }
@@ -157,11 +182,13 @@ export function solveCircumcenterApp(text) {
       step: `提取關鍵數據：三個${place}就是三個點 ${pts.map((p) => `${p.name}${ptText(p.x, p.y)}`).join('、')}`,
       reason: `題目裡的「${place}」這些名詞只是情境，在課本上的概念就是「點」，其他文字可以先丟掉`,
       defs: ['geo.point', 'geo.coordinate'],
+      talk: { script: 'point', vars: { place, pts: pts.map((p) => `${p.name}${ptText(p.x, p.y)}`).join('、') } },
     },
     {
       step: `先看最後要求什麼：到三點距離都相等的位置，就是三條中垂線的交點（外心）${hasSub ? '；所以第 (1) 小題的中垂線是在幫第 (2) 小題鋪路' : ''}`,
       reason: '中垂線上的點到線段兩端等距；同時在兩條中垂線上，就到三個點都等距',
       defs: ['geo.perp_bisector_property', 'geo.circumcenter'],
+      talk: { script: 'equidistant', vars: { place, side: b1.side, subNote: hasSub ? '所以第 (1) 小題先叫你算 AB 的中垂線，就是在幫第 (2) 小題鋪路。'.replace('AB', b1.side) : '' } },
     },
     ...bisectorSteps(b1, label1),
     {
@@ -180,6 +207,10 @@ export function solveCircumcenterApp(text) {
       detail: `解 ${b1.equation} 與 ${b2.equation}，得 x ＝ ${fmt(ox)}、y ＝ ${fmt(oy)}`,
       ask: ask('把兩條中垂線聯立，交點坐標是？', 'point', `(${ox.plain()}, ${oy.plain()})`),
       defs: ['geo.intersection'],
+      talk: {
+        script: 'intersect',
+        vars: { eq1: b1.equation, eq2: b2.equation, Ov: `(${ox.plain()}, ${oy.plain()})`, detail: `把 ${b1.equation} 和 ${b2.equation} 聯立（可以用加減消去一個未知數），解得 x ＝ ${fmt(ox)}、y ＝ ${fmt(oy)}，交點是 ${center}。` },
+      },
     },
     {
       step: `檢查：${center} 到三點的距離平方都是 ${fmt(r2)}，所以到三點等距`,

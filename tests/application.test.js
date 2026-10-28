@@ -3,8 +3,8 @@ import { solve } from '../src/engine/index.js';
 import { diagnose } from '../src/core/diagnose.js';
 import { validateDiagram } from '../src/core/diagram.js';
 import { getDefinitionEntry } from '../src/core/definitions.js';
-import { startCheck, answerCheck, currentConcept, checkDone, explainConcept } from '../src/tutor/conceptCheck.js';
-import { newTutorState, handleTutorClick } from '../src/ui/tutor.js';
+import { SCRIPTS, startDialogue, reply, matchAnswer, optionsOf } from '../src/tutor/dialogue.js';
+import { newTutorState, handleTutorClick, stucksOf } from '../src/ui/tutor.js';
 
 const EX = '坐標平面上有三個村莊 A(−3, −2)、B(3, 10)、C(9, 4)，要蓋一所到三個村莊距離都相等的學校。(1) 求 AB 的中垂線方程式。(2) 求學校的坐標。';
 
@@ -69,42 +69,105 @@ describe('應用問題：到三點等距（外心）', () => {
   });
 });
 
-describe('你知道這個概念嗎？', () => {
-  it('知道就往下，不重複問', () => {
-    const known = new Set();
-    let st = startCheck(['geo.slope', 'geo.perpendicular'], known);
-    expect(currentConcept(st)).toBe('geo.slope');
-    st = answerCheck(st, true, known);
-    expect(currentConcept(st)).toBe('geo.perpendicular');
-    st = answerCheck(st, true, known);
-    expect(checkDone(st)).toBe(true);
-    expect(startCheck(['geo.slope'], known).queue).toEqual([]);
+describe('引導式對話', () => {
+  const r = solve(EX);
+  const talkOf = (script) => r.data.extension.find((s) => s.talk?.script === script).talk;
+
+  it('劇本格式正確：每個 next 都存在，每個問題都有兜底答案，文字沒有 LaTeX 或 Markdown', () => {
+    for (const [id, sc] of Object.entries(SCRIPTS)) {
+      expect(sc.nodes[sc.start], id).toBeTruthy();
+      expect(getDefinitionEntry(sc.concept), `${id} 的概念`).toBeTruthy();
+      for (const [nid, n] of Object.entries(sc.nodes)) {
+        if (n.end) continue;
+        expect(n.answers.some((a) => a.else), `${id}.${nid} 要有 else`).toBe(true);
+        for (const a of n.answers) expect(sc.nodes[a.next], `${id}.${nid} → ${a.next}`).toBeTruthy();
+      }
+      expect(JSON.stringify(sc)).not.toMatch(/\$|\*\*|\\\\[a-z]/);
+    }
   });
-  it('不知道的定義：只給定義', () => {
-    const ex = explainConcept('geo.slope');
-    expect(ex.paras[0]).toMatch(/^定義：/);
-    expect(ex.paras.join('')).not.toContain('為什麼會這樣');
+
+  it('每段對話的變數都由引擎帶齊（沒有留下 {變數}）', () => {
+    for (const s of r.data.extension.filter((x) => x.talk)) {
+      const st = startDialogue(s.talk.script, s.talk.vars);
+      const sc = SCRIPTS[s.talk.script];
+      for (const n of Object.values(sc.nodes)) {
+        const texts = [n.say, ...(n.answers || []).flatMap((a) => [a.say, a.label])].filter(Boolean);
+        for (const t of texts) expect(t.replace(/\{(\w+)\}/g, (m, k) => (k in st.vars ? '' : m)), `${s.talk.script}：${t}`).not.toMatch(/\{\w+\}/);
+      }
+    }
   });
-  it('不知道的導出概念：解釋為什麼，再接著問推導用到的概念', () => {
-    const known = new Set();
-    let st = startCheck(['geo.slope_perpendicular'], known);
-    st = answerCheck(st, false, known);
-    expect(st.shown[0].paras.join('')).toContain('為什麼會這樣');
-    expect(st.queue).toEqual(expect.arrayContaining(['geo.slope', 'geo.perpendicular', 'geo.right_angle']));
+
+  it('斜率：自己算對三題，這一步就算解出', () => {
+    const st = startDialogue('slope', talkOf('slope').vars);
+    reply(st, '6');
+    reply(st, '12');
+    reply(st, '2');
+    expect(st.done).toBe(true);
+    expect(st.lastOk).toBe(true);
+    expect(st.stucks).toEqual([]);
+  });
+
+  it('斜率：上下顛倒會被診斷出來，並給解釋', () => {
+    const st = startDialogue('slope', talkOf('slope').vars);
+    reply(st, '6');
+    reply(st, '12');
+    reply(st, '1/2');
+    expect(st.stucks).toContain('Δx、Δy 上下顛倒');
+    expect(st.log.at(-2).text).toContain('不是倒過來');
+  });
+
+  it('垂直：用轉手機帶出 −1；忘了變號會被抓到', () => {
+    const st = startDialogue('perp', talkOf('perp').vars);
+    expect(st.log[0].text).toContain('往右 1、往上 2');
+    reply(st, '往上');
+    reply(st, '左邊');
+    reply(st, '1/2');
+    expect(st.stucks).toContain('只取倒數、忘了變號');
+    reply(st, '-1');
+    expect(st.done).toBe(true);
+  });
+
+  it('等距：用自己的話回答也聽得懂，「不一樣」不會被當成「一樣」', () => {
+    const st = startDialogue('equidistant', talkOf('equidistant').vars);
+    reply(st, '我覺得只有正中間那一個');
+    expect(st.stucks).toContain('只想到中點，沒想到一整條線');
+    reply(st, '應該不一樣吧');
+    expect(st.stucks).toContain('以為離開中點就不等距');
+    expect(st.log.at(-2).text).toContain('對稱');
+  });
+
+  it('聽不懂時請學生點選項', () => {
+    const st = startDialogue('point', talkOf('point').vars);
+    expect(matchAnswer(st, '嗯嗯嗯')).toBeNull();
+    reply(st, '嗯嗯嗯');
+    expect(st.pick).toBe(true);
+    expect(optionsOf(st)).toContain('一個點');
+  });
+
+  it('點斜式：打出含 x 的式子也能比對', () => {
+    const st = startDialogue('pointslope', talkOf('pointslope').vars);
+    reply(st, 'x - 0');
+    reply(st, 'y-4');
+    reply(st, 'x + 2y = 8');
+    expect(st.done && st.lastOk).toBe(true);
   });
 });
 
 describe('老師模式流程', () => {
-  it('第一步要先回答概念問題，才看得到內容', () => {
+  it('第一步先對話；聊完才看到整理，卡點記在老師的筆記', () => {
     const r = solve(EX);
     const ts = newTutorState(r);
-    expect(currentConcept(ts.steps[0].check)).toBe('geo.point');
-    const click = (data) => handleTutorClick({ dataset: data }, r, ts, { querySelector: () => null }, () => {});
-    click({ act: 'concept-know', i: '0', v: '1' });
-    click({ act: 'concept-know', i: '0', v: '0' });
-    expect(checkDone(ts.steps[0].check)).toBe(true);
-    expect(ts.steps[0].check.shown[0].name).toBe('直角坐標');
+    expect(ts.steps[0].talk.script).toBe('point');
+    const out = { querySelector: (sel) => ({ value: sel.includes('talk-0') ? input : '' }) };
+    let input = '';
+    const click = (data) => handleTutorClick({ dataset: data }, r, ts, out, () => {});
+    input = '還是一大片區域';
+    click({ act: 'talk-send', i: '0' });
+    click({ act: 'talk-pick', i: '0', o: '0' });
+    click({ act: 'talk-pick', i: '0', o: '0' });
+    expect(ts.steps[0].talk.done).toBe(true);
+    expect(stucksOf(ts)).toContain('把地點當成有大小的區域');
     click({ act: 'next-step' });
-    expect(ts.steps[1].check.queue).not.toContain('geo.point');
+    expect(ts.steps[1].talk.script).toBe('equidistant');
   });
 });
