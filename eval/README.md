@@ -43,3 +43,15 @@ npm run eval -- --check            # 只檢查題目格式
 - **圖解需求一致率**：模型有沒有給圖，與 `needs_diagram` 一致的比例
 
 JSON 不合法的題目，答案與概念都算 0 分。
+
+## AI 對話評測（`agent-problems.json`）
+
+讓 AI 透過計算工具解題，抽出回覆最後一行的「答案：…」，用數學比對評分（直線方程式只差倍數也算對）。
+
+```bash
+cp .env.example .env               # 填入 GEMINI_API_KEY
+npm run eval:agent                 # 公開的改編題
+npm run eval:agent -- --file private/某份考卷/problems.json   # 本機私有題，不會被提交
+```
+
+學校考卷等原題只能放在 `private/`（已被 .gitignore 排除），不得放進 `eval/`。

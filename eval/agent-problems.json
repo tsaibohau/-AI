@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "note": "AI 對話的評測題：直線與斜率單元。全部為改編題（題型參考常見平時考，數字與敘述都已改寫），不收原題。",
+  "problems": [
+    { "id": "a01", "source": "改編", "text": "設 A(1,2)、B(2,5)、C(0,1)、D(3,a)。已知直線 AB 的斜率大於直線 CD 的斜率，求 a 的範圍。", "answer": { "type": "interval", "value": "(-inf, 10)" } },
+    { "id": "a02", "source": "改編", "text": "設 A(1,2)、B(2,5)、C(0,1)、D(3,a)。已知直線 AB 與直線 CD 垂直，求 a。", "answer": { "type": "number", "value": "0" } },
+    { "id": "a03", "source": "改編", "text": "直線 L 的斜率為 −2，且 L 與兩坐標軸圍成的三角形面積為 16，求 L 的方程式（寫出所有可能）。", "answer": { "type": "lines", "value": ["2x+y-8=0", "2x+y+8=0"] } },
+    { "id": "a04", "source": "改編", "text": "把直線 L 往右平移 2 單位、再往下平移 3 單位後得到 x − 2y = 0，求直線 L 的方程式。", "answer": { "type": "line", "value": "x-2y+8=0" } },
+    { "id": "a05", "source": "改編", "text": "直線 L1 通過 (4,0) 與 (0,2)，直線 L2 通過 (1,1) 與 (2,k)。若 L1、L2 與兩坐標軸圍成的四邊形內接於一個圓，求 k。", "answer": { "type": "number", "value": "3" } },
+    { "id": "a06", "source": "改編", "text": "已知 A(0,2)、B(4,6)，點 P 在直線 x − 2y + 1 = 0 上且 PA = PB，求 P 的坐標。", "answer": { "type": "point", "value": "(11/3, 7/3)" } },
+    { "id": "a07", "source": "改編", "text": "三個社區位在 A(8,6)、B(0,2)、C(4,−2)，要蓋一座與三個社區等距離的公園，求公園的坐標。", "answer": { "type": "point", "value": "(14/3, 8/3)" } },
+    { "id": "a08", "source": "改編", "text": "三直線 L1: x − y − 1 = 0、L2: x + 2y − 4 = 0、L3: ax + y − 3 = 0 不能圍成三角形，求所有可能的 a。", "answer": { "type": "set", "value": "{-1, 1/2, 1}" } },
+    { "id": "a09", "source": "改編", "text": "不論實數 m 為何，直線 y = mx + 2m − 4 恆過一個定點，求這個點。", "answer": { "type": "point", "value": "(-2, -4)" } },
+    { "id": "a10", "source": "改編", "text": "直線 y = mx + 2m − 4 與兩坐標軸圍成的三角形面積為 8，求 m 的所有可能值。", "answer": { "type": "set", "value": "{4-2*sqrt(3), 4+2*sqrt(3)}" } },
+    { "id": "a11", "source": "改編", "text": "矩形 OABC 中，O(0,0)、A(6,0)、C(0,4)，過點 P(5,5) 的直線把矩形面積平分，求此直線方程式。", "answer": { "type": "line", "value": "3x-2y-5=0" } },
+    { "id": "a12", "source": "改編", "text": "菱形 ABCD 中，A(2,1)，直線 AB 為 y = 1，兩對角線交於 M(5,3)，求 B 的坐標。", "answer": { "type": "point", "value": "(19/3, 1)" } },
+    { "id": "a13", "source": "改編", "text": "點 A(2,1) 在直線 L: 3x + by + c = 0 上，點 B(−1,3) 不在 L 上，且 AB ⊥ L，求數對 (b, c)。", "answer": { "type": "point", "value": "(-2, -4)" } }
+  ]
+}

@@ -12,7 +12,8 @@
     "test": "vitest run",
     "scan": "node scripts/scan-secrets.mjs --all",
     "eval": "node eval/score.mjs",
-    "prepare": "git config core.hooksPath .githooks || true"
+    "prepare": "git config core.hooksPath .githooks || true",
+    "eval:agent": "node eval/agent-score.mjs"
   },
   "engines": {
     "node": ">=22"
