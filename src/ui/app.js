@@ -1,7 +1,7 @@
 // 主畫面：輸入題目 → 四階段逐步提示 → 最後才看答案；解不出來時進入引導思考模式
 import concepts from '../../data/concepts.json';
 import { solve, TYPES } from '../engine/index.js';
-import { toolEvaluate, toolRoots } from '../engine/tools.js';
+import { toolEvaluate, toolRoots, toolGraphSpec } from '../engine/tools.js';
 import { recordUnsolved, listUnsolved, clearUnsolved, downloadJson } from './storage.js';
 import { newTutorState, renderTutor, handleTutorClick, typeLabel } from './tutor.js';
 import { mountAI } from './ai-settings.js';
@@ -243,8 +243,9 @@ function renderGuided(r) {
       <input id="tool-val" class="inp small" placeholder="x = ?" inputmode="decimal" />
       <button type="button" id="tool-eval" class="ghost">代入計算</button>
       <button type="button" id="tool-roots" class="ghost">找 = 0</button>
+      <button type="button" id="tool-graph" class="ghost">畫圖</button>
     </div>
-    <p id="tool-out" class="tool-out" aria-live="polite"></p></article>`;
+    <p id="tool-out" class="tool-out" aria-live="polite"></p><div id="tool-diagram"></div></article>`;
   html += `<details class="card"><summary class="label">如果你知道題型，也可以自己選</summary>${renderTypePicker()}</details>`;
   html += `<div class="card note"><p class="mini">這題已記錄在這台裝置（共 ${n} 題解不出的題目），方便之後補上新題型。資料不會上傳。</p>
     <div class="row"><button type="button" id="exp-unsolved" class="ghost">匯出紀錄</button><button type="button" id="clr-unsolved" class="ghost">清除紀錄</button></div></div>`;
@@ -258,6 +259,23 @@ function bindGuided(root, out) {
   out.querySelector('#tool-eval').addEventListener('click', () => {
     res.textContent = toolEvaluate(expr.value, out.querySelector('#tool-val').value.trim());
   });
+  const graphBox = out.querySelector('#tool-diagram');
+  const drawTool = (text, quiet) => {
+    const g = toolGraphSpec(text);
+    graphBox.innerHTML = '';
+    if (g.error || !g.spec) {
+      if (!quiet) res.textContent = g.error || '畫不出這個算式';
+      return;
+    }
+    const card = createDiagram(g.spec);
+    if (!card) return;
+    card.setVisible(() => true);
+    card.caption('把 x 代進去算出 y，所有的點 (x, y) 連起來就是這條曲線；和 x 軸的交點就是等於 0 的地方。');
+    graphBox.appendChild(card.el);
+  };
+  out.querySelector('#tool-graph').addEventListener('click', () => drawTool(expr.value, false));
+  // 題目裡有可以畫的式子時，直接先畫出來
+  if (expr.value) drawTool(expr.value, true);
   out.querySelector('#tool-roots').addEventListener('click', () => {
     res.textContent = toolRoots(expr.value);
   });

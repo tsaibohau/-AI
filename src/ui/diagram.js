@@ -36,10 +36,17 @@ export function createDiagram(rawSpec) {
   if (v.ok && !v.spec) return null; // 這題沒有圖
   const spec = v.ok ? v.spec : null;
   const id = `jxg-${++uid}`;
-  el.innerHTML = `<h2>圖解</h2><p class="mini cap"></p>
+  el.innerHTML = `<div class="diag-head"><h2>圖解</h2><button type="button" class="link small diag-toggle" aria-expanded="true">收起</button></div><div class="diag-body"><p class="mini cap"></p>
     ${spec ? `<div id="${id}" class="jxgbox board ${spec.type}"></div>` : ''}
     <div class="fallback"></div>
-    ${spec ? '<details class="expr"><summary>圖上有什麼（文字說明）</summary><div class="desc"></div></details>' : ''}`;
+    ${spec ? '<details class="expr"><summary>圖上有什麼（文字說明）</summary><div class="desc"></div></details>' : ''}</div>`;
+  const toggle = el.querySelector('.diag-toggle');
+  toggle.addEventListener('click', () => {
+    const hide = !el.classList.contains('collapsed');
+    el.classList.toggle('collapsed', hide);
+    toggle.textContent = hide ? '展開圖解' : '收起';
+    toggle.setAttribute('aria-expanded', String(!hide));
+  });
   const fallback = el.querySelector('.fallback');
   const desc = el.querySelector('.desc');
   let pred = () => true;
@@ -110,7 +117,10 @@ function draw(JXG, id, spec) {
         out.push({ spec: e, els: [g] });
       } else if (e.kind === 'point') {
         const color = ROLE_COLOR(c)[e.role];
-        const p = board.create('point', [e.x, e.y], { fixed: true, size: 3.5, name: esc(e.label), strokeColor: color, fillColor: color, highlight: false, withLabel: !!e.label, label: labelOpt });
+        // 靠近右邊界的點，標籤改放在左邊，才不會被切掉
+        const nearRight = e.x > x0 + (x1 - x0) * 0.7;
+        const lab = nearRight ? { ...labelOpt, anchorX: 'right', offset: [-8, 10] } : labelOpt;
+        const p = board.create('point', [e.x, e.y], { fixed: true, size: 3.5, name: esc(e.label), strokeColor: color, fillColor: color, highlight: false, withLabel: !!e.label, label: lab });
         out.push({ spec: e, els: [p] });
       } else if (e.kind === 'shade') {
         out.push({ spec: e, els: drawShade(board, e, spec, c) });

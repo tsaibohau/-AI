@@ -174,3 +174,6 @@ select.inp { margin-top: 4px; }
 .card.diagram .board.geometry { aspect-ratio: 1 / 1; }
 .card.diagram .cap { margin-top: 0; }
 .jxgbox { border-radius: 8px; }
+.diag-head { display: flex; justify-content: space-between; align-items: baseline; }
+.card.diagram.collapsed .diag-body { display: none; }
+#tool-diagram .card.diagram { margin: 10px 0 0; padding: 10px; }
