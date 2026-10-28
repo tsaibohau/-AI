@@ -148,7 +148,7 @@ function talkView(st, i, current) {
       html +=
         nluStatus === 'loading'
           ? '<p class="mini">下載中，請稍候…</p>'
-          : `<button type="button" class="link small" data-act="talk-nlu" data-i="${i}">讓老師聽懂更多說法（下載小模型，約 30～50 MB，建議用 Wi-Fi；免費、在手機上執行）</button>${nluStatus === 'error' ? '<p class="fb bad">下載失敗，請檢查網路後再試一次。</p>' : ''}`;
+          : `<button type="button" class="link small" data-act="talk-nlu" data-i="${i}">讓老師聽懂更多說法（下載小模型，約 21 MB，建議用 Wi-Fi；免費、在手機上執行）</button>${nluStatus === 'error' ? '<p class="fb bad">下載失敗：請檢查網路；如果網站剛更新，請把網頁關掉再打開後再試一次。</p>' : ''}`;
     }
     html += `<div class="row ask-row"><input class="inp" data-input="talk-${i}" placeholder="${typed ? '寫下你的答案' : '用自己的話回答也可以'}" autocomplete="off" spellcheck="false" />
       <button type="button" class="primary small" data-act="talk-send" data-i="${i}">回答</button></div>

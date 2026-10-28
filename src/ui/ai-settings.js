@@ -63,7 +63,9 @@ export function mountAI(card, { onReady } = {}) {
         onReady?.();
       } catch (err) {
         st.status = 'idle';
-        st.error = `啟用失敗：${err.message}。可以改選「輕量」模型再試一次。`;
+        st.error = /module script|dynamically imported module|Failed to fetch/i.test(err.message)
+          ? '網站剛更新，這個頁面還是舊版。請把網頁完全關掉再打開（或重新整理），然後再按一次。'
+          : `啟用失敗：${err.message}。可以改選「輕量」模型再試一次。`;
       }
       render();
     }

@@ -1,4 +1,15 @@
 import './style.css';
+
+// 網站更新後，還開著的舊頁面會找不到改過名字的程式檔：自動重新整理一次換成新版
+window.addEventListener('vite:preloadError', () => {
+  try {
+    if (sessionStorage.getItem('mt.reloaded')) return;
+    sessionStorage.setItem('mt.reloaded', '1');
+  } catch {
+    return;
+  }
+  location.reload();
+});
 import { mountApp } from './ui/app.js';
 import { mountChat } from './ui/chat.js';
 
