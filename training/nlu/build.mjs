@@ -76,14 +76,49 @@ ${banned.join('、')}
 `;
 }
 
+/** 補強：很短的回答、很短的無關話、正反對照（第一版模型最弱的地方） */
+function promptBoost(nodes, tests) {
+  const banned = [...new Set(tests.map((t) => t.reply))];
+  return `# 任務：補強訓練資料（很短的回答、正反對照）
+
+延續之前的任務（台灣高中數學家教，判斷學生的回答最接近哪個選項）。第一版模型在下面三種情況最容易錯，請專門補這些：
+
+## 規則
+
+1. **很短的回答**：每個選項產生 8 句 1～4 個字的回答（例如「點啊」「一樣ㄚ」「不同」「上」）。
+2. **很短的無關話**：每個問題產生 8 句 1～5 個字、跟題目無關或只是語助詞的回答，option 填 0（例如「哈哈哈」「喔」「好睏」「？？」「...」「隨便」「ok」）。
+3. **正反對照**：有意思相反的選項時（例如「一樣遠」和「不一樣」、「只有一個」和「不只一個」、「兩個都要」和「一個就好」），每個選項再產生 8 句**用字很像但意思相反**的句子，兩邊都要寫，盡量用同樣的字只差一兩個字（例如「應該一樣吧」和「應該不一樣吧」、「會相等」和「會不相等」、「就一個」和「不只一個」）。
+4. 「不知道」選項不要用「不」開頭的反義句混淆：像「不一樣」「不同」是在回答內容，不是不知道。
+5. 不要寫出「禁止使用的句子」，也不要只在它們後面加標點。
+6. 只輸出 JSON Lines，一行一筆，不要有其他說明文字，不要用程式碼區塊：
+{"node": "問題代號", "option": 選項編號, "reply": "學生的回答"}
+
+## 問題與選項
+
+${nodes
+  .map(
+    (n) => `### ${n.id}
+老師問：${n.question}
+${n.options.map((o, i) => `- 選項 ${i + 1}：${o}`).join('\n')}
+- 選項 0：和題目無關、看不懂`,
+  )
+  .join('\n\n')}
+
+## 禁止使用的句子
+
+${banned.join('、')}
+`;
+}
+
 function makePrompts() {
   const nodes = listNodes();
   const tests = testSet(nodes);
   mkdirSync(join(HERE, 'prompts'), { recursive: true });
   BATCHES.forEach((b, i) => writeFileSync(join(HERE, 'prompts', `${i + 1}-${b.join('-')}.md`), promptFor(b, nodes, tests)));
+  writeFileSync(join(HERE, 'prompts', `${BATCHES.length + 1}-boost.md`), promptBoost(nodes, tests));
   writeFileSync(join(HERE, 'nodes.json'), JSON.stringify(nodes, null, 1) + '\n');
   writeFileSync(join(HERE, 'test.json'), JSON.stringify(tests, null, 1) + '\n');
-  console.log(`問題 ${nodes.length} 個、選項 ${nodes.reduce((s, n) => s + n.options.length, 0)} 個、測試題 ${tests.length} 句；提示詞 ${BATCHES.length} 份`);
+  console.log(`問題 ${nodes.length} 個、選項 ${nodes.reduce((s, n) => s + n.options.length, 0)} 個、測試題 ${tests.length} 句；提示詞 ${BATCHES.length + 1} 份`);
 }
 
 /** 檢查 Gemini 的輸出並合併 */
@@ -93,6 +128,9 @@ function check(file) {
   const trainPath = join(HERE, 'data', 'train.jsonl');
   const old = existsSync(trainPath) ? readFileSync(trainPath, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)) : [];
   const seen = new Set(old.map((r) => `${r.node}|${norm(r.reply)}`));
+  // 標成「無關」但其實在說聽不懂的，改標成「不知道」（老師對這兩種的反應不同）
+  const CONFUSED = /不知道|不懂|一頭霧水|一臉問號/;
+  let relabeled = 0;
   const problems = { 看不懂: 0, 問題代號不存在: 0, 選項編號不對: 0, 和測試題重複: 0, 重複: 0, 太長: 0 };
   const added = [];
   // Gemini 偶爾會包程式碼區塊或加說明，只取像 JSON 的行
@@ -114,6 +152,13 @@ function check(file) {
     else if (tests.has(norm(r.reply))) problems.和測試題重複++;
     else if (seen.has(`${r.node}|${norm(r.reply)}`)) problems.重複++;
     else {
+      if (r.option === 0 && CONFUSED.test(r.reply)) {
+        const idk = n.options.indexOf('不知道');
+        if (idk >= 0) {
+          r.option = idk + 1;
+          relabeled++;
+        }
+      }
       seen.add(`${r.node}|${norm(r.reply)}`);
       added.push({ node: r.node, option: r.option, reply: r.reply.trim() });
     }
@@ -121,7 +166,7 @@ function check(file) {
   const all = [...old, ...added];
   mkdirSync(dirname(trainPath), { recursive: true });
   writeFileSync(trainPath, all.map((r) => JSON.stringify(r)).join('\n') + '\n');
-  console.log(`新增 ${added.length} 句，訓練資料共 ${all.length} 句`);
+  console.log(`新增 ${added.length} 句，訓練資料共 ${all.length} 句（其中 ${relabeled} 句從「無關」改標成「不知道」）`);
   console.log('略過：', Object.entries(problems).filter(([, v]) => v).map(([k, v]) => `${k} ${v}`).join('、') || '無');
   // 每個選項的數量，太少的要補
   for (const n of nodes.values()) {

@@ -12,6 +12,17 @@
 
 現成模型分不出正反（「只有一個」被判成「不只一個」），所以要訓練。
 
+### 第一版訓練（764 句 Gemini 資料，`train.py`，配對分類 4 輪）
+
+| 做法 | 答對 |
+|---|---|
+| 用訓練資料找最像的句子（kNN，不訓練） | 56 |
+| 訓練後的模型單獨用 | 54～56 |
+| 關鍵字優先、聽不懂才用訓練後的模型 | 59 |
+
+弱點：很短的無關話（「哈哈」「嗯？」被判成不知道）、很短的正反句（「應該會變吧」被判成一樣遠）。
+補強提示詞：`prompts/5-boost.md`。
+
 ## 流程
 
 1. `node training/nlu/build.mjs prompts`：從 `data/dialogues.json` 產生
@@ -20,6 +31,6 @@
    - `test.json`：測試題（**不可拿來訓練**）
 2. 把 Gemini 的輸出存成文字檔，`node training/nlu/build.mjs check <檔案>`：
    檢查格式、去掉重複與和測試題相同的句子，合併進 `data/train.jsonl`
-3. 在 Colab 用 `data/train.jsonl` 訓練，用 `test.json` 評估（之後補 Colab 筆記本）
+3. `python training/nlu/train.py`：用 `data/train.jsonl` 訓練，用 `test.json` 評估（Colab 也能跑）
 
 劇本改了選項之後要重跑第 1 步。
