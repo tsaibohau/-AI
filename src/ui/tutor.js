@@ -6,6 +6,7 @@ import { answerFollowUp, INTENTS, LESSON } from '../tutor/followup.js';
 import * as llm from '../tutor/llm.js';
 import { validateDiagram } from '../core/diagram.js';
 import { explainGraph } from '../tutor/graph.js';
+import * as nlu from '../tutor/nlu.js';
 import { startDialogue, reply as talkReply, optionsOf, answersOf, matchAnswer, classifyPrompt, fromClassify } from '../tutor/dialogue.js';
 
 const CONCEPTS = concepts.concepts;
@@ -14,6 +15,10 @@ const esc = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 const MAX_TRIES = 3;
+
+// 之前啟用過「聽懂你的話」小模型，就在背景先載入（瀏覽器已快取，不會重新下載）
+if (typeof window !== 'undefined' && nlu.wanted()) nlu.load().catch(() => {});
+let nluStatus = ''; // '' | 'loading' | 'error'
 
 /** 這一步有引導對話就開始 */
 const openTalk = (s) => (s.talk ? startDialogue(s.talk.script, s.talk.vars) : null);
@@ -93,6 +98,13 @@ function talkView(st, i, current) {
     // 需要算數字的問題先讓學生自己打；聽不懂時才給選項
     if (opts.length && (c.pick || !typed)) {
       html += `<div class="chips">${opts.map((o, k) => `<button type="button" class="chip-s" data-act="talk-pick" data-i="${i}" data-o="${k}">${esc(o)}</button>`).join('')}</div>`;
+    }
+    // 聽不懂學生的話時，提供下載小模型（只對要聽懂意思的問題，不含要算數字的）
+    if (c.pick && !typed && !nlu.isReady()) {
+      html +=
+        nluStatus === 'loading'
+          ? '<p class="mini">下載中，請稍候…</p>'
+          : `<button type="button" class="link small" data-act="talk-nlu" data-i="${i}">讓老師聽懂更多說法（下載小模型，約 30～50 MB，建議用 Wi-Fi；免費、在手機上執行）</button>${nluStatus === 'error' ? '<p class="fb bad">下載失敗，請檢查網路後再試一次。</p>' : ''}`;
     }
     html += `<div class="row ask-row"><input class="inp" data-input="talk-${i}" placeholder="${typed ? '寫下你的答案' : '用自己的話回答也可以'}" autocomplete="off" spellcheck="false" />
       <button type="button" class="primary small" data-act="talk-send" data-i="${i}">回答</button></div>
@@ -310,7 +322,23 @@ export function handleTutorClick(el, r, ts, out, rerender) {
       const text = val(`talk-${i}`).trim();
       if (!text) return false;
       const m = matchAnswer(st.talk, text);
-      // 劇本對不上、本機 AI 有啟用時，請 AI 判斷學生的意思比較接近哪個選項
+      const typedNode = answersOf(st.talk).some((a) => a.type);
+      // 關鍵字對不上：先用自己訓練的小模型判斷意思（只用在要聽懂意思的問題）
+      if (!m && !typedNode && nlu.isReady()) {
+        st.talk.thinking = true;
+        nlu
+          .classify(optionsOf(st.talk), text)
+          .then(({ index }) => (index >= 0 ? answersOf(st.talk).filter((x) => x.label)[index] : null))
+          .catch(() => null)
+          .then((a) => {
+            st.talk.thinking = false;
+            talkReply(st.talk, text, a);
+            afterTalk(st);
+            rerender();
+          });
+        return true;
+      }
+      // 再不行、本機 AI 有啟用時，請 AI 判斷學生的意思比較接近哪個選項
       if (!m && llm.isReady() && optionsOf(st.talk).length) {
         st.talk.thinking = true;
         rerender();
@@ -330,6 +358,17 @@ export function handleTutorClick(el, r, ts, out, rerender) {
       afterTalk(st);
       return true;
     }
+    case 'talk-nlu':
+      nluStatus = 'loading';
+      nlu
+        .load()
+        .then(() => (nluStatus = ''))
+        .catch((e) => {
+          console.error('小模型載入失敗', e);
+          nluStatus = 'error';
+        })
+        .then(rerender);
+      return true;
     case 'talk-skip':
       ts.steps[i].talk.skipped = true;
       return true;

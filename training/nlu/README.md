@@ -45,5 +45,12 @@
 2. 把 Gemini 的輸出存成文字檔，`node training/nlu/build.mjs check <檔案>`：
    檢查格式、去掉重複與和測試題相同的句子，合併進 `data/train.jsonl`
 3. `python training/nlu/train.py`：用 `data/train.jsonl` 訓練，用 `test.json` 評估（Colab 也能跑）
+4. `python training/nlu/export.py`：轉成 ONNX、int8 壓縮，輸出到 `public/models/nlu/`（網站用 transformers.js 載入）
+5. `npx vitest run tests/nlu.test.js`：確認網頁版模型的成績
+
+## 網站怎麼用
+
+`src/tutor/nlu.js`。老師模式的對話中，關鍵字聽不懂學生的話時，學生可以按「讓老師聽懂更多說法」下載小模型；
+之後關鍵字對不上就先問小模型（只用在要聽懂意思的問題，要算數字的題目不用）。判斷成「無關」時照樣請學生點選項。
 
 劇本改了選項之後要重跑第 1 步。

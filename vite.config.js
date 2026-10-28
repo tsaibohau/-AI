@@ -26,15 +26,19 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png}'],
         // 本機 AI 的程式很大，只有啟用 AI 的人才需要：不預先快取，用到時再存起來
-        globIgnores: ['**/webllm-*.js'],
-        runtimeCaching: [{ urlPattern: /webllm-.*\.js$/, handler: 'CacheFirst', options: { cacheName: 'webllm-lib' } }],
+        // 「聽懂你的話」小模型的程式與模型檔也一樣：啟用的人才下載
+        globIgnores: ['**/webllm-*.js', '**/transformers-*.js', '**/models/**'],
+        runtimeCaching: [
+          { urlPattern: /webllm-.*\.js$/, handler: 'CacheFirst', options: { cacheName: 'webllm-lib' } },
+          { urlPattern: /transformers-.*\.js$/, handler: 'CacheFirst', options: { cacheName: 'nlu-lib' } },
+        ],
       },
     }),
   ],
   build: {
     rolldownOptions: {
       output: {
-        codeSplitting: { groups: [{ name: 'webllm', test: /node_modules[\\/]@mlc-ai/ }, { name: 'jsxgraph', test: /node_modules[\\/]jsxgraph/ }] },
+        codeSplitting: { groups: [{ name: 'webllm', test: /node_modules[\\/]@mlc-ai/ }, { name: 'jsxgraph', test: /node_modules[\\/]jsxgraph/ }, { name: 'transformers', test: /node_modules[\\/](@huggingface|onnxruntime)/ }] },
       },
     },
     chunkSizeWarningLimit: 7000,
