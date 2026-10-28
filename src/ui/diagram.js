@@ -91,8 +91,12 @@ export function createDiagram(rawSpec) {
   };
 }
 
+const LINE_COLORS = (c) => [c.accent, c.warn, c.ok, c.bad];
+
 function draw(JXG, id, spec) {
   const c = colors();
+  let lineNo = 0;
+  const legend = [];
   const [x0, x1] = spec.x;
   const out = [];
   if (spec.type === 'number_line') return drawNumberLine(JXG, id, spec, c);
@@ -139,12 +143,33 @@ function draw(JXG, id, spec) {
       } else if (e.kind === 'circle') {
         const cc = board.create('circle', e.through ? [pts[e.center], pts[e.through]] : [pts[e.center], e.radius], { strokeColor: c.ok, strokeWidth: 2, fillOpacity: 0, highlight: false });
         out.push({ spec: e, els: [cc] });
+      } else if (e.kind === 'line') {
+        // JSXGraph 的直線 [c, a, b] 代表 c + a·x + b·y = 0；每條線不同顏色，方程式寫在圖下方的圖例（不會被切掉）
+        const color = LINE_COLORS(c)[lineNo++ % 4];
+        const ln = board.create('line', [e.C, e.A, e.B], { strokeColor: color, strokeWidth: 2.2, highlight: false, fixed: true, withLabel: false });
+        legend.push({ color, text: e.label || e.equation, spec: e });
+        out.push({ spec: e, els: [ln] });
+      } else if (e.kind === 'polygon') {
+        const pg = board.create('polygon', e.points.map((p) => pts[p]), { fillColor: c.ok, fillOpacity: 0.12, highlight: false, fixed: true, borders: { strokeColor: c.ok, strokeWidth: 2, highlight: false }, vertices: { visible: false } });
+        out.push({ spec: e, els: [pg] });
+      } else if (e.kind === 'curve') {
+        const f = compile(parseText(e.expr));
+        const g = board.create('functiongraph', [(t) => f({ x: t }), x0, x1], { strokeColor: c.warn, strokeWidth: 2.5, highlight: false });
+        out.push({ spec: e, els: [g] });
       } else if (e.kind === 'angle') {
         const [a, b, d] = e.points.map((p) => pts[p]);
         const an = board.create('angle', [a, b, d], { radius: Math.max(0.4, (x1 - x0) / 12), fillColor: c.warn, fillOpacity: 0.25, strokeColor: c.warn, highlight: false, name: esc(e.label), withLabel: !!e.label, label: labelOpt });
         out.push({ spec: e, els: [an] });
       }
     }
+  }
+  if (legend.length) {
+    const box = document.getElementById(id);
+    const lg = document.createElement('ul');
+    lg.className = 'legend';
+    lg.innerHTML = legend.map((l) => `<li><span class="sw" style="background:${l.color}"></span>${esc(l.text)}</li>`).join('');
+    box.after(lg);
+    out.legend = lg;
   }
   return out;
 }

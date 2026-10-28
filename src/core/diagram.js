@@ -3,6 +3,7 @@
 import { evalReal } from './math.js';
 import { parseText } from '../engine/poly.js';
 import { compile, containsVar } from '../engine/general/ast.js';
+import { parseLine } from '../engine/lines.js';
 
 const MAX_ELEMENTS = 40;
 const MAX_ABS = 1e4;
@@ -122,6 +123,22 @@ function geometry(spec) {
         }
         return c;
       }
+      case 'line': {
+        let l;
+        try {
+          l = parseLine(String(e.equation ?? ''));
+        } catch {
+          fail(`${w} 的直線方程式看不懂`);
+        }
+        if (l.kind !== 'line') fail(`${w} 的直線含參數，畫不出來`);
+        return { kind: 'line', A: l.A.value(), B: l.B.value(), C: l.C.value(), equation: String(e.equation), label: label(e.label), stage: stage(e.stage) };
+      }
+      case 'polygon': {
+        if (!Array.isArray(e.points) || e.points.length < 3) fail(`${w} 的多邊形至少要三個點`);
+        return { kind: 'polygon', points: e.points.map((p) => ref(p, w)), stage: stage(e.stage) };
+      }
+      case 'curve':
+        return { kind: 'curve', ...fn(e.expr, w, x), label: label(e.label), stage: stage(e.stage) };
       case 'angle': {
         if (!Array.isArray(e.points) || e.points.length !== 3) fail(`${w} 的 points 要有三個點（中間是頂點）`);
         return { kind: 'angle', points: e.points.map((p) => ref(p, w)), label: label(e.label), stage: stage(e.stage) };
@@ -172,6 +189,8 @@ export function describeDiagram(spec, visible = () => true) {
     else if (e.kind === 'segment') lines.push(`線段 ${e.from}${e.to}${e.label ? `，長 ${e.label}` : ''}`);
     else if (e.kind === 'circle') lines.push(`以 ${e.center} 為圓心${e.through ? `、通過 ${e.through}` : `、半徑 ${fmt(e.radius)}`}的圓`);
     else if (e.kind === 'angle') lines.push(`角 ${e.points.join('')}${e.label ? ` = ${e.label}` : ''}`);
+    else if (e.kind === 'line') lines.push(`直線 ${e.label || e.equation}`);
+    else if (e.kind === 'polygon') lines.push(`多邊形 ${e.points.join('')}`);
   }
   return lines;
 }
