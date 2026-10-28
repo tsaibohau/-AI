@@ -1,0 +1,249 @@
+{
+  "version": 1,
+  "note": "定義樹（全部自創）。hs 是高中精確版（核心）；simplified 依年級記錄較早的說法、少講了什麼、高中怎麼修正。kind：definition＝要背的定義；derived＝由其他概念導出，不用背（derivation 寫推導，uses 列出用到的概念）。intro 是第一次學到的年級。cues 是考卷上的情境字眼。",
+  "levels": ["國小", "國中", "高中"],
+  "chains": [
+    {
+      "id": "hs1.2-1",
+      "name": "第一冊 2-1 直線與斜率：從點到外心",
+      "goal": "geo.circumcenter",
+      "order": [
+        "geo.point", "geo.coordinate", "geo.right_angle", "geo.perpendicular", "geo.pythagoras",
+        "geo.distance", "geo.midpoint", "geo.midpoint_formula", "geo.slope", "geo.slope_perpendicular",
+        "geo.point_slope", "geo.general_form", "geo.intersection", "geo.perp_bisector",
+        "geo.perp_bisector_property", "geo.circle", "geo.circumcenter", "geo.circumcircle"
+      ]
+    }
+  ],
+  "definitions": [
+    {
+      "id": "geo.point",
+      "name": "點",
+      "kind": "definition",
+      "intro": "國小",
+      "prereq": [],
+      "hs": "點只表示位置，沒有大小。在坐標平面上，一個點由一組有序數對 (x, y) 決定。",
+      "simplified": {
+        "國小": { "say": "點是一個很小的位置記號。", "missing": "沒有說點完全沒有大小，也沒有用數字表示位置。", "fix": "高中把點和有序數對 (x, y) 一一對應，所以可以用數字計算點的關係。" },
+        "國中": { "say": "點用坐標 (x, y) 表示位置。", "missing": "比較少強調「題目裡的地點都只是點」這種抽象化。", "fix": "高中應用題會把村莊、學校、車站等全部看成點，只留下坐標。" }
+      },
+      "cues": ["村莊", "學校", "車站", "商店", "燈塔", "基地台", "位置在"]
+    },
+    {
+      "id": "geo.coordinate",
+      "name": "直角坐標",
+      "kind": "definition",
+      "intro": "國中",
+      "prereq": ["geo.point"],
+      "hs": "在平面上取兩條互相垂直的數線（x 軸、y 軸），交點為原點。平面上每個點對應唯一的有序數對 (x, y)，x 是橫坐標、y 是縱坐標。",
+      "simplified": {
+        "國中": { "say": "用 (x, y) 表示點的位置，先寫左右、再寫上下。", "missing": "沒有強調「點和數對一一對應」。", "fix": "高中利用一一對應，把幾何問題（距離、垂直）改成代數計算。" }
+      },
+      "cues": ["坐標平面", "地圖上", "以…為原點", "東邊", "北邊"]
+    },
+    {
+      "id": "geo.right_angle",
+      "name": "直角",
+      "kind": "definition",
+      "intro": "國小",
+      "prereq": [],
+      "hs": "90° 的角。兩條直線相交形成四個角，若其中一個是 90°，四個都是 90°。",
+      "simplified": {
+        "國小": { "say": "像正方形的角那樣的角就是直角。", "missing": "沒有用度數精確描述。", "fix": "國中以後用 90° 定義直角。" }
+      },
+      "cues": ["直角", "90°", "正方形的角"]
+    },
+    {
+      "id": "geo.perpendicular",
+      "name": "垂直",
+      "kind": "definition",
+      "intro": "國小",
+      "prereq": ["geo.right_angle"],
+      "hs": "兩條直線相交成直角，就說這兩條線互相垂直。",
+      "simplified": {
+        "國小": { "say": "兩條線交叉成直角就是垂直。", "missing": "沒有和斜率連結。", "fix": "高中導出：兩條都不是鉛直線時，垂直等價於斜率相乘等於 −1。" },
+        "國中": { "say": "兩直線相交成 90° 稱為互相垂直。", "missing": "沒有用坐標判斷垂直的方法。", "fix": "高中用斜率判斷垂直，並特別處理水平線與鉛直線。" }
+      },
+      "cues": ["垂直", "直角", "最短的路", "正交"]
+    },
+    {
+      "id": "geo.pythagoras",
+      "name": "畢氏定理",
+      "kind": "derived",
+      "intro": "國中",
+      "prereq": ["geo.right_angle"],
+      "uses": ["geo.right_angle"],
+      "hs": "直角三角形中，兩股長的平方和等於斜邊長的平方：a² + b² = c²。",
+      "derivation": "把四個一樣的直角三角形排在邊長 a + b 的正方形裡，中間空出邊長 c 的正方形。大正方形面積 (a + b)² 減掉四個三角形 2ab，剩下 c²，所以 a² + b² = c²。",
+      "simplified": {
+        "國中": { "say": "直角三角形兩股平方和等於斜邊平方。", "missing": "國中的重點在使用，坐標上的應用較少。", "fix": "高中用它導出兩點距離公式。" }
+      },
+      "cues": ["直角三角形", "斜邊", "直線距離"]
+    },
+    {
+      "id": "geo.distance",
+      "name": "兩點距離",
+      "kind": "derived",
+      "intro": "國中",
+      "prereq": ["geo.coordinate", "geo.pythagoras"],
+      "uses": ["geo.coordinate", "geo.pythagoras"],
+      "hs": "A(x₁, y₁)、B(x₂, y₂) 的距離 AB = √((x₂ − x₁)² + (y₂ − y₁)²)。",
+      "derivation": "從 A 往右（或左）走 x₂ − x₁、再往上（或下）走 y₂ − y₁ 到 B，兩段互相垂直，AB 是直角三角形的斜邊。用畢氏定理就得到距離公式。",
+      "simplified": {
+        "國中": { "say": "在坐標上畫直角三角形，用畢氏定理算兩點距離。", "missing": "通常先畫圖再算，沒有整理成一條公式。", "fix": "高中寫成公式，坐標含未知數時也能直接列式。" }
+      },
+      "cues": ["距離", "多遠", "等距", "距離相等", "一樣遠"]
+    },
+    {
+      "id": "geo.midpoint",
+      "name": "中點",
+      "kind": "definition",
+      "intro": "國小",
+      "prereq": ["geo.point"],
+      "hs": "線段 AB 上，到 A、B 距離相等的那一點叫做 AB 的中點，它把 AB 分成兩段一樣長的線段。",
+      "simplified": {
+        "國小": { "say": "線段正中間的點。", "missing": "沒有用坐標求出中點。", "fix": "高中導出中點坐標公式。" }
+      },
+      "cues": ["中點", "正中間", "一半的地方"]
+    },
+    {
+      "id": "geo.midpoint_formula",
+      "name": "中點坐標公式",
+      "kind": "derived",
+      "intro": "國中",
+      "prereq": ["geo.midpoint", "geo.coordinate"],
+      "uses": ["geo.midpoint", "geo.coordinate"],
+      "hs": "A(x₁, y₁)、B(x₂, y₂) 的中點是 ((x₁ + x₂)/2, (y₁ + y₂)/2)。",
+      "derivation": "中點在 A、B 正中間，所以橫坐標是兩個橫坐標的平均、縱坐標是兩個縱坐標的平均（數線上兩數的中點就是它們的平均）。",
+      "simplified": {
+        "國中": { "say": "數線上兩點的中點是兩數相加除以 2。", "missing": "只講一維的數線。", "fix": "高中在平面上 x、y 分開各取平均。" }
+      },
+      "cues": ["中點", "正中間"]
+    },
+    {
+      "id": "geo.slope",
+      "name": "斜率",
+      "kind": "definition",
+      "intro": "高中",
+      "prereq": ["geo.coordinate"],
+      "hs": "非鉛直的直線上任取相異兩點 (x₁, y₁)、(x₂, y₂)，斜率 m = (y₂ − y₁)/(x₂ − x₁) = Δy/Δx，代表 x 每增加 1，y 變化多少。不論取哪兩點，結果都一樣。鉛直線的 Δx = 0，斜率不存在。",
+      "simplified": {},
+      "cues": ["斜率", "坡度", "傾斜程度", "每前進…上升…"]
+    },
+    {
+      "id": "geo.slope_perpendicular",
+      "name": "垂直時斜率相乘等於 −1",
+      "kind": "derived",
+      "intro": "高中",
+      "prereq": ["geo.slope", "geo.perpendicular"],
+      "uses": ["geo.slope", "geo.perpendicular", "geo.right_angle"],
+      "hs": "兩條都不是鉛直線的直線 L₁、L₂，斜率分別為 m₁、m₂，則 L₁ ⊥ L₂ ⇔ m₁ × m₂ = −1。水平線（斜率 0）和鉛直線（斜率不存在）也互相垂直，但不能用這個式子。",
+      "derivation": "先看例子：y = x（斜率 1）和 y = −x（斜率 −1）夾角是 90°，1 × (−1) = −1。一般情形：斜率 m 的直線方向是「往右 1、往上 m」，把它轉 90° 變成「往右 −m、往上 1」，新的斜率是 1/(−m) = −1/m，所以 m × (−1/m) = −1。",
+      "simplified": {},
+      "cues": ["垂直", "中垂線", "高", "最短距離"]
+    },
+    {
+      "id": "geo.point_slope",
+      "name": "點斜式",
+      "kind": "derived",
+      "intro": "高中",
+      "prereq": ["geo.slope"],
+      "uses": ["geo.slope"],
+      "hs": "通過點 (x₀, y₀)、斜率為 m 的直線：y − y₀ = m(x − x₀)。",
+      "derivation": "直線上任一點 (x, y)（不是 (x₀, y₀)）和 (x₀, y₀) 算出來的斜率都要是 m：(y − y₀)/(x − x₀) = m。兩邊乘 (x − x₀) 就是點斜式，而且 (x₀, y₀) 本身也滿足。",
+      "simplified": {},
+      "cues": ["通過…且斜率為", "直線方程式"]
+    },
+    {
+      "id": "geo.general_form",
+      "name": "直線一般式",
+      "kind": "definition",
+      "intro": "國中",
+      "prereq": ["geo.coordinate"],
+      "hs": "直線方程式寫成 ax + by + c = 0（a、b 不全為 0）。所有直線（包含鉛直線）都能寫成這個樣子；b ≠ 0 時斜率是 −a/b。",
+      "simplified": {
+        "國中": { "say": "二元一次方程式 ax + by = c 的圖形是一條直線。", "missing": "沒有和斜率、點斜式互相轉換。", "fix": "高中把點斜式整理成一般式當作標準答案的寫法。" }
+      },
+      "cues": ["直線方程式", "求直線"]
+    },
+    {
+      "id": "geo.intersection",
+      "name": "兩直線交點＝聯立方程式的解",
+      "kind": "derived",
+      "intro": "國中",
+      "prereq": ["geo.general_form"],
+      "uses": ["geo.coordinate", "geo.general_form"],
+      "hs": "兩直線的交點同時在兩條線上，所以它的坐標同時滿足兩個方程式，也就是聯立方程式的解。恰一組解＝相交於一點；無解＝平行；無限多解＝重合。",
+      "derivation": "點在直線上 ⇔ 坐標代入方程式會成立。同時在兩條線上 ⇔ 同時滿足兩個方程式。",
+      "simplified": {
+        "國中": { "say": "解二元一次聯立方程式，就是找兩條直線的交點。", "missing": "較少討論無解、無限多解對應的圖形。", "fix": "高中用係數比判斷相交、平行、重合。" }
+      },
+      "cues": ["交點", "同時", "交會", "相遇"]
+    },
+    {
+      "id": "geo.perp_bisector",
+      "name": "中垂線",
+      "kind": "definition",
+      "intro": "國中",
+      "prereq": ["geo.midpoint", "geo.perpendicular"],
+      "hs": "通過線段中點、並且和線段垂直的直線，叫做這條線段的垂直平分線（中垂線）。",
+      "simplified": {
+        "國中": { "say": "用尺規作圖畫出線段的垂直平分線。", "missing": "沒有寫出中垂線的方程式。", "fix": "高中用「中點 ＋ 斜率取負倒數 ＋ 點斜式」求出中垂線方程式。" }
+      },
+      "cues": ["中垂線", "垂直平分線", "到兩地距離相等"]
+    },
+    {
+      "id": "geo.perp_bisector_property",
+      "name": "中垂線上的點到線段兩端等距",
+      "kind": "derived",
+      "intro": "國中",
+      "prereq": ["geo.perp_bisector", "geo.distance"],
+      "uses": ["geo.perp_bisector", "geo.distance"],
+      "hs": "點 P 在 AB 的中垂線上 ⇔ PA = PB。所以「到 A、B 兩點距離相等的所有點」剛好就是 AB 的中垂線。",
+      "derivation": "設 M 是 AB 中點。P 在中垂線上時，三角形 PMA 和 PMB 有 MA = MB、PM 共用、夾角都是直角，兩個三角形全等（SAS），所以 PA = PB。也可以用距離公式：PA² = PB² 展開整理後剛好就是中垂線方程式。",
+      "simplified": {
+        "國中": { "say": "中垂線上任一點到線段兩端點等距。", "missing": "多半只講「中垂線上 → 等距」這一個方向。", "fix": "高中強調反過來也成立，所以「到兩點等距」可以直接翻譯成「在中垂線上」。" }
+      },
+      "cues": ["到兩地距離相等", "一樣遠", "等距"]
+    },
+    {
+      "id": "geo.circle",
+      "name": "圓",
+      "kind": "definition",
+      "intro": "國小",
+      "prereq": ["geo.distance"],
+      "hs": "平面上到一個定點（圓心）距離等於定長（半徑）的所有點所成的圖形。",
+      "simplified": {
+        "國小": { "say": "用圓規畫出來的圖形，中心叫圓心。", "missing": "沒有說圓是「所有等距的點」集合起來的。", "fix": "高中用距離定義圓，可以寫成方程式 (x − h)² + (y − k)² = r²。" }
+      },
+      "cues": ["圓", "半徑", "範圍內", "訊號涵蓋"]
+    },
+    {
+      "id": "geo.circumcenter",
+      "name": "外心",
+      "kind": "definition",
+      "intro": "國中",
+      "prereq": ["geo.perp_bisector", "geo.perp_bisector_property", "geo.intersection"],
+      "hs": "三角形三邊中垂線的交點叫做外心。三條中垂線一定交於同一點，而且外心到三個頂點的距離相等。求法：找任兩邊的中垂線方程式，聯立解出交點。",
+      "derivation": "為什麼三條會交在一點、而且等距：設 AB、BC 的中垂線交於 O。O 在 AB 中垂線上，所以 OA = OB；O 在 BC 中垂線上，所以 OB = OC。於是 OA = OC，O 也在 AC 的中垂線上。因此只要算兩條就夠了。",
+      "simplified": {
+        "國中": { "say": "三角形三邊中垂線的交點，到三個頂點等距。", "missing": "用尺規作圖找外心，沒有算坐標。", "fix": "高中用兩條中垂線的方程式聯立，算出外心的精確坐標。" }
+      },
+      "cues": ["到三個…距離都相等", "到三地等距", "蓋一所學校", "設置一座…使其到", "三中垂線"]
+    },
+    {
+      "id": "geo.circumcircle",
+      "name": "外接圓",
+      "kind": "derived",
+      "intro": "國中",
+      "prereq": ["geo.circumcenter", "geo.circle"],
+      "uses": ["geo.circumcenter", "geo.circle"],
+      "hs": "以外心為圓心、外心到頂點的距離為半徑畫圓，會通過三角形的三個頂點，這個圓叫做外接圓。",
+      "derivation": "外心到三個頂點等距，依照圓的定義，三個頂點都在以外心為圓心、這個距離為半徑的圓上。",
+      "simplified": {
+        "國中": { "say": "外心是外接圓的圓心。", "missing": "沒有寫出外接圓方程式。", "fix": "高中可以寫出外接圓方程式，並用來判斷其他點在圓內或圓外。" }
+      },
+      "cues": ["外接圓", "通過三點的圓", "三地都在範圍內"]
+    }
+  ]
+}

@@ -29,7 +29,7 @@
 | `src/tutor/` | 「我不懂」追問（`followup.js`）、用圖解釋（`graph.js`）、本機 AI（`llm.js`，WebLLM） |
 | `src/core/` | 答案比對（`answer.js`）、作答診斷（`diagnose.js`）、圖解規格驗證（`diagram.js`）、schema |
 | `src/ui/` | 首頁 AI 對話（`chat.js`）、老師帶我做（`app.js`、`tutor.js`）、圖解渲染（`diagram.js`，JSXGraph） |
-| `data/` | 概念清單、觀念小講義、名詞解釋（全部自創） |
+| `data/` | 概念清單、觀念小講義、名詞解釋、定義樹 `definitions.json`（高中精確版＋國小／國中簡化標記、定義或導出、先備、考卷字眼；讀取用 `src/core/definitions.js`）（全部自創） |
 | `eval/` | 引擎評測（`score.mjs`）、AI 對話評測（`agent-score.mjs`，需要 Gemini 金鑰） |
 | `docs/` | 使用者提供的解題思路（見下方） |
 
