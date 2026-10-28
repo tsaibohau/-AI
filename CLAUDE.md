@@ -39,7 +39,7 @@
 - **Gemini 暫停**：使用者沒有電腦，無法跑 `npm run eval:agent`；不要主動推進 Gemini 相關工作，除非使用者提起。
 - 一張學校平時考（第一冊 2-1 直線與斜率）的原題在 `private/exam-2-1/`（不在儲存庫裡，使用者手上有備份）；用工具重現 17/17 小題答案正確。
 - 應用問題第一類已完成：到三點等距（外心），`src/engine/types/application.js`；老師模式改成**引導式對話**：劇本 `data/dialogues.json`（診斷問題＋比喻，數字由引擎帶入）、對話引擎 `src/tutor/dialogue.js`；本機 AI 只把學生的話對應到劇本選項。使用者不喜歡直接念定義或一直問「知道嗎」。
-- 長期目標：使用者想**自己訓練 AI**（在 Colab），計劃書見 `docs/AI訓練計劃書.md`；第一階段「聽懂學生的話」小模型已上線（`training/nlu/`、`src/tutor/nlu.js`、模型在 `public/models/nlu/`，約 23 MB，使用者選擇放在儲存庫裡）；資料用 Gemini 產生、測試 64 句：關鍵字＋模型 61。第二階段（會說話的生成模型）還沒開始，使用者沒說之前先別動手。
+- 長期目標：使用者想**自己訓練 AI**（在 Colab），計劃書見 `docs/AI訓練計劃書.md`；第一階段「聽懂學生的話」小模型已上線（`training/nlu/`、`src/tutor/nlu.js`、模型在 `public/models/nlu/`，約 23 MB，使用者選擇放在儲存庫裡）；資料用 Gemini 產生、測試 64 句：關鍵字＋模型 61。**第二階段已決定開始**：微調 Qwen2.5-1.5B（LoRA、Colab），學有溫度、工具格式正確、事實只來自工具；模型放使用者的 Hugging Face 帳號（金鑰只放 Colab 的「密鑰」，絕不進儲存庫或對話）。最終用途：學校校訊網站的「問校務」機器人（第三階段，見計劃書）。
 - 待做：更多應用問題類型、3D 圖解、錯題本與回饋表、換數字出類似題。
 - 待使用者決定：`eval/problems.json` 第 3～5 題的 `needs_diagram` 要不要改成 `true`。
 
