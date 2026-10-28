@@ -30,7 +30,9 @@ export default defineConfig({
         globIgnores: ['**/webllm-*.js', '**/transformers-*.js', '**/models/**'],
         runtimeCaching: [
           { urlPattern: /webllm-.*\.js$/, handler: 'CacheFirst', options: { cacheName: 'webllm-lib' } },
-          { urlPattern: /transformers-.*\.js$/, handler: 'CacheFirst', options: { cacheName: 'nlu-lib' } },
+          // 小模型與執行程式：第一次下載後永久存在這個瀏覽器（網站預設只快取 10 分鐘）
+          { urlPattern: /(transformers-.*\.js|\.wasm)$/, handler: 'CacheFirst', options: { cacheName: 'nlu-lib' } },
+          { urlPattern: /models\/nlu\//, handler: 'CacheFirst', options: { cacheName: 'nlu-model' } },
         ],
       },
     }),

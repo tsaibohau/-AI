@@ -3,7 +3,7 @@ import concepts from '../../data/concepts.json';
 import { solve, TYPES, APP_TYPES } from '../engine/index.js';
 import { toolEvaluate, toolRoots, toolGraphSpec } from '../engine/tools.js';
 import { recordUnsolved, listUnsolved, clearUnsolved, downloadJson } from './storage.js';
-import { newTutorState, renderTutor, handleTutorClick, typeLabel } from './tutor.js';
+import { newTutorState, renderTutor, handleTutorClick, typeLabel, animateTalk } from './tutor.js';
 import { createDiagram } from './diagram.js';
 
 const CONCEPT_NAME = new Map(concepts.concepts.map((c) => [c.id, c.name]));
@@ -157,6 +157,7 @@ function render(root) {
     out.innerHTML = renderHeader(r) + '<div id="diagram-slot"></div>' + renderTutor(r, state.ts);
     out.querySelector('#retype')?.addEventListener('click', () => showTypePicker(root, out));
     placeDiagram(out, r);
+    animateTalk(out);
     return;
   }
   out.innerHTML = renderHeader(r) + '<div id="diagram-slot"></div>' + renderStages(r);

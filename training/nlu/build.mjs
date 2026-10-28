@@ -33,7 +33,7 @@ export function listNodes() {
       if (n.end || n.answers.some((a) => a.type)) continue;
       const st = startDialogue(sid, step.talk.vars);
       st.node = nid;
-      const question = n.say.replace(/\{(\w+)\}/g, (m, k) => st.vars[k] ?? m);
+      const question = [n.say].flat()[0].replace(/\{(\w+)\}/g, (m, k) => st.vars[k] ?? m);
       out.push({ id: `${sid}.${nid}`, script: sid, question, options: optionsOf(st) });
     }
   }

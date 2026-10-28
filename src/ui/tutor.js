@@ -20,6 +20,45 @@ const MAX_TRIES = 3;
 if (typeof window !== 'undefined' && nlu.wanted()) nlu.load().catch(() => {});
 let nluStatus = ''; // '' | 'loading' | 'error'
 
+// ---------- 「老師正在輸入」動畫 ----------
+const typed = new Set(); // 已經打出來（或開始打）的老師句子
+let typing = false;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** 把畫面上還沒打出來的老師句子，一句一句做出「正在輸入…」再逐字打出 */
+export async function animateTalk(root) {
+  const reduce = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (typing) return; // 正在打字的迴圈會自己找到新的句子
+  typing = true;
+  document.body.classList.add('is-typing');
+  try {
+    let el;
+    while ((el = root.querySelector('[data-type]:not([data-started])'))) {
+      el.dataset.started = '1';
+      typed.add(Number(el.dataset.type));
+      const text = el.dataset.text;
+      if (reduce) {
+        el.textContent = text;
+        continue;
+      }
+      el.classList.add('pending');
+      await sleep(350 + Math.random() * 350);
+      el.classList.remove('pending');
+      // 越長的句子打越快，每句最多約 1.6 秒
+      const step = Math.max(1, Math.ceil(text.length / 60));
+      for (let k = step; k < text.length + step; k += step) {
+        el.textContent = text.slice(0, k);
+        await sleep(25);
+      }
+      el.textContent = text;
+    }
+  } finally {
+    typing = false;
+    document.body.classList.remove('is-typing');
+    root.querySelector('.steps li.current')?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }
+}
+
 /** 這一步有引導對話就開始 */
 const openTalk = (s) => (s.talk ? startDialogue(s.talk.script, s.talk.vars) : null);
 
@@ -90,9 +129,14 @@ function talkView(st, i, current) {
   const c = st.talk;
   if (!c) return '';
   let html = '<div class="talk">';
-  for (const m of c.log) html += `<div class="bubble ${m.who === 't' ? 'tutor' : 'me'}">${esc(m.text)}</div>`;
+  for (const m of c.log) {
+    // 老師的新句子先留空，由 animateTalk() 做出「正在輸入」再一個字一個字打出來
+    if (m.who === 't' && m.id && !typed.has(m.id)) html += `<div class="bubble tutor" data-type="${m.id}" data-text="${esc(m.text)}"></div>`;
+    else html += `<div class="bubble ${m.who === 't' ? 'tutor' : 'me'}">${esc(m.text)}</div>`;
+  }
   if (c.thinking) html += '<div class="bubble tutor mini">想一想你的意思…</div>';
   if (!c.done && !c.skipped && current) {
+    html += '<div class="talk-controls">';
     const opts = optionsOf(c);
     const typed = answersOf(c).some((a) => a.type);
     // 需要算數字的問題先讓學生自己打；聽不懂時才給選項
@@ -108,7 +152,7 @@ function talkView(st, i, current) {
     }
     html += `<div class="row ask-row"><input class="inp" data-input="talk-${i}" placeholder="${typed ? '寫下你的答案' : '用自己的話回答也可以'}" autocomplete="off" spellcheck="false" />
       <button type="button" class="primary small" data-act="talk-send" data-i="${i}">回答</button></div>
-      <button type="button" class="link small" data-act="talk-skip" data-i="${i}">我會了，直接算</button>`;
+      <button type="button" class="link small" data-act="talk-skip" data-i="${i}">我會了，直接算</button></div>`;
   }
   return html + '</div>';
 }

@@ -160,6 +160,13 @@ details.card > summary { cursor: pointer; }
 .bubble.me { background: color-mix(in srgb, var(--accent) 15%, var(--card)); margin-left: 20%; }
 .bubble.tutor { background: var(--card); border: 1px solid var(--border); margin-right: 10%; }
 .bubble.ai { border-style: dashed; }
+/* 老師正在輸入：跳動的三個點；打字時先藏起輸入框和下一步 */
+.bubble.pending { width: 4.5em; white-space: nowrap; }
+.bubble[data-type]:not([data-started]) { display: none; }
+.bubble.pending::after { content: '●●●'; letter-spacing: 2px; font-size: 10px; color: var(--muted, #888); animation: typing-dots 1s infinite; }
+@keyframes typing-dots { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+.is-typing .steps li.current > :not(.talk), .is-typing .talk-controls { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .bubble.pending::after { animation: none; } }
 .tag { font-size: 0.75rem; color: var(--muted); }
 .warn-text { color: var(--warn); font-size: 0.85rem; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }

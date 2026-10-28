@@ -91,7 +91,7 @@ describe('引導式對話', () => {
       const st = startDialogue(s.talk.script, s.talk.vars);
       const sc = SCRIPTS[s.talk.script];
       for (const n of Object.values(sc.nodes)) {
-        const texts = [n.say, ...(n.answers || []).flatMap((a) => [a.say, a.label])].filter(Boolean);
+        const texts = [n.say, ...(n.answers || []).flatMap((a) => [a.say, a.label])].flat().filter(Boolean);
         for (const t of texts) expect(t.replace(/\{(\w+)\}/g, (m, k) => (k in st.vars ? '' : m)), `${s.talk.script}：${t}`).not.toMatch(/\{\w+\}/);
       }
     }
@@ -134,6 +134,14 @@ describe('引導式對話', () => {
     reply(st, '應該不一樣吧');
     expect(st.stucks).toContain('以為離開中點就不等距');
     expect(st.log.at(-2).text).toContain('對稱');
+  });
+
+  it('同一句話有好幾種講法，每次隨機挑一種', () => {
+    const v = talkOf('point').vars;
+    const a = startDialogue('point', v, { random: () => 0 }).log[0].text;
+    const b = startDialogue('point', v, { random: () => 0.99 }).log[0].text;
+    expect(a).not.toBe(b);
+    for (const t of [a, b]) expect(t).toContain('村莊');
   });
 
   it('聽不懂時請學生點選項', () => {
