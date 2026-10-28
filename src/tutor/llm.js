@@ -76,22 +76,25 @@ export async function deleteModel(id) {
   saveModel(null);
 }
 
-const SYSTEM = `你是台灣高中數學家教，學生正在一步一步做一題數學題，現在對某一步有疑問。
+const SYSTEM = `你是台灣高中數學家教，學生對一題數學題有疑問。
 請遵守：
-1. 只根據下面提供的「題目資料」解釋，不要自己做新的計算，也不要改動任何數字或答案。
-2. 如果學生還沒看到答案，不要直接說出最後答案。
-3. 用繁體中文、口語、像老師面對面講解，簡短（150 字以內），可以反問學生一個小問題確認他懂了。
-4. 先抓出學生真正卡住的點，再解釋；如果問題和這題無關，請溫和地帶回題目。
-5. 不要寫「顯然」。`;
+1. 只根據「題目資料」解釋，不要自己做新的計算，不要改動任何數字或答案。
+2. 學生還沒看到答案時，不要說出最後答案。
+3. 只回答學生問的那一件事。學生問圖形，就用「圖上的點」來說明（例如 x = 0 時 y 是多少），不要重講整題。
+4. 用繁體中文口語回答，最多 3 句、100 字以內，最後可以問學生一個小問題。
+5. 數學式直接用一般文字與符號寫，例如 x ≠ −2、x² − 1、√2、≤、≥。
+   絕對不要用 LaTeX（不要寫反斜線、\\( \\)、$ 符號），也不要用 Markdown（不要寫 **、#、- 開頭的清單）。
+6. 不要寫「顯然」。`;
 
 /** 組出給模型的訊息（純函式，可測試） */
-export function buildMessages({ question, problem, step, lesson, answerShown, history = [] }) {
+export function buildMessages({ question, problem, step, lesson, graph, answerShown, history = [] }) {
   const ctx = [
     `題目：${problem}`,
     step ? `目前這一步：${step.step}` : '',
     step?.reason ? `這一步的理由：${step.reason}` : '',
     step?.detail ? `計算細節：${step.detail}` : '',
     lesson ? `相關觀念：${lesson}` : '',
+    graph ? `圖解說明：${graph}` : '',
     answerShown ? `最後答案（學生已看過）：${answerShown}` : '學生還沒看到最後答案。',
   ]
     .filter(Boolean)
@@ -99,10 +102,60 @@ export function buildMessages({ question, problem, step, lesson, answerShown, hi
   return [
     { role: 'system', content: SYSTEM },
     { role: 'user', content: `【題目資料】\n${ctx}` },
-    { role: 'assistant', content: '好的，我會只根據這些資料解釋。' },
+    { role: 'assistant', content: '好的，我會只根據這些資料，用一般文字回答。' },
     ...history.slice(-4),
     { role: 'user', content: question },
   ];
+}
+
+const LATEX = [
+  [/\\neq|\\ne(?![a-z])/g, '≠'],
+  [/\\leq?(?![a-z])/g, '≤'],
+  [/\\geq?(?![a-z])/g, '≥'],
+  [/\\times/g, '×'],
+  [/\\cdot/g, '·'],
+  [/\\div/g, '÷'],
+  [/\\pm/g, '±'],
+  [/\\infty/g, '∞'],
+  [/\\cup/g, '∪'],
+  [/\\cap/g, '∩'],
+  [/\\in(?![a-z])/g, '∈'],
+  [/\\Rightarrow|\\implies/g, '⇒'],
+  [/\\Leftrightarrow|\\iff/g, '⇔'],
+  [/\\to|\\rightarrow/g, '→'],
+  [/\\pi/g, 'π'],
+  [/\\theta/g, 'θ'],
+  [/\\Delta/g, 'Δ'],
+  [/\\log_\{?(\w+)\}?/g, 'log_$1'],
+  [/\\(log|ln|sin|cos|tan)/g, '$1'],
+  [/\\left|\\right/g, ''],
+  [/\\[,;!: ]/g, ' '],
+  [/\\quad|\\qquad/g, ' '],
+];
+const SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹', '-': '⁻', n: 'ⁿ', x: 'ˣ' };
+const SUB = { 0: '₀', 1: '₁', 2: '₂', 3: '₃', 4: '₄', 5: '₅', 6: '₆', 7: '₇', 8: '₈', 9: '₉' };
+
+/** 把 AI 輸出的 LaTeX、Markdown 轉成一般文字（純函式，可測試） */
+export function cleanText(raw) {
+  let t = String(raw || '');
+  // 分數與根號（由內而外處理幾次，應付巢狀）
+  for (let i = 0; i < 3; i++) {
+    t = t.replace(/\\[dt]?frac\{([^{}]*)\}\{([^{}]*)\}/g, (_, a, b) => `${/^[\w.]+$/.test(a) ? a : `(${a})`}/${/^[\w.]+$/.test(b) ? b : `(${b})`}`);
+    t = t.replace(/\\sqrt\{([^{}]*)\}/g, (_, a) => (/^[\w.]+$/.test(a) ? `√${a}` : `√(${a})`));
+  }
+  for (const [re, rep] of LATEX) t = t.replace(re, rep);
+  // 上下標
+  t = t.replace(/\^\{([0-9nx-]+)\}|\^([0-9nx])(?![0-9])/g, (_, a, b) => [...(a || b)].map((c) => SUP[c] ?? c).join(''));
+  t = t.replace(/_\{(\d+)\}|log_(\d+)/g, (m, a, b) => (b ? `log${[...b].map((c) => SUB[c]).join('')}` : [...a].map((c) => SUB[c]).join('')));
+  // 拿掉數學模式的括號與錢字號、剩下的反斜線指令
+  t = t.replace(/\\\(|\\\)|\\\[|\\\]/g, '').replace(/\$+/g, '');
+  t = t.replace(/\\(text|mathrm|mathbf|operatorname)\{([^{}]*)\}/g, '$2').replace(/\\[a-zA-Z]+/g, '').replace(/[{}]/g, '');
+  // Markdown：粗體、標題、清單符號
+  t = t.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*\*/g, '').replace(/^#+\s*/gm, '').replace(/^\s*[-*]\s+/gm, '・');
+  // 句中的「 - 分子…」也是清單；但「x - 1」的 - 是減號，只有後面接中文才當清單
+  t = t.replace(/(^|\s)-\s+(?=[\u3400-\u9fff])/g, '\n・');
+  t = t.replace(/顯然/g, '可以看出');
+  return t.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
 }
 
 const numsIn = (s) =>
@@ -118,8 +171,14 @@ export function unknownNumbers(reply, contextText) {
 export async function askLLM(args) {
   if (!engine) throw new Error('本機 AI 尚未載入');
   const messages = buildMessages(args);
-  const res = await engine.chat.completions.create({ messages, temperature: 0.3, max_tokens: 320 });
-  const text = (res.choices?.[0]?.message?.content || '').replace(/顯然/g, '可以看出');
+  const res = await engine.chat.completions.create({ messages, temperature: 0.2, max_tokens: 200 });
+  const choice = res.choices?.[0];
+  let text = cleanText(choice?.message?.content || '');
+  // 被長度截斷時，切在最後一個完整句子
+  if (choice?.finish_reason === 'length') {
+    const cut = Math.max(text.lastIndexOf('。'), text.lastIndexOf('？'), text.lastIndexOf('！'));
+    text = cut > 20 ? text.slice(0, cut + 1) : `${text}…`;
+  }
   const ctxText = messages.slice(0, 2).map((m) => m.content).join('\n');
   const bad = unknownNumbers(text, ctxText);
   return {
