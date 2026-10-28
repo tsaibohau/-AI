@@ -4,6 +4,8 @@ import { parseText, symbolsOf } from './poly.js';
 import { compile } from './general/ast.js';
 import { findRoots } from './general/numeric.js';
 import { identify } from './general/identify.js';
+import { pretty, toMath } from './general/ast.js';
+import { evaluateDiagram } from './diagrams.js';
 
 function prep(exprText) {
   const t = normalizeProblem(exprText).replace(/\s+/g, '');
@@ -37,5 +39,55 @@ export function toolRoots(exprText) {
     return `使算式等於 0 的 ${v}：${roots.map((r) => identify(r).pretty()).join('、')}`;
   } catch (e) {
     return `看不懂這個算式：${e.message}`;
+  }
+}
+
+/** 把一個算式畫成圖解規格；回傳 { spec } 或 { error } */
+export function toolGraphSpec(exprText) {
+  try {
+    // 方程式或不等式：畫「左邊 − 右邊」
+    const t = normalizeProblem(exprText).replace(/\s+/g, '');
+    const m = t.match(/^(.+?)(<=|>=|!=|=|<|>)(.+)$/);
+    const { node, v } = prep(m ? `(${m[1]})-(${m[3]})` : exprText);
+    const f = compile(node);
+    const has = symbolsOf(node).some((s) => !['pi', 'e'].includes(s));
+    if (!has) return { spec: evaluateDiagram(node, f({})) };
+    const g = (x) => f({ [v]: x });
+    const { roots } = findRoots(g);
+    const near = roots.filter((r) => Math.abs(r) <= 50);
+    // 有根時以根為中心，沒有根時看原點附近
+    const c0 = near.length ? Math.min(...near) : 0;
+    const c1 = near.length ? Math.max(...near) : 0;
+    const half = Math.max(4, (c1 - c0) / 2 + 3);
+    const mid = (c0 + c1) / 2;
+    const lo = Math.floor(mid - half);
+    const hi = Math.ceil(mid + half);
+    // y 範圍只看根附近，曲線的重點才不會被壓扁
+    const ys = [];
+    const ylo0 = near.length ? c0 - 1.5 : lo;
+    const yhi0 = near.length ? c1 + 1.5 : hi;
+    for (let i = 0; i <= 80; i++) {
+      const y = g(ylo0 + ((yhi0 - ylo0) * i) / 80);
+      if (Number.isFinite(y)) ys.push(y);
+    }
+    if (!ys.length) return { error: '這個算式在 −5 到 5 附近都沒有定義，畫不出來' };
+    ys.sort((a, b) => a - b);
+    const ylo = Math.min(0, ys[Math.floor(ys.length * 0.05)]);
+    const yhi = Math.max(0, ys[Math.floor(ys.length * 0.95)]);
+    const pad = Math.max(1, (yhi - ylo) * 0.15);
+    const expr = v === 'x' ? toMath(node) : toMath(node, { [v]: 'x' });
+    return {
+      spec: {
+        type: 'function_graph',
+        x: [lo, hi],
+        y: [Math.round((ylo - pad) * 100) / 100, Math.round((yhi + pad) * 100) / 100],
+        elements: [
+          { kind: 'curve', expr, label: `y = ${v === 'x' ? pretty(node) : pretty(node, { [v]: 'x' }).replace(/\(x\)/g, 'x')}`, stage: 1 },
+          ...near.map((r) => ({ kind: 'point', x: r, y: 0, role: 'root', label: identify(r).pretty(), stage: 1 })),
+        ],
+      },
+    };
+  } catch (e) {
+    return { error: `畫不出來：${e.message}` };
   }
 }

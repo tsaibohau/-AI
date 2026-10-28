@@ -7,6 +7,7 @@ import { compile, containsVar, domainConditions, features, logInfo, pretty, toMa
 import { domainRuns, extrema, findRoots, signSolve } from './numeric.js';
 import { identify, Approx } from './identify.js';
 import { rangeText as rangeTextOf } from '../parse.js';
+import { evaluateDiagram } from '../diagrams.js';
 
 export const num = (v) => (v === Infinity ? POS_INF : v === -Infinity ? NEG_INF : identify(v) || new Approx(v));
 const show = (v) => num(v).pretty();
@@ -287,7 +288,7 @@ function evaluate(an, { lhs }) {
     implicit: feat.log ? ['對數的真數要大於 0、底數大於 0 且不等於 1', '沒寫底數的 log 是以 10 為底'] : [],
     concepts: feat.log ? [['log.definition', '用定義求對數值'], ['log.rules', '用對數律化簡']] : [['exp.rules', '用指數律化簡']],
     steps,
-    diagram: null,
+    diagram: evaluateDiagram(lhs, v),
     answer: res.pretty(),
     check: '用計算機按一次，確認數值相同',
     uncertain: [...an.uncertain, ...(res.approx ? ['結果無法化成簡單的精確值，以近似值表示'] : [])],

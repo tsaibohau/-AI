@@ -5,6 +5,7 @@ import { ALL, contains, describeSet, formatSet, intersect } from '../interval.js
 import { REL_PRETTY, ask, buildResult, rootSteps, solveIneq } from '../common.js';
 import { compile, containsVar, logInfo, pretty, toMath } from '../general/ast.js';
 import { sides, num } from '../general/solve.js';
+import { evaluateDiagram } from '../diagrams.js';
 
 const INEQ = ['<', '<=', '>', '>='];
 const strip = (n) => (n.type === 'ParenthesisNode' ? strip(n.content) : n);
@@ -399,7 +400,7 @@ export function solveLogEvaluate(an) {
     implicit: ['沒寫底數的 log 是以 10 為底', '真數要大於 0、底數大於 0 且不等於 1'],
     concepts,
     steps,
-    diagram: null,
+    diagram: evaluateDiagram(node, value),
     answer: res.pretty(),
     check: '用計算機驗算，數值相同',
     uncertain: [...an.uncertain, ...(res.approx ? ['結果無法化成簡單的精確值，以近似值表示'] : [])],
