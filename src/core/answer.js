@@ -1,5 +1,5 @@
 // 答案比對：數值、集合、區間、座標點，以數學等價判斷（不是比字串）
-import { evalReal } from './math.js';
+import { evalReal, parseExpr } from './math.js';
 
 const EPS = 1e-9;
 const near = (a, b) =>
@@ -240,8 +240,9 @@ function equalParsed(type, a, b) {
  * 回傳 { ok, reason }
  */
 /** 把算式文字整理成可計算的 mathjs 字串；有等號時取「左 − 右」 */
-export function exprToMath(s) {
-  let t = normalize(s).replace(/^[a-zA-Z]\([a-zA-Z]\)=/, '').replace(/^y=/, '');
+export function exprToMath(s, { keepY = false } = {}) {
+  let t = normalize(s);
+  if (!keepY) t = t.replace(/^[a-zA-Z]\([a-zA-Z]\)=/, '').replace(/^y=/, '');
   // t(t-1) 這種單一字母後面接括號，當成相乘
   t = t.replace(/(^|[^a-zA-Z])([a-zA-Z])\(/g, '$1$2*(');
   const parts = splitTop(t, ['=']);
@@ -251,17 +252,35 @@ export function exprToMath(s) {
 }
 
 /** 隨機代值比較兩個算式；proportional 為 true 時允許差一個非零倍數 */
+/** 算式中的變數名稱（不含函數名稱與常數） */
+function varsOf(expr) {
+  try {
+    const names = new Set();
+    parseExpr(expr).traverse((n, path, parent) => {
+      if (n.type === 'SymbolNode' && !(parent?.type === 'FunctionNode' && path === 'fn') && !['pi', 'e', 'Infinity'].includes(n.name)) names.add(n.name);
+    });
+    return [...names];
+  } catch {
+    return [];
+  }
+}
+
 export function compareExpr(goldStr, studentStr, v = 'x', proportional = false) {
-  const g = exprToMath(goldStr);
-  const st = exprToMath(studentStr);
+  // 直線（自動找變數）要保留「y =」，其他情況的「y =」「f(x) =」只是函數名稱
+  const keepY = v === 'auto';
+  const g = exprToMath(goldStr, { keepY });
+  const st = exprToMath(studentStr, { keepY });
   if (!g || !st) return { ok: false, reason: '無法解析', ratio: null };
+  // v 可以是一個變數、變數陣列，或 'auto'（從標準答案找出所有變數，例如直線的 x、y）
+  const vars = v === 'auto' ? [...new Set([...varsOf(g), ...varsOf(st)])] : Array.isArray(v) ? v : [v];
   const pts = [-2.3, -1.1, 0.4, 1.7, 2.9, 3.6, 0.9];
   let ratio = null;
   let used = 0;
   let allClose = true;
-  for (const p of pts) {
-    const a = evalReal(g, { [v]: p });
-    const b = evalReal(st, { [v]: p });
+  for (const [i, p] of pts.entries()) {
+    const scope = Object.fromEntries(vars.map((name, j) => [name, pts[(i + j * 3) % pts.length] + j * 0.37]));
+    const a = evalReal(g, scope);
+    const b = evalReal(st, scope);
     if (!Number.isFinite(a) || !Number.isFinite(b)) continue;
     used++;
     if (Math.abs(a - b) > 1e-7 * Math.max(1, Math.abs(a))) allClose = false;
@@ -279,6 +298,10 @@ export function compareExpr(goldStr, studentStr, v = 'x', proportional = false) 
 }
 
 export function compareAnswer(gold, modelAnswer) {
+  if (gold.type === 'line') {
+    // 直線方程式：兩邊移到同一邊後，只差一個非零倍數就算對（例如 2x+y−17=0 與 4x+2y=34）
+    return compareExpr(gold.value, modelAnswer ?? '', 'auto', true);
+  }
   if (gold.type === 'expr' || gold.type === 'expr_prop') {
     return compareExpr(gold.value, modelAnswer ?? '', gold.var || 'x', gold.type === 'expr_prop');
   }
