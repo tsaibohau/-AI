@@ -10,6 +10,7 @@ const FORMAT_HINT = {
   set: '例如 {1, 2} 或 x = 1 或 x = 2',
   interval: '例如 (−2, 3]、x < −1 或 x > 4、所有實數、無解',
   point: '例如 (2, −5)',
+  line: '例如 x + 2y − 8 = 0 或 y = −1/2 x + 4',
   expr: '例如 4k² − 12k − 16',
   expr_prop: '例如 t² − 6t + 8',
 };
@@ -83,6 +84,13 @@ function diagnosePoint(g, s) {
 export function diagnose(ask, student) {
   const text = String(student ?? '').trim();
   if (!text) return result(false, '先寫下你的答案再檢查。');
+  if (ask.type === 'line') {
+    // 直線：移到同一邊後只差一個非零倍數就算對
+    const c = compareExpr(ask.value, text, 'auto', true);
+    if (c.ok) return result(true, '正確！');
+    if (c.reason === '無法解析') return result(false, `看不懂你的寫法，${FORMAT_HINT.line}。`);
+    return result(false, '這條直線不對：檢查斜率有沒有取負倒數、代入的是不是中點，或把中點代進你的式子看看會不會成立。', '計算');
+  }
   if (ask.type === 'expr' || ask.type === 'expr_prop') {
     const c = compareExpr(ask.value, text, ask.var || 'x', ask.type === 'expr_prop');
     if (c.ok) return result(true, '正確！');

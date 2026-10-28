@@ -1,12 +1,13 @@
 {
   "version": 1,
-  "note": "第一版範圍：二次函數與二次不等式、指數與對數。prereq 為先備概念 id。",
+  "note": "範圍：二次函數與二次不等式、指數與對數、直線與坐標幾何（應用題）。prereq 為先備概念 id。",
   "units": [
     { "id": "base", "name": "基礎代數" },
     { "id": "quad", "name": "二次函數" },
     { "id": "qineq", "name": "二次不等式" },
     { "id": "exp", "name": "指數" },
-    { "id": "log", "name": "對數" }
+    { "id": "log", "name": "對數" },
+    { "id": "line", "name": "直線與坐標幾何" }
   ],
   "concepts": [
     { "id": "base.factoring", "name": "因式分解", "unit": "base", "prereq": [] },
@@ -46,6 +47,12 @@
     { "id": "log.function_graph", "name": "對數函數圖形與單調性", "unit": "log", "prereq": ["log.definition", "exp.function_graph"] },
     { "id": "log.equation", "name": "對數方程式", "unit": "log", "prereq": ["log.rules", "log.domain"] },
     { "id": "log.inequality", "name": "對數不等式", "unit": "log", "prereq": ["log.function_graph", "log.domain"] },
-    { "id": "log.common", "name": "常用對數與位數估計", "unit": "log", "prereq": ["log.rules"] }
+    { "id": "log.common", "name": "常用對數與位數估計", "unit": "log", "prereq": ["log.rules"] },
+
+    { "id": "line.slope_perp", "name": "斜率與垂直（斜率相乘 −1）", "unit": "line", "prereq": [] },
+    { "id": "line.point_slope", "name": "點斜式與一般式", "unit": "line", "prereq": [] },
+    { "id": "line.perp_bisector", "name": "中垂線方程式", "unit": "line", "prereq": ["line.slope_perp", "line.point_slope"] },
+    { "id": "line.intersection", "name": "兩直線交點（聯立）", "unit": "line", "prereq": [] },
+    { "id": "line.circumcenter", "name": "外心（到三點等距）", "unit": "line", "prereq": ["line.perp_bisector", "line.intersection"] }
   ]
 }

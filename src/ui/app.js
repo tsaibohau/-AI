@@ -1,6 +1,6 @@
 // 主畫面：輸入題目 → 四階段逐步提示 → 最後才看答案；解不出來時進入引導思考模式
 import concepts from '../../data/concepts.json';
-import { solve, TYPES } from '../engine/index.js';
+import { solve, TYPES, APP_TYPES } from '../engine/index.js';
 import { toolEvaluate, toolRoots, toolGraphSpec } from '../engine/tools.js';
 import { recordUnsolved, listUnsolved, clearUnsolved, downloadJson } from './storage.js';
 import { newTutorState, renderTutor, handleTutorClick, typeLabel } from './tutor.js';
@@ -23,6 +23,7 @@ const EXAMPLES = [
   '解方程式 4^x − 6·2^x + 8 = 0',
   '解 log₂(x − 1) + log₂(x + 1) = 3',
   '解 (x − 1)/(x + 2) ≥ 0',
+  '坐標平面上有三個村莊 A(−3, −2)、B(3, 10)、C(9, 4)，要蓋一所到三個村莊距離都相等的學校。(1) 求 AB 的中垂線方程式。(2) 求學校的坐標。',
 ];
 
 const STAGES = [
@@ -215,10 +216,11 @@ function renderHeader(r) {
 }
 
 function renderTypePicker() {
-  const units = [...new Set(TYPES.map((t) => t.unit))];
+  const all = [...TYPES, ...APP_TYPES];
+  const units = [...new Set(all.map((t) => t.unit))];
   return `<p class="label">這題屬於哪一種？</p>${units
     .map(
-      (u) => `<div class="unit"><span class="unit-name">${esc(u)}</span>${TYPES.filter((t) => t.unit === u)
+      (u) => `<div class="unit"><span class="unit-name">${esc(u)}</span>${all.filter((t) => t.unit === u)
         .map((t) => `<button type="button" class="chip" data-type="${t.id}">${esc(t.label)}</button>`)
         .join('')}</div>`,
     )

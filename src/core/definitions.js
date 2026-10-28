@@ -11,17 +11,18 @@ export const getChain = (id) => data.chains.find((c) => c.id === id) || null;
 
 /**
  * 依年級取定義。
- * 回傳 { id, name, kind, level, text, derivation?, missing?, fix?, notYet? }
+ * 回傳 { id, name, kind, level, text, derivation?, missing?, fix?, beyond? }
  * - 高中：精確版（hs）
  * - 較低年級：有對應的簡化層就用它，並附上「少講了什麼、高中怎麼修正」
- * - 該年級還沒學到（intro 比較晚）：notYet = true
+ * - 該年級還沒正式學到（intro 比較晚）：國中其實也會稍微碰到，所以照樣給高中版，標 beyond = true
+ *   （要不要講、講多少，由「你知道這個概念嗎？」的回答決定，不靠年級擋掉）
  */
 export function getDefinition(id, level = '高中') {
   const d = DEF.get(id);
   if (!d) return null;
   if (rank(level) < 0) throw new Error(`不認得的年級「${level}」`);
   const base = { id, name: d.name, kind: d.kind, level };
-  if (rank(level) < rank(d.intro)) return { ...base, notYet: true, text: `「${d.name}」要到${d.intro}才會學到。` };
+  if (rank(level) < rank(d.intro)) return { ...base, level: '高中', beyond: true, text: d.hs, ...(d.derivation ? { derivation: d.derivation } : {}) };
   if (level === '高中') return { ...base, text: d.hs, ...(d.derivation ? { derivation: d.derivation } : {}) };
   // 這個年級沒有專屬說法時，往下找最近的較低年級
   for (let r = rank(level); r >= 0; r--) {

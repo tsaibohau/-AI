@@ -70,8 +70,10 @@ describe('依年級取定義', () => {
     expect(d.missing).toBeTruthy();
     expect(d.fix).toContain('高中');
   });
-  it('還沒學到的概念標記 notYet', () => {
-    expect(getDefinition('geo.slope', '國中').notYet).toBe(true);
+  it('還沒正式學到的概念照樣給高中版，標記 beyond', () => {
+    const d = getDefinition('geo.slope', '國中');
+    expect(d.beyond).toBe(true);
+    expect(d.text).toContain('Δy/Δx');
   });
   it('國中沒有專屬說法時退回國小層', () => {
     expect(getDefinition('geo.midpoint', '國中').level).toBe('國小');

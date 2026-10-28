@@ -8,6 +8,7 @@ import { solveExpEquation, solveExpInequality } from './types/exponential.js';
 import { solveLogEquation, solveLogInequality, solveLogEvaluate } from './types/logarithm.js';
 import { solveGeneral } from './general/solve.js';
 import { buildGuided } from './guided.js';
+import { isCircumcenterApp, solveCircumcenterApp } from './types/application.js';
 import { compareAnswer } from '../core/answer.js';
 
 export const TYPES = [
@@ -23,6 +24,8 @@ export const TYPES = [
   { id: 'log.inequality', unit: '對數', label: '對數不等式', solve: solveLogInequality },
   { id: 'log.evaluate', unit: '對數', label: '對數求值', solve: solveLogEvaluate },
 ];
+// 應用問題直接讀題目文字（不經過算式分析）
+export const APP_TYPES = [{ id: 'app.circumcenter', unit: '應用問題', label: '到三點等距（外心）', detect: isCircumcenterApp, solve: solveCircumcenterApp }];
 export const GENERAL = { id: 'general', unit: '通用', label: '通用解法' };
 const BY_ID = new Map(TYPES.map((t) => [t.id, t]));
 const CONCEPT_NAME = new Map(concepts.concepts.map((c) => [c.id, c.name]));
@@ -74,7 +77,7 @@ export function finalAsk(type, data) {
 }
 
 // 題目要求的類型（給「審題」選擇題用）
-export const GOALS = ['求最大值或最小值', '求頂點或對稱軸', '解方程式（找出所有解）', '解不等式（找出範圍）', '求參數的範圍', '求一個式子的值'];
+export const GOALS = ['求最大值或最小值', '求頂點或對稱軸', '解方程式（找出所有解）', '解不等式（找出範圍）', '求參數的範圍', '求一個式子的值', '求點的坐標或直線方程式'];
 
 export function goalOf(type, data) {
   const map = {
@@ -111,6 +114,16 @@ function failure(text, an, reason, extra = {}) {
  * 失敗：{ ok: false, reason, guided, needType?, uncertain }
  */
 export function solve(text, { type } = {}) {
+  const app = APP_TYPES.find((t) => (type ? t.id === type : t.detect(text)));
+  if (app) {
+    try {
+      const { data, goal, final } = app.solve(text);
+      return { ok: true, type: app.id, data, goal, final };
+    } catch (e) {
+      if (!(e instanceof EngineError)) throw e;
+      return failure(text, null, `「${app.label}」的解法不適用（${e.message}）`);
+    }
+  }
   let an;
   try {
     an = analyze(text);

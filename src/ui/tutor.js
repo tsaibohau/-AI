@@ -1,11 +1,12 @@
 // 老師模式：每一階段先問學生、學生作答後判斷對錯並給提示；每一步都可以按「我不懂」追問
 import concepts from '../../data/concepts.json';
-import { GOALS, TYPES, GENERAL } from '../engine/index.js';
+import { GOALS, TYPES, APP_TYPES, GENERAL } from '../engine/index.js';
 import { diagnose } from '../core/diagnose.js';
 import { answerFollowUp, INTENTS, LESSON } from '../tutor/followup.js';
 import * as llm from '../tutor/llm.js';
 import { validateDiagram } from '../core/diagram.js';
 import { explainGraph } from '../tutor/graph.js';
+import { startCheck, currentConcept, checkDone, conceptQuestion, answerCheck } from '../tutor/conceptCheck.js';
 
 const CONCEPTS = concepts.concepts;
 const CONCEPT_NAME = new Map(CONCEPTS.map((c) => [c.id, c.name]));
@@ -16,13 +17,16 @@ const MAX_TRIES = 3;
 
 /** 建立一題的老師模式狀態 */
 export function newTutorState(result) {
+  const known = new Set(); // 學生說知道、或已經講解過的概念（整題共用）
+  const ext = result.data.extension;
   return {
+    knownConcepts: known,
     stage: 0, // 0 審題、1 已知、2 觀念、3 推導、4 答案
     goal: { pick: null, tries: 0, done: false },
     known: { revealed: false },
     concept: { picks: new Set(), checked: false, options: conceptOptions(result.data) },
     stepIdx: 0,
-    steps: result.data.extension.map(() => ({ tries: 0, solved: false, revealed: false, input: '', feedback: null, hint: false })),
+    steps: ext.map((s, i) => ({ tries: 0, solved: false, revealed: false, input: '', feedback: null, hint: false, check: i === 0 ? startCheck(s.defs, known) : null })),
     final: { input: '', feedback: null, revealed: false },
     chats: {}, // key → [{ q, a, ai, pending }]
     openAsk: null,
@@ -75,11 +79,31 @@ function askPanel(key, ts) {
   return html + '</div>';
 }
 
+/** 「你知道這個概念嗎？」：講過的內容 + 目前要問的概念 */
+function checkView(st, i) {
+  const c = st.check;
+  if (!c) return '';
+  let html = '';
+  for (const ex of c.shown) {
+    html += `<div class="bubble tutor"><b>${esc(ex.name)}</b>${ex.paras.map((p) => `<p>${esc(p)}</p>`).join('')}</div>`;
+  }
+  const id = currentConcept(c);
+  if (id) {
+    html += `<div class="q">${esc(conceptQuestion(id))}</div><div class="chips">
+      <button type="button" class="chip-s" data-act="concept-know" data-i="${i}" data-v="1">知道</button>
+      <button type="button" class="chip-s" data-act="concept-know" data-i="${i}" data-v="0">不知道</button></div>`;
+  }
+  return html;
+}
+
 function stepView(s, i, ts, current) {
   const st = ts.steps[i];
-  const showBody = !s.ask || st.solved || st.revealed;
-  let html = `<li class="${current ? 'current' : ''}">`;
-  if (!showBody) {
+  const checking = st.check && !checkDone(st.check);
+  const showBody = !checking && (!s.ask || st.solved || st.revealed);
+  let html = `<li class="${current ? 'current' : ''}">` + checkView(st, i);
+  if (checking) {
+    // 先確認概念，再做這一步
+  } else if (!showBody) {
     html += `<div class="q">${esc(s.ask.q)}</div>
       <div class="row ask-row"><input class="inp" data-input="step-${i}" value="${esc(st.input)}" placeholder="寫下你的答案" autocomplete="off" spellcheck="false" />
       <button type="button" class="primary small" data-act="check-step" data-i="${i}">檢查</button></div>`;
@@ -250,9 +274,17 @@ export function handleTutorClick(el, r, ts, out, rerender) {
       ts.steps[i].revealed = true;
       return true;
     case 'next-step':
-      if (ts.stepIdx < ts.steps.length - 1) ts.stepIdx++;
-      else ts.stage = 4;
+      if (ts.stepIdx < ts.steps.length - 1) {
+        ts.stepIdx++;
+        const st = ts.steps[ts.stepIdx];
+        st.check ||= startCheck(r.data.extension[ts.stepIdx].defs, ts.knownConcepts);
+      } else ts.stage = 4;
       return true;
+    case 'concept-know': {
+      const st = ts.steps[i];
+      st.check = answerCheck(st.check, el.dataset.v === '1', ts.knownConcepts);
+      return true;
+    }
     case 'check-final':
       ts.final.input = val('final');
       ts.final.feedback = diagnose(r.final, ts.final.input);
@@ -289,6 +321,6 @@ export function handleTutorClick(el, r, ts, out, rerender) {
 }
 
 export function typeLabel(r) {
-  const t = r.type === 'general' ? GENERAL : TYPES.find((x) => x.id === r.type);
+  const t = r.type === 'general' ? GENERAL : [...TYPES, ...APP_TYPES].find((x) => x.id === r.type);
   return `${t?.unit}・${t?.label}`;
 }
