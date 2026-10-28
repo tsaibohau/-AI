@@ -99,6 +99,13 @@ export function compile(node) {
           cbrt: Math.cbrt,
           abs: Math.abs,
           exp: Math.exp,
+          sin: Math.sin,
+          cos: Math.cos,
+          // tan 在 90° 附近沒有定義
+          tan: (a) => (Math.abs(Math.cos(a)) < 1e-12 ? NaN : Math.tan(a)),
+          asin: (a) => (Math.abs(a) > 1 ? NaN : Math.asin(a)),
+          acos: (a) => (Math.abs(a) > 1 ? NaN : Math.acos(a)),
+          atan: Math.atan,
         }[n.fn.name];
         if (!g || fs.length !== 1) throw new EngineError(`不支援的函數 ${n.fn.name}`);
         return (s) => g(fs[0](s));
@@ -156,8 +163,15 @@ export function pretty(node, subst = {}) {
         switch (n.fn) {
           case 'unaryMinus': return `−${wrap(a, 3)}`;
           case 'unaryPlus': return rec(a);
-          case 'add': return `${rec(a)} + ${wrap(b, 1)}`;
-          case 'subtract': return `${rec(a)} − ${wrap(b, 2)}`;
+          case 'add': {
+            const r = wrap(b, 1);
+            return r.startsWith('−') ? `${rec(a)} − ${r.slice(1)}` : `${rec(a)} + ${r}`;
+          }
+          case 'subtract': {
+            // a − (−b) 寫成 a + b
+            const r = wrap(b, 2);
+            return r.startsWith('−') && prec(b) >= 2 ? `${rec(a)} + ${r.slice(1)}` : `${rec(a)} − ${r}`;
+          }
           case 'multiply': {
             const l = wrap(a, 2);
             const r = wrap(b, 3);

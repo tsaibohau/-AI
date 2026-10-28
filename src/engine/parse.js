@@ -22,6 +22,8 @@ export function normalizeProblem(text) {
     .replace(/≠/g, '!=')
     .replace(/[×·⋅∙]/g, '*')
     .replace(/÷/g, '/')
+    // 角度：72° → 72*pi/180
+    .replace(/(\d+(?:\.\d+)?)\s*°/g, '($1*pi/180)')
     .replace(/√\(/g, 'sqrt(')
     .replace(/√(\d+(?:\.\d+)?|[a-zA-Z])/g, 'sqrt($1)')
     // log_2 8 → log_2(8)；log 2 → log(2)；ln x → ln(x)

@@ -143,12 +143,12 @@ export class MPoly {
   }
 }
 
-const FUNCS = new Set(['log', 'ln', 'sqrt', 'sin', 'cos', 'tan', 'exp', 'abs']);
+const FUNCS = new Set(['log', 'ln', 'sqrt', 'cbrt', 'sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'exp', 'abs', 'log2', 'log10']);
 
 /** 把 2kx 拆成 2k*x、x(x+1) 變成 x*(x+1)，讓 mathjs 照數學習慣解析 */
 export function prepExpr(s) {
   return s
-    .replace(/[a-zA-Z]+/g, (w) => (FUNCS.has(w) ? w : w.split('').join('*')))
+    .replace(/[a-zA-Z]+/g, (w) => (FUNCS.has(w) || w === 'pi' ? w : w.split('').join('*')))
     .replace(/(^|[^a-zA-Z])([a-zA-Z])\(/g, '$1$2*(')
     .replace(/\)\(/g, ')*(');
 }

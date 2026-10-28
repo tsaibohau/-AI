@@ -25,6 +25,12 @@ import {
   smallerDependencies,
   largerDependencies,
   equalDependencies,
+  sinDependencies,
+  cosDependencies,
+  tanDependencies,
+  asinDependencies,
+  acosDependencies,
+  atanDependencies,
 } from 'mathjs';
 
 export const math = create({
@@ -51,6 +57,12 @@ export const math = create({
   smallerDependencies,
   largerDependencies,
   equalDependencies,
+  sinDependencies,
+  cosDependencies,
+  tanDependencies,
+  asinDependencies,
+  acosDependencies,
+  atanDependencies,
 });
 const limitedEvaluate = math.evaluate;
 const limitedParse = math.parse;

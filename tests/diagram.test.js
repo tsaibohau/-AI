@@ -59,7 +59,7 @@ describe('不合法的規格會被擋下，不會丟出例外', () => {
     ['未知元素', { type: 'function_graph', x: [0, 1], y: [0, 1], elements: [{ kind: 'image', src: 'x' }] }],
     ['算式含其他變數', { type: 'function_graph', x: [0, 1], y: [0, 1], elements: [{ kind: 'curve', expr: 'k*x' }] }],
     ['算式看不懂', { type: 'function_graph', x: [0, 1], y: [0, 1], elements: [{ kind: 'curve', expr: ')(' }] }],
-    ['算式不支援的函數', { type: 'function_graph', x: [0, 1], y: [0, 1], elements: [{ kind: 'curve', expr: 'sin(x)' }] }],
+    ['算式不支援的函數', { type: 'function_graph', x: [0, 1], y: [0, 1], elements: [{ kind: 'curve', expr: 'gamma(x)' }] }],
     ['範圍內沒有定義', { type: 'function_graph', x: [-5, -1], y: [0, 1], elements: [{ kind: 'curve', expr: 'sqrt(x)' }] }],
     ['錯的 sign', { type: 'function_graph', x: [0, 1], y: [0, 1], elements: [{ kind: 'shade', expr: 'x', sign: '!=0' }] }],
     ['數線區間顛倒', { type: 'number_line', x: [0, 5], elements: [{ kind: 'interval', from: 3, to: 1 }] }],
