@@ -4,6 +4,8 @@ import { GOALS, TYPES, GENERAL } from '../engine/index.js';
 import { diagnose } from '../core/diagnose.js';
 import { answerFollowUp, INTENTS, LESSON } from '../tutor/followup.js';
 import * as llm from '../tutor/llm.js';
+import { validateDiagram } from '../core/diagram.js';
+import { explainGraph } from '../tutor/graph.js';
 
 const CONCEPTS = concepts.concepts;
 const CONCEPT_NAME = new Map(CONCEPTS.map((c) => [c.id, c.name]));
@@ -62,7 +64,7 @@ function askPanel(key, ts) {
     }
     if (m.pending) html += '<div class="bubble tutor mini">本機 AI 思考中…</div>';
     if (m.ai) {
-      html += `<div class="bubble tutor ai"><span class="tag">AI 解釋</span><p>${esc(m.ai.text)}</p>${m.ai.warning ? `<p class="warn-text">${esc(m.ai.warning)}</p>` : ''}</div>`;
+      html += `<div class="bubble tutor ai"><span class="tag">AI 解釋</span>${m.ai.text.split('\n').filter(Boolean).map((l) => `<p>${esc(l)}</p>`).join('')}${m.ai.warning ? `<p class="warn-text">${esc(m.ai.warning)}</p>` : ''}</div>`;
     }
   }
   if (open) {
@@ -169,9 +171,10 @@ export function renderTutor(r, ts) {
 
 function stageContext(key, r, ts) {
   const d = r.data;
+  const diagram = validateDiagram(d.diagram).spec || null;
   if (key.startsWith('s')) {
     const step = d.extension[Number(key.slice(1))];
-    return { step, concept: step.concept || d.concepts[0]?.id };
+    return { step, concept: step.concept || d.concepts[0]?.id, diagram };
   }
   const text = {
     problem: d.problem,
@@ -179,7 +182,7 @@ function stageContext(key, r, ts) {
     concepts: d.concepts.map((c) => `${CONCEPT_NAME.get(c.id)}：${c.why}`).join('；'),
     answer: `${d.answer}；${d.check}`,
   }[key];
-  return { concept: d.concepts[0]?.id, stageText: text };
+  return { concept: d.concepts[0]?.id, stageText: text, diagram };
 }
 
 async function askAI(r, ts, key, q, msg, rerender) {
@@ -193,6 +196,7 @@ async function askAI(r, ts, key, q, msg, rerender) {
       problem: r.data.problem,
       step: ctx.step || (ctx.stageText ? { step: ctx.stageText } : null),
       lesson: LESSON[ctx.concept]?.summary,
+      graph: ctx.diagram ? explainGraph(ctx.diagram).join(' ') : null,
       answerShown: ts.stage >= 4 && (ts.final.revealed || ts.final.feedback?.ok) ? r.data.answer : null,
       history,
     });

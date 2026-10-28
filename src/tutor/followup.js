@@ -3,6 +3,7 @@
 import concepts from '../../data/concepts.json' with { type: 'json' };
 import lessonsData from '../../data/lessons.json' with { type: 'json' };
 import glossary from '../../data/glossary.json' with { type: 'json' };
+import { explainGraph } from './graph.js';
 
 const CONCEPT = new Map(concepts.concepts.map((c) => [c.id, c]));
 const LESSON = lessonsData.lessons;
@@ -14,9 +15,12 @@ export const INTENTS = [
   { id: 'example', label: '可以舉個簡單的例子嗎？' },
   { id: 'prereq', label: '我前面的觀念不太熟' },
   { id: 'pitfall', label: '這裡要注意什麼？' },
+  { id: 'graph', label: '用圖看看' },
 ];
 
 const RULES = [
+  // 問圖形的放最前面：「為什麼圖是彎的」是在問圖，不是問步驟的理由
+  { id: 'graph', re: /圖|曲線|彎|形狀|拋物線|線條|長這樣|斷開|直線|畫出|看起來/ },
   { id: 'how', re: /怎麼來|怎麼算|哪裡來|哪來|從哪|怎麼得|怎麼變|算出來|怎麼求|怎麼出現|怎麼跑出|為什麼是\s*[−-]?\d|怎麼會是|怎樣算/ },
   { id: 'example', re: /例子|舉例|舉個|例題|簡單一點|簡單的|再一題|示範/ },
   { id: 'prereq', re: /不熟|忘了|忘記|沒學過|沒教|前面|基礎|根本不懂|完全不懂|從頭/ },
@@ -129,6 +133,10 @@ export function answerFollowUp(intentOrText, ctx = {}) {
       } else if (!cid) paras.push('先告訴我你卡在哪個名詞或步驟，我從那裡開始講。');
       break;
     }
+    case 'graph':
+      title = '用圖看看';
+      paras.push(...explainGraph(ctx.diagram || null));
+      break;
     case 'pitfall':
       title = '要注意的地方';
       paras.push(...lessonParas(cid, ['pitfall']));
