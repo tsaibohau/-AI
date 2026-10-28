@@ -3,9 +3,20 @@
 // 模型只在使用者按下「下載」後才載入；問題不會傳到任何伺服器。
 
 export const MODELS = [
-  { id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC', label: '標準（約 1 GB，較聰明）', vramMB: 1630 },
+  { id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC', label: '標準（約 1 GB，手機可用）', vramMB: 1630 },
   { id: 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC', label: '輕量（約 0.4 GB，較快、較不準）', vramMB: 950 },
+  { id: 'Qwen2.5-3B-Instruct-q4f16_1-MLC', label: '進階（約 2 GB，建議電腦或新手機）', vramMB: 2505 },
+  { id: 'Qwen2.5-7B-Instruct-q4f16_1-MLC', label: '最強（約 5 GB，只適合有獨立顯示卡的電腦）', vramMB: 5107 },
 ];
+
+/** 直接用已載入的本機模型對話（給 AI 對話頁用） */
+export async function chatRaw(messages, { maxTokens = 700, temperature = 0.2 } = {}) {
+  if (!engine) throw new Error('本機 AI 尚未載入，請先到設定下載並啟用');
+  const res = await engine.chat.completions.create({ messages, temperature, max_tokens: maxTokens });
+  return res.choices?.[0]?.message?.content || '';
+}
+
+export const loadedModel = () => loadedId;
 
 const PREF_KEY = 'mt.llm.model.v1';
 
@@ -136,7 +147,7 @@ const SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶',
 const SUB = { 0: '₀', 1: '₁', 2: '₂', 3: '₃', 4: '₄', 5: '₅', 6: '₆', 7: '₇', 8: '₈', 9: '₉' };
 
 /** 把 AI 輸出的 LaTeX、Markdown 轉成一般文字（純函式，可測試） */
-export function cleanText(raw) {
+export function cleanText(raw, { keepBold = false } = {}) {
   let t = String(raw || '');
   // 分數與根號（由內而外處理幾次，應付巢狀）
   for (let i = 0; i < 3; i++) {
@@ -151,7 +162,8 @@ export function cleanText(raw) {
   t = t.replace(/\\\(|\\\)|\\\[|\\\]/g, '').replace(/\$+/g, '');
   t = t.replace(/\\(text|mathrm|mathbf|operatorname)\{([^{}]*)\}/g, '$2').replace(/\\[a-zA-Z]+/g, '').replace(/[{}]/g, '');
   // Markdown：粗體、標題、清單符號
-  t = t.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*\*/g, '').replace(/^#+\s*/gm, '').replace(/^\s*[-*]\s+/gm, '・');
+  if (!keepBold) t = t.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*\*/g, '');
+  t = t.replace(/^#+\s*/gm, '').replace(/^\s*[-*]\s+/gm, '・');
   // 句中的「 - 分子…」也是清單；但「x - 1」的 - 是減號，只有後面接中文才當清單
   t = t.replace(/(^|\s)-\s+(?=[\u3400-\u9fff])/g, '\n・');
   t = t.replace(/顯然/g, '可以看出');

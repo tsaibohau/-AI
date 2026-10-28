@@ -4,7 +4,6 @@ import { solve, TYPES } from '../engine/index.js';
 import { toolEvaluate, toolRoots, toolGraphSpec } from '../engine/tools.js';
 import { recordUnsolved, listUnsolved, clearUnsolved, downloadJson } from './storage.js';
 import { newTutorState, renderTutor, handleTutorClick, typeLabel } from './tutor.js';
-import { mountAI } from './ai-settings.js';
 import { createDiagram } from './diagram.js';
 
 const CONCEPT_NAME = new Map(concepts.concepts.map((c) => [c.id, c.name]));
@@ -42,10 +41,7 @@ const diag = { result: null, card: null };
 
 export function mountApp(root) {
   root.innerHTML = `
-    <header class="top">
-      <h1>數學解惑</h1>
-      <p class="sub">不只給答案，帶你一步一步想。完全離線、免費。</p>
-    </header>
+    <p class="sub">解題引擎：輸入一題，老師一步一步帶你做。完全離線、免費。</p>
     <section class="card" id="input-card">
       <label for="q" class="label">輸入題目</label>
       <textarea id="q" rows="3" placeholder="例如：解不等式 x² − x − 6 < 0" autocomplete="off" spellcheck="false"></textarea>
@@ -63,9 +59,8 @@ export function mountApp(root) {
       </details>
     </section>
     <section id="out" aria-live="polite"></section>
-    <section class="card" id="ai-card"></section>
+    <p class="mini center">想用任何說法追問？到「AI 對話」的設定啟用本機 AI 後，這裡的「我不懂」也能用 AI 回答。</p>
   `;
-  mountAI(root.querySelector('#ai-card'));
   const out = root.querySelector('#out');
   // 老師模式的按鈕都用事件委派處理
   out.addEventListener('click', (e) => {
@@ -128,6 +123,12 @@ export function mountApp(root) {
     render(root);
     ta.focus();
   });
+  return {
+    loadProblem(text) {
+      ta.value = text;
+      run(root, text);
+    },
+  };
 }
 
 function run(root, text, type) {

@@ -4,8 +4,8 @@ import * as llm from '../tutor/llm.js';
 const esc = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-export function mountAI(card) {
-  const st = { support: null, status: 'idle', progress: 0, text: '', error: '', model: llm.savedModel() || llm.MODELS[0].id, downloaded: false };
+export function mountAI(card, { onReady } = {}) {
+  const st = { support: null, status: llm.isReady() ? 'ready' : 'idle', progress: 0, text: '', error: '', model: llm.loadedModel?.() || llm.savedModel() || llm.MODELS[0].id, downloaded: false };
 
   const render = () => {
     let body = '';
@@ -13,7 +13,7 @@ export function mountAI(card) {
     else if (!st.support.ok) body = `<p class="mini">${esc(st.support.reason)}</p><p class="mini">沒有本機 AI 也能使用全部功能，只是自由打字的追問只能聽懂常見問法。</p>`;
     else if (st.status === 'ready') {
       body = `<p class="fb ok">已啟用：${esc(llm.MODELS.find((m) => m.id === st.model)?.label)}</p>
-        <p class="mini">在「我不懂」裡直接打字發問，就會由本機 AI 用口語回答。</p>
+        <p class="mini">「AI 對話」與解題引擎裡的「我不懂」都會使用本機 AI。</p>
         <button type="button" class="ghost" data-ai="delete">刪除模型，釋放空間</button>`;
     } else if (st.status === 'loading') {
       body = `<p>${st.downloaded ? '載入中' : '下載中'}… ${Math.round(st.progress * 100)}%</p>
@@ -60,6 +60,7 @@ export function mountAI(card) {
           render();
         });
         st.status = 'ready';
+        onReady?.();
       } catch (err) {
         st.status = 'idle';
         st.error = `啟用失敗：${err.message}。可以改選「輕量」模型再試一次。`;

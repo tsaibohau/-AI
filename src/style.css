@@ -177,3 +177,44 @@ select.inp { margin-top: 4px; }
 .diag-head { display: flex; justify-content: space-between; align-items: baseline; }
 .card.diagram.collapsed .diag-body { display: none; }
 #tool-diagram .card.diagram { margin: 10px 0 0; padding: 10px; }
+
+/* 分頁 */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.tabs { display: flex; gap: 4px; background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 3px; }
+.tab { font: inherit; font-size: 0.9rem; border: 0; background: none; color: var(--fg); padding: 6px 12px; border-radius: 999px; min-height: 36px; }
+.tab.on { background: var(--accent); color: #fff; font-weight: 600; }
+@media (prefers-color-scheme: dark) { .tab.on { color: #10161f; } }
+.center { text-align: center; }
+
+/* AI 對話 */
+.chat-log { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.chat-log .bubble.me { align-self: flex-end; max-width: 85%; margin-left: 0; }
+.chat-log .bubble.tutor { max-width: 100%; margin-right: 0; }
+.rich p { margin: 6px 0; }
+.rich ul { margin: 4px 0; }
+.thumbs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.thumbs img { max-width: 120px; max-height: 120px; border-radius: 6px; }
+.tool-card { border: 1px solid var(--border); border-left: 3px solid var(--ok); border-radius: 8px; padding: 6px 10px; background: var(--card); font-size: 0.88rem; }
+.tool-card.bad { border-left-color: var(--bad); }
+.tool-card summary { cursor: pointer; overflow-wrap: anywhere; }
+.tool-name { color: var(--ok); font-weight: 600; }
+.tool-card.bad .tool-name { color: var(--bad); }
+.tool-card pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.78rem; margin: 6px 0 0; }
+.chat-diagram .card.diagram { margin: 6px 0; }
+.composer { position: sticky; bottom: 8px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); }
+.composer-row { margin-top: 8px; }
+.file-btn { display: inline-flex; align-items: center; cursor: pointer; }
+.file-btn.disabled { opacity: 0.45; pointer-events: none; }
+.img-previews { display: flex; gap: 6px; flex-wrap: wrap; }
+.img-chip { position: relative; }
+.img-chip img { width: 64px; height: 64px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+.img-chip button { position: absolute; top: -6px; right: -6px; border-radius: 50%; border: 0; width: 22px; height: 22px; background: var(--bad); color: #fff; }
+.chat-settings details > summary { cursor: pointer; }
+.card.inner { margin: 8px 0 0; }
+.welcome h2 { margin-bottom: 4px; }
+.thinking { display: flex; justify-content: space-between; align-items: center; }
+.legend { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.85rem; }
+.legend .sw { display: inline-block; width: 18px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+/* 捲動到最新訊息時，留空間給下方的輸入框 */
+.chat-log > * { scroll-margin-bottom: 240px; }
+.chat-log { padding-bottom: 8px; }
