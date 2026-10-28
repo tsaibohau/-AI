@@ -26,6 +26,9 @@ const PROBLEMS = [
   '求 x + 1/x 在 x > 0 的最小值',
   '解 log_4(x) + log_2(x) = 6',
   'log₂3 · log₃8',
+  '求 log₂ 8 + log₂ 4 的值',
+  'log 2 + log 5',
+  '求 2^10 − 1000 的值',
 ];
 
 describe('引擎產生的圖解規格全部合法', () => {
@@ -35,6 +38,7 @@ describe('引擎產生的圖解規格全部合法', () => {
       expect(r.ok, r.reason).toBe(true);
       const v = validateDiagram(r.data.diagram);
       expect(v.ok, v.error).toBe(true);
+      expect(v.spec, '每題都要有圖解').not.toBeNull();
       if (v.spec) {
         expect(describeDiagram(v.spec).length).toBeGreaterThan(0);
         // 階段要介於 1~4，讓圖可以逐步出現
