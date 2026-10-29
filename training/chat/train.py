@@ -11,6 +11,7 @@
 import argparse, json, os, re, random, time
 # 只用一張顯示卡：Kaggle 給兩張 T4 時，自動平行（DataParallel）配 LoRA 容易出錯，也不會比較快
 os.environ.setdefault('CUDA_VISIBLE_DEVICES', '0')
+os.environ.setdefault('PYTORCH_CUDA_ALLOC_CONF', 'expandable_segments:True')  # 減少記憶體碎片
 import torch
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -30,8 +31,8 @@ GPU = torch.cuda.is_available()
 # 顯示卡等級：8 以上（A100、L4…）才真正支援 bf16；T4、P100 比較舊（is_bf16_supported() 在新版 torch 會誤報）
 NEW_GPU = GPU and torch.cuda.get_device_capability(0)[0] >= 8
 DTYPE = torch.bfloat16 if NEW_GPU else (torch.float16 if GPU else torch.float32)  # 考試（推論）用
-# 訓練：新卡用 bf16；舊卡用 fp32 權重＋fp16 混合精度（較穩，不會溢位）
-TRAIN_DTYPE = torch.bfloat16 if NEW_GPU else torch.float32
+# 訓練：模型權重用半精度（T4 只有 15 GB，fp32 會爆記憶體）；LoRA 本身保持 fp32
+TRAIN_DTYPE = DTYPE
 MIXED = {'bf16': NEW_GPU, 'fp16': GPU and not NEW_GPU}  # 兩個都要明寫，TRL 預設會開 bf16
 if GPU and not NEW_GPU:
     # TRL 有一段「半精度相乘、輸出 fp32」的加速只支援新卡，舊卡改走一般算法
@@ -85,6 +86,13 @@ def load(path, dtype=DTYPE):
     # 只用第一張卡（Kaggle 給兩張 T4 時，把模型拆兩半反而慢）
     model = AutoModelForCausalLM.from_pretrained(path, dtype=dtype, device_map={'': 0} if GPU else None)
     return tok, model
+
+
+def fp32_lora(model):
+    """要訓練的 LoRA 參數一定用 fp32（fp16 混合精度不能更新半精度參數）"""
+    for prm in model.parameters():
+        if prm.requires_grad and prm.dtype != torch.float32:
+            prm.data = prm.data.float()
 
 
 def lora():
@@ -159,8 +167,8 @@ def sft():
         output_dir=os.path.join(OUT, 'sft_ckpt'),
         num_train_epochs=1 if args.smoke else 3,
         max_steps=6 if args.smoke else -1,
-        per_device_train_batch_size=1 if args.smoke else 2,
-        gradient_accumulation_steps=1 if args.smoke else 8,
+        per_device_train_batch_size=1,  # 一次一筆：系統提示詞很長，兩筆會爆記憶體
+        gradient_accumulation_steps=1 if args.smoke else 16,
         gradient_checkpointing=True,  # 省記憶體：系統提示詞很長
         learning_rate=2e-4,
         lr_scheduler_type='cosine',
@@ -173,6 +181,7 @@ def sft():
         report_to=[],
     )
     trainer = SFTTrainer(model=model, args=cfg, train_dataset=Dataset.from_list(data), processing_class=tok, peft_config=lora())
+    fp32_lora(trainer.model)
     trainer.train()
     merged = trainer.model.merge_and_unload().to(DTYPE)
     path = os.path.join(OUT, 'sft')
@@ -193,8 +202,8 @@ def dpo():
         output_dir=os.path.join(OUT, 'dpo_ckpt'),
         num_train_epochs=1,
         max_steps=3 if args.smoke else -1,
-        per_device_train_batch_size=1 if args.smoke else 2,
-        gradient_accumulation_steps=1 if args.smoke else 8,
+        per_device_train_batch_size=1,  # 一次一筆：系統提示詞很長，兩筆會爆記憶體
+        gradient_accumulation_steps=1 if args.smoke else 16,
         gradient_checkpointing=True,
         learning_rate=5e-6 if not args.smoke else 1e-5,
         beta=0.1,
@@ -205,6 +214,7 @@ def dpo():
         report_to=[],
     )
     trainer = DPOTrainer(model=model, args=cfg, train_dataset=Dataset.from_list(data), processing_class=tok, peft_config=lora())
+    fp32_lora(trainer.model)
     trainer.train()
     merged = trainer.model.merge_and_unload().to(DTYPE)
     path = os.path.join(OUT, 'final')
@@ -230,7 +240,7 @@ def upload():
 
 steps = ['exam_before', 'sft', 'dpo', 'exam_after', 'upload'] if args.step == 'all' else [args.step]
 log('裝置：', 'GPU ' + torch.cuda.get_device_name(0) if GPU else 'CPU', '；模型：', BASE)
-log('訓練格式：', TRAIN_DTYPE, MIXED, '（T4 應該是 float32 + fp16）')
+log('訓練格式：', TRAIN_DTYPE, MIXED, '（T4 應該是 float16 + fp16）')
 done = lambda d: os.path.exists(os.path.join(OUT, d, 'config.json'))
 for s in steps:
     # 完整流程時，已經做完的步驟就跳過（斷線後重跑會從上次的地方接著做）
