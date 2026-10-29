@@ -40,6 +40,12 @@
 - 一張學校平時考（第一冊 2-1 直線與斜率）的原題在 `private/exam-2-1/`（不在儲存庫裡，使用者手上有備份）；用工具重現 17/17 小題答案正確。
 - 應用問題第一類已完成：到三點等距（外心），`src/engine/types/application.js`；老師模式改成**引導式對話**：劇本 `data/dialogues.json`（診斷問題＋比喻，數字由引擎帶入）、對話引擎 `src/tutor/dialogue.js`；本機 AI 只把學生的話對應到劇本選項。使用者不喜歡直接念定義或一直問「知道嗎」。
 - 長期目標：使用者想**自己訓練 AI**（在 Colab），計劃書見 `docs/AI訓練計劃書.md`；第一階段「聽懂學生的話」小模型已上線（`training/nlu/`、`src/tutor/nlu.js`、模型在 `public/models/nlu/`，約 23 MB，使用者選擇放在儲存庫裡）；資料用 Gemini 產生、測試 64 句：關鍵字＋模型 61。**第二階段已決定開始**：微調 Qwen2.5-1.5B（LoRA、Colab），學有溫度、工具格式正確、事實只來自工具；模型放使用者的 Hugging Face 帳號 HauHau2010（金鑰只放 Colab 的「密鑰」，絕不進儲存庫或對話）。最終用途：學校校訊網站的「問校務」機器人（第三階段，見計劃書）。
+- **第二階段進度（下一步從這裡接）**：訓練程式 `training/chat/train.py`＋筆記本 `training/chat/train.ipynb` 已完成，已在 CPU 用 0.5B 跑通（`--smoke`）。資料：`data/chat.jsonl` 245、`tools.jsonl` 147、`pairs.jsonl` 392（DPO）、考題 `exam.json` 20 題。
+  1. **等使用者在 Kaggle（建議，可背景）或 Colab 跑 `train.ipynb`**（約 1.5～2 小時，需 GPU、Internet、密鑰 `HF_TOKEN`），模型以私人上傳到 `HauHau2010/math-tutor-qwen2.5-1.5b`。
+  2. 使用者貼回最後一格「訓練前 vs 訓練後」對照 → 檢查自動檢查結果、請使用者評語氣；有問題就補資料重訓。
+  3. 效果好 → 轉 MLC 格式（`mlc_llm convert_weight`，沿用 mlc-ai 現成 Qwen2.5-1.5B q4f16_1 函式庫）放 HF；網站要能載入需改公開，**先問使用者**。
+  4. 接進網站（`src/tutor/llm.js`、`src/agent/local.js` 換模型網址）。
+  5. 第三階段「問校務」：先確認學校同意與公開資料來源。
 - 待做：更多應用問題類型、3D 圖解、錯題本與回饋表、換數字出類似題。
 - 待使用者決定：`eval/problems.json` 第 3～5 題的 `needs_diagram` 要不要改成 `true`。
 
