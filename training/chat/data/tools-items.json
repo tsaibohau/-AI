@@ -1915,7 +1915,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "3/6 + 1/2"
+    "expression": "(3/6) + (1/2)"
    }
   },
   "result": {
@@ -1931,12 +1931,12 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "3/3 / 8/4"
+    "expression": "(3/3) / (8/4)"
    }
   },
   "result": {
-   "exact": "1/32",
-   "approx": 0.03125
+   "exact": "1/2",
+   "approx": 0.5
   }
  },
  {
@@ -1947,7 +1947,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "6/9 - 7/9"
+    "expression": "(6/9) - (7/9)"
    }
   },
   "result": {
@@ -1963,7 +1963,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "9/7 * 2/6"
+    "expression": "(9/7) * (2/6)"
    }
   },
   "result": {
@@ -1979,7 +1979,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "1/6 + 2/8"
+    "expression": "(1/6) + (2/8)"
    }
   },
   "result": {
@@ -1995,7 +1995,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "5/2 * 8/3"
+    "expression": "(5/2) * (8/3)"
    }
   },
   "result": {
@@ -2011,7 +2011,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "8/8 - 8/5"
+    "expression": "(8/8) - (8/5)"
    }
   },
   "result": {
@@ -2027,7 +2027,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "4/3 + 2/7"
+    "expression": "(4/3) + (2/7)"
    }
   },
   "result": {
@@ -2043,7 +2043,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "1/7 + 4/2"
+    "expression": "(1/7) + (4/2)"
    }
   },
   "result": {
@@ -2059,7 +2059,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "7/6 * 4/7"
+    "expression": "(7/6) * (4/7)"
    }
   },
   "result": {
@@ -2075,7 +2075,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "4/8 + 8/8"
+    "expression": "(4/8) + (8/8)"
    }
   },
   "result": {
@@ -2091,7 +2091,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "4/3 + 4/6"
+    "expression": "(4/3) + (4/6)"
    }
   },
   "result": {
@@ -2107,7 +2107,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "4/6 - 4/7"
+    "expression": "(4/6) - (4/7)"
    }
   },
   "result": {
@@ -2123,7 +2123,7 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "1/7 + 3/2"
+    "expression": "(1/7) + (3/2)"
    }
   },
   "result": {
@@ -2139,12 +2139,12 @@
   "call": {
    "name": "calculate",
    "args": {
-    "expression": "1/9 / 9/5"
+    "expression": "(1/9) / (9/5)"
    }
   },
   "result": {
-   "exact": "1/405",
-   "approx": 0.002469135802
+   "exact": "5/81",
+   "approx": 0.06172839506
   }
  },
  {

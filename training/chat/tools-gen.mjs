@@ -120,7 +120,7 @@ for (let i = 0; i < 15; i++) {
   const [a, b, c, d] = [int(1, 9), int(2, 9), int(1, 9), int(2, 9)];
   const op = pick(['+', '−', '×', '÷']);
   const expr = `${a}/${b} ${op} ${c}/${d}`;
-  add('calc', pick([`${expr} 等於多少？`, `算 ${expr}`, `幫我算 ${expr}`]), { name: 'calculate', args: { expression: expr.replace('−', '-').replace('×', '*').replace('÷', '/') } }, pick(LEAD.calc));
+  add('calc', pick([`${expr} 等於多少？`, `算 ${expr}`, `幫我算 ${expr}`]), { name: 'calculate', args: { expression: `(${a}/${b}) ${{ '+': '+', '−': '-', '×': '*', '÷': '/' }[op]} (${c}/${d})` } }, pick(LEAD.calc));
 }
 // 9. 距離、中點
 for (let i = 0; i < 10; i++) {
