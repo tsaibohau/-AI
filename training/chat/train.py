@@ -9,6 +9,8 @@
 # 每一步做完都會把結果存到 OUT 資料夾；有 HF_TOKEN 時也會上傳到 Hugging Face（私人），斷線不怕從頭來。
 # 資料全部自創，見 training/chat/README.md
 import argparse, json, os, re, random, time
+# 只用一張顯示卡：Kaggle 給兩張 T4 時，自動平行（DataParallel）配 LoRA 容易出錯，也不會比較快
+os.environ.setdefault('CUDA_VISIBLE_DEVICES', '0')
 import torch
 
 HERE = os.path.dirname(os.path.abspath(__file__))
