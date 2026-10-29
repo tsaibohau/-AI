@@ -33,8 +33,11 @@ TRAIN_DTYPE = torch.bfloat16 if NEW_GPU else torch.float32
 MIXED = {'bf16': NEW_GPU, 'fp16': GPU and not NEW_GPU}  # 兩個都要明寫，TRL 預設會開 bf16
 if GPU and not NEW_GPU:
     # TRL 有一段「半精度相乘、輸出 fp32」的加速只支援新卡，舊卡改走一般算法
-    import trl.kernels.chunked_logprob as _ck
-    _ck._MM_OUT_DTYPE = False
+    try:
+        import trl.kernels.chunked_logprob as _ck  # 只有新版 TRL 才有
+        _ck._MM_OUT_DTYPE = False
+    except ImportError:
+        pass
 SYSTEM = open(os.path.join(DATA, 'system.txt'), encoding='utf-8').read()
 random.seed(0)
 torch.manual_seed(0)
