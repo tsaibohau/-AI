@@ -1,0 +1,2839 @@
+[
+ {
+  "id": "slope-1",
+  "kind": "slope",
+  "question": "斜率？兩點是 (-5, -5)、(-1, 2)",
+  "lead": "斜率我用工具算，避免算錯。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-5, -5)",
+    "p2": "(-1, 2)"
+   }
+  },
+  "result": {
+   "slope": "7/4"
+  }
+ },
+ {
+  "id": "slope-2",
+  "kind": "slope",
+  "question": "(-3, 0) 到 (-1, -3) 的斜率怎麼算？",
+  "lead": "我先把斜率算出來。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-3, 0)",
+    "p2": "(-1, -3)"
+   }
+  },
+  "result": {
+   "slope": "−3/2"
+  }
+ },
+ {
+  "id": "slope-3",
+  "kind": "slope",
+  "question": "求通過 (-4, 1) 和 (0, 3) 的直線斜率",
+  "lead": "",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-4, 1)",
+    "p2": "(0, 3)"
+   }
+  },
+  "result": {
+   "slope": "1/2"
+  }
+ },
+ {
+  "id": "slope-4",
+  "kind": "slope",
+  "question": "求通過 (3, 5) 和 (-1, 6) 的直線斜率",
+  "lead": "先算斜率。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(3, 5)",
+    "p2": "(-1, 6)"
+   }
+  },
+  "result": {
+   "slope": "−1/4"
+  }
+ },
+ {
+  "id": "slope-5",
+  "kind": "slope",
+  "question": "A(4, -2)、B(-1, -3) 的斜率是多少？",
+  "lead": "先算斜率。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(4, -2)",
+    "p2": "(-1, -3)"
+   }
+  },
+  "result": {
+   "slope": "1/5"
+  }
+ },
+ {
+  "id": "slope-6",
+  "kind": "slope",
+  "question": "(3, 2) 到 (0, 0) 的斜率怎麼算？",
+  "lead": "斜率我用工具算，避免算錯。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(3, 2)",
+    "p2": "(0, 0)"
+   }
+  },
+  "result": {
+   "slope": "2/3"
+  }
+ },
+ {
+  "id": "slope-7",
+  "kind": "slope",
+  "question": "求通過 (4, -1) 和 (-1, 2) 的直線斜率",
+  "lead": "我先把斜率算出來。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(4, -1)",
+    "p2": "(-1, 2)"
+   }
+  },
+  "result": {
+   "slope": "−3/5"
+  }
+ },
+ {
+  "id": "slope-8",
+  "kind": "slope",
+  "question": "(-3, 6) 到 (0, 4) 的斜率怎麼算？",
+  "lead": "斜率我用工具算，避免算錯。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-3, 6)",
+    "p2": "(0, 4)"
+   }
+  },
+  "result": {
+   "slope": "−2/3"
+  }
+ },
+ {
+  "id": "slope-9",
+  "kind": "slope",
+  "question": "求通過 (-1, 3) 和 (-5, 1) 的直線斜率",
+  "lead": "斜率我用工具算，避免算錯。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-1, 3)",
+    "p2": "(-5, 1)"
+   }
+  },
+  "result": {
+   "slope": "1/2"
+  }
+ },
+ {
+  "id": "slope-10",
+  "kind": "slope",
+  "question": "求通過 (-4, 5) 和 (-2, -1) 的直線斜率",
+  "lead": "先算斜率。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-4, 5)",
+    "p2": "(-2, -1)"
+   }
+  },
+  "result": {
+   "slope": "−3"
+  }
+ },
+ {
+  "id": "slope-11",
+  "kind": "slope",
+  "question": "斜率？兩點是 (0, 2)、(-2, -5)",
+  "lead": "",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(0, 2)",
+    "p2": "(-2, -5)"
+   }
+  },
+  "result": {
+   "slope": "7/2"
+  }
+ },
+ {
+  "id": "slope-12",
+  "kind": "slope",
+  "question": "斜率？兩點是 (-1, 3)、(-6, -6)",
+  "lead": "我先把斜率算出來。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-1, 3)",
+    "p2": "(-6, -6)"
+   }
+  },
+  "result": {
+   "slope": "9/5"
+  }
+ },
+ {
+  "id": "slope-13",
+  "kind": "slope",
+  "question": "(3, -6) 到 (6, 1) 的斜率怎麼算？",
+  "lead": "我先把斜率算出來。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(3, -6)",
+    "p2": "(6, 1)"
+   }
+  },
+  "result": {
+   "slope": "7/3"
+  }
+ },
+ {
+  "id": "slope-14",
+  "kind": "slope",
+  "question": "斜率？兩點是 (3, -6)、(-1, 6)",
+  "lead": "斜率我用工具算，避免算錯。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(3, -6)",
+    "p2": "(-1, 6)"
+   }
+  },
+  "result": {
+   "slope": "−3"
+  }
+ },
+ {
+  "id": "slope-15",
+  "kind": "slope",
+  "question": "A(-1, -1)、B(-6, 2) 的斜率是多少？",
+  "lead": "先算斜率。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-1, -1)",
+    "p2": "(-6, 2)"
+   }
+  },
+  "result": {
+   "slope": "−3/5"
+  }
+ },
+ {
+  "id": "slope-16",
+  "kind": "slope",
+  "question": "(-5, -5) 到 (-6, -2) 的斜率怎麼算？",
+  "lead": "斜率我用工具算，避免算錯。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-5, -5)",
+    "p2": "(-6, -2)"
+   }
+  },
+  "result": {
+   "slope": "−3"
+  }
+ },
+ {
+  "id": "slope-17",
+  "kind": "slope",
+  "question": "A(0, 4)、B(3, -2) 的斜率是多少？",
+  "lead": "我先把斜率算出來。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(0, 4)",
+    "p2": "(3, -2)"
+   }
+  },
+  "result": {
+   "slope": "−2"
+  }
+ },
+ {
+  "id": "slope-18",
+  "kind": "slope",
+  "question": "斜率？兩點是 (-5, -2)、(-2, 2)",
+  "lead": "我先把斜率算出來。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-5, -2)",
+    "p2": "(-2, 2)"
+   }
+  },
+  "result": {
+   "slope": "4/3"
+  }
+ },
+ {
+  "id": "line-1",
+  "kind": "line",
+  "question": "幫我寫出過 (-2, 0) 和 (0, 1) 的直線",
+  "lead": "",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(-2, 0)",
+    "p2": "(0, 1)"
+   }
+  },
+  "result": {
+   "equation": "x − 2y + 2 = 0",
+   "A": "1",
+   "B": "-2",
+   "C": "2",
+   "slope": "1/2",
+   "form": "y = (1/2)x + 1",
+   "yIntercept": "1",
+   "xIntercept": "−2"
+  }
+ },
+ {
+  "id": "line-2",
+  "kind": "line",
+  "question": "求通過 (5, 3)、(5, -3) 的直線方程式",
+  "lead": "我用兩點把直線求出來。",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(5, 3)",
+    "p2": "(5, -3)"
+   }
+  },
+  "result": {
+   "equation": "x − 5 = 0",
+   "A": "1",
+   "B": "0",
+   "C": "-5",
+   "slope": "沒有斜率（鉛直線）",
+   "form": "x = 5",
+   "xIntercept": "5"
+  }
+ },
+ {
+  "id": "line-3",
+  "kind": "line",
+  "question": "求通過 (0, 0)、(2, -2) 的直線方程式",
+  "lead": "",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(0, 0)",
+    "p2": "(2, -2)"
+   }
+  },
+  "result": {
+   "equation": "x + y = 0",
+   "A": "1",
+   "B": "1",
+   "C": "0",
+   "slope": "−1",
+   "form": "y = −x",
+   "yIntercept": "0",
+   "xIntercept": "0"
+  }
+ },
+ {
+  "id": "line-4",
+  "kind": "line",
+  "question": "A(-1, 0)、B(4, 4) 這條直線的方程式是什麼？",
+  "lead": "",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(-1, 0)",
+    "p2": "(4, 4)"
+   }
+  },
+  "result": {
+   "equation": "4x − 5y + 4 = 0",
+   "A": "4",
+   "B": "-5",
+   "C": "4",
+   "slope": "4/5",
+   "form": "y = (4/5)x + 4/5",
+   "yIntercept": "4/5",
+   "xIntercept": "−1"
+  }
+ },
+ {
+  "id": "line-5",
+  "kind": "line",
+  "question": "求通過 (5, -3)、(-3, 1) 的直線方程式",
+  "lead": "先把直線方程式算出來。",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(5, -3)",
+    "p2": "(-3, 1)"
+   }
+  },
+  "result": {
+   "equation": "x + 2y + 1 = 0",
+   "A": "1",
+   "B": "2",
+   "C": "1",
+   "slope": "−1/2",
+   "form": "y = (−1/2)x − 1/2",
+   "yIntercept": "−1/2",
+   "xIntercept": "−1"
+  }
+ },
+ {
+  "id": "line-6",
+  "kind": "line",
+  "question": "A(5, -4)、B(-3, -1) 這條直線的方程式是什麼？",
+  "lead": "先把直線方程式算出來。",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(5, -4)",
+    "p2": "(-3, -1)"
+   }
+  },
+  "result": {
+   "equation": "3x + 8y + 17 = 0",
+   "A": "3",
+   "B": "8",
+   "C": "17",
+   "slope": "−3/8",
+   "form": "y = (−3/8)x − 17/8",
+   "yIntercept": "−17/8",
+   "xIntercept": "−17/3"
+  }
+ },
+ {
+  "id": "line-7",
+  "kind": "line",
+  "question": "幫我寫出過 (5, 1) 和 (0, 2) 的直線",
+  "lead": "",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(5, 1)",
+    "p2": "(0, 2)"
+   }
+  },
+  "result": {
+   "equation": "x + 5y − 10 = 0",
+   "A": "1",
+   "B": "5",
+   "C": "-10",
+   "slope": "−1/5",
+   "form": "y = (−1/5)x + 2",
+   "yIntercept": "2",
+   "xIntercept": "10"
+  }
+ },
+ {
+  "id": "line-8",
+  "kind": "line",
+  "question": "幫我寫出過 (-4, 1) 和 (5, -5) 的直線",
+  "lead": "我用兩點把直線求出來。",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(-4, 1)",
+    "p2": "(5, -5)"
+   }
+  },
+  "result": {
+   "equation": "2x + 3y + 5 = 0",
+   "A": "2",
+   "B": "3",
+   "C": "5",
+   "slope": "−2/3",
+   "form": "y = (−2/3)x − 5/3",
+   "yIntercept": "−5/3",
+   "xIntercept": "−5/2"
+  }
+ },
+ {
+  "id": "line-9",
+  "kind": "line",
+  "question": "A(-4, -4)、B(0, 3) 這條直線的方程式是什麼？",
+  "lead": "",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(-4, -4)",
+    "p2": "(0, 3)"
+   }
+  },
+  "result": {
+   "equation": "7x − 4y + 12 = 0",
+   "A": "7",
+   "B": "-4",
+   "C": "12",
+   "slope": "7/4",
+   "form": "y = (7/4)x + 3",
+   "yIntercept": "3",
+   "xIntercept": "−12/7"
+  }
+ },
+ {
+  "id": "line-10",
+  "kind": "line",
+  "question": "求通過 (4, -5)、(-5, 1) 的直線方程式",
+  "lead": "",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(4, -5)",
+    "p2": "(-5, 1)"
+   }
+  },
+  "result": {
+   "equation": "2x + 3y + 7 = 0",
+   "A": "2",
+   "B": "3",
+   "C": "7",
+   "slope": "−2/3",
+   "form": "y = (−2/3)x − 7/3",
+   "yIntercept": "−7/3",
+   "xIntercept": "−7/2"
+  }
+ },
+ {
+  "id": "line-11",
+  "kind": "line",
+  "question": "幫我寫出過 (-2, -3) 和 (-2, 4) 的直線",
+  "lead": "我用兩點把直線求出來。",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(-2, -3)",
+    "p2": "(-2, 4)"
+   }
+  },
+  "result": {
+   "equation": "x + 2 = 0",
+   "A": "1",
+   "B": "0",
+   "C": "2",
+   "slope": "沒有斜率（鉛直線）",
+   "form": "x = −2",
+   "xIntercept": "−2"
+  }
+ },
+ {
+  "id": "line-12",
+  "kind": "line",
+  "question": "幫我寫出過 (-3, -2) 和 (1, 2) 的直線",
+  "lead": "我用兩點把直線求出來。",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(-3, -2)",
+    "p2": "(1, 2)"
+   }
+  },
+  "result": {
+   "equation": "x − y + 1 = 0",
+   "A": "1",
+   "B": "-1",
+   "C": "1",
+   "slope": "1",
+   "form": "y = x + 1",
+   "yIntercept": "1",
+   "xIntercept": "−1"
+  }
+ },
+ {
+  "id": "line-13",
+  "kind": "line",
+  "question": "A(-1, -4)、B(-3, -1) 這條直線的方程式是什麼？",
+  "lead": "",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(-1, -4)",
+    "p2": "(-3, -1)"
+   }
+  },
+  "result": {
+   "equation": "3x + 2y + 11 = 0",
+   "A": "3",
+   "B": "2",
+   "C": "11",
+   "slope": "−3/2",
+   "form": "y = (−3/2)x − 11/2",
+   "yIntercept": "−11/2",
+   "xIntercept": "−11/3"
+  }
+ },
+ {
+  "id": "line-14",
+  "kind": "line",
+  "question": "幫我寫出過 (4, 3) 和 (0, 5) 的直線",
+  "lead": "我用兩點把直線求出來。",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(4, 3)",
+    "p2": "(0, 5)"
+   }
+  },
+  "result": {
+   "equation": "x + 2y − 10 = 0",
+   "A": "1",
+   "B": "2",
+   "C": "-10",
+   "slope": "−1/2",
+   "form": "y = (−1/2)x + 5",
+   "yIntercept": "5",
+   "xIntercept": "10"
+  }
+ },
+ {
+  "id": "line-15",
+  "kind": "line",
+  "question": "幫我寫出過 (2, -2) 和 (0, 1) 的直線",
+  "lead": "",
+  "call": {
+   "name": "line",
+   "args": {
+    "mode": "two_points",
+    "p1": "(2, -2)",
+    "p2": "(0, 1)"
+   }
+  },
+  "result": {
+   "equation": "3x + 2y − 2 = 0",
+   "A": "3",
+   "B": "2",
+   "C": "-2",
+   "slope": "−3/2",
+   "form": "y = (−3/2)x + 1",
+   "yIntercept": "1",
+   "xIntercept": "2/3"
+  }
+ },
+ {
+  "id": "bisector-1",
+  "kind": "bisector",
+  "question": "求線段 AB 的垂直平分線，A(-2, -2)、B(2, -2)",
+  "lead": "",
+  "call": {
+   "name": "perpendicular_bisector",
+   "args": {
+    "p1": "(-2, -2)",
+    "p2": "(2, -2)"
+   }
+  },
+  "result": {
+   "midpoint": "(0, −2)",
+   "equation": "x = 0",
+   "A": "1",
+   "B": "0",
+   "C": "0",
+   "slope": "沒有斜率（鉛直線）",
+   "form": "x = 0",
+   "xIntercept": "0"
+  }
+ },
+ {
+  "id": "bisector-2",
+  "kind": "bisector",
+  "question": "求線段 AB 的垂直平分線，A(-5, 5)、B(-1, 7)",
+  "lead": "中垂線要通過中點、又跟線段垂直，我直接算。",
+  "call": {
+   "name": "perpendicular_bisector",
+   "args": {
+    "p1": "(-5, 5)",
+    "p2": "(-1, 7)"
+   }
+  },
+  "result": {
+   "midpoint": "(−3, 6)",
+   "equation": "2x + y = 0",
+   "A": "2",
+   "B": "1",
+   "C": "0",
+   "slope": "−2",
+   "form": "y = −2x",
+   "yIntercept": "0",
+   "xIntercept": "0"
+  }
+ },
+ {
+  "id": "bisector-3",
+  "kind": "bisector",
+  "question": "A(-3, 1)、B(-9, -1) 的中垂線方程式？",
+  "lead": "我算一下中垂線。",
+  "call": {
+   "name": "perpendicular_bisector",
+   "args": {
+    "p1": "(-3, 1)",
+    "p2": "(-9, -1)"
+   }
+  },
+  "result": {
+   "midpoint": "(−6, 0)",
+   "equation": "3x + y + 18 = 0",
+   "A": "3",
+   "B": "1",
+   "C": "18",
+   "slope": "−3",
+   "form": "y = −3x − 18",
+   "yIntercept": "−18",
+   "xIntercept": "−6"
+  }
+ },
+ {
+  "id": "bisector-4",
+  "kind": "bisector",
+  "question": "求線段 AB 的垂直平分線，A(1, 5)、B(-3, 1)",
+  "lead": "中垂線要通過中點、又跟線段垂直，我直接算。",
+  "call": {
+   "name": "perpendicular_bisector",
+   "args": {
+    "p1": "(1, 5)",
+    "p2": "(-3, 1)"
+   }
+  },
+  "result": {
+   "midpoint": "(−1, 3)",
+   "equation": "x + y − 2 = 0",
+   "A": "1",
+   "B": "1",
+   "C": "-2",
+   "slope": "−1",
+   "form": "y = −x + 2",
+   "yIntercept": "2",
+   "xIntercept": "2"
+  }
+ },
+ {
+  "id": "bisector-5",
+  "kind": "bisector",
+  "question": "到 (-3, -2) 和 (1, -4) 距離相等的點形成什麼直線？",
+  "lead": "我算一下中垂線。",
+  "call": {
+   "name": "perpendicular_bisector",
+   "args": {
+    "p1": "(-3, -2)",
+    "p2": "(1, -4)"
+   }
+  },
+  "result": {
+   "midpoint": "(−1, −3)",
+   "equation": "2x − y − 1 = 0",
+   "A": "2",
+   "B": "-1",
+   "C": "-1",
+   "slope": "2",
+   "form": "y = 2x − 1",
+   "yIntercept": "−1",
+   "xIntercept": "1/2"
+  }
+ },
+ {
+  "id": "bisector-6",
+  "kind": "bisector",
+  "question": "A(6, -3)、B(4, -3) 的中垂線方程式？",
+  "lead": "中垂線要通過中點、又跟線段垂直，我直接算。",
+  "call": {
+   "name": "perpendicular_bisector",
+   "args": {
+    "p1": "(6, -3)",
+    "p2": "(4, -3)"
+   }
+  },
+  "result": {
+   "midpoint": "(5, −3)",
+   "equation": "x − 5 = 0",
+   "A": "1",
+   "B": "0",
+   "C": "-5",
+   "slope": "沒有斜率（鉛直線）",
+   "form": "x = 5",
+   "xIntercept": "5"
+  }
+ },
+ {
+  "id": "bisector-7",
+  "kind": "bisector",
+  "question": "A(4, -3)、B(2, -7) 的中垂線方程式？",
+  "lead": "我算一下中垂線。",
+  "call": {
+   "name": "perpendicular_bisector",
+   "args": {
+    "p1": "(4, -3)",
+    "p2": "(2, -7)"
+   }
+  },
+  "result": {
+   "midpoint": "(3, −5)",
+   "equation": "x + 2y + 7 = 0",
+   "A": "1",
+   "B": "2",
+   "C": "7",
+   "slope": "−1/2",
+   "form": "y = (−1/2)x − 7/2",
+   "yIntercept": "−7/2",
+   "xIntercept": "−7"
+  }
+ },
+ {
+  "id": "bisector-8",
+  "kind": "bisector",
+  "question": "到 (-5, 5) 和 (-1, 3) 距離相等的點形成什麼直線？",
+  "lead": "中垂線要通過中點、又跟線段垂直，我直接算。",
+  "call": {
+   "name": "perpendicular_bisector",
+   "args": {
+    "p1": "(-5, 5)",
+    "p2": "(-1, 3)"
+   }
+  },
+  "result": {
+   "midpoint": "(−3, 4)",
+   "equation": "2x − y + 10 = 0",
+   "A": "2",
+   "B": "-1",
+   "C": "10",
+   "slope": "2",
+   "form": "y = 2x + 10",
+   "yIntercept": "10",
+   "xIntercept": "−5"
+  }
+ },
+ {
+  "id": "bisector-9",
+  "kind": "bisector",
+  "question": "A(-2, 1)、B(2, 1) 的中垂線方程式？",
+  "lead": "我算一下中垂線。",
+  "call": {
+   "name": "perpendicular_bisector",
+   "args": {
+    "p1": "(-2, 1)",
+    "p2": "(2, 1)"
+   }
+  },
+  "result": {
+   "midpoint": "(0, 1)",
+   "equation": "x = 0",
+   "A": "1",
+   "B": "0",
+   "C": "0",
+   "slope": "沒有斜率（鉛直線）",
+   "form": "x = 0",
+   "xIntercept": "0"
+  }
+ },
+ {
+  "id": "bisector-10",
+  "kind": "bisector",
+  "question": "A(-3, -4)、B(-9, 2) 的中垂線方程式？",
+  "lead": "我算一下中垂線。",
+  "call": {
+   "name": "perpendicular_bisector",
+   "args": {
+    "p1": "(-3, -4)",
+    "p2": "(-9, 2)"
+   }
+  },
+  "result": {
+   "midpoint": "(−6, −1)",
+   "equation": "x − y + 5 = 0",
+   "A": "1",
+   "B": "-1",
+   "C": "5",
+   "slope": "1",
+   "form": "y = x + 5",
+   "yIntercept": "5",
+   "xIntercept": "−5"
+  }
+ },
+ {
+  "id": "bisector-11",
+  "kind": "bisector",
+  "question": "求線段 AB 的垂直平分線，A(0, 2)、B(-6, 8)",
+  "lead": "我算一下中垂線。",
+  "call": {
+   "name": "perpendicular_bisector",
+   "args": {
+    "p1": "(0, 2)",
+    "p2": "(-6, 8)"
+   }
+  },
+  "result": {
+   "midpoint": "(−3, 5)",
+   "equation": "x − y + 8 = 0",
+   "A": "1",
+   "B": "-1",
+   "C": "8",
+   "slope": "1",
+   "form": "y = x + 8",
+   "yIntercept": "8",
+   "xIntercept": "−8"
+  }
+ },
+ {
+  "id": "bisector-12",
+  "kind": "bisector",
+  "question": "A(6, 5)、B(12, 3) 的中垂線方程式？",
+  "lead": "我算一下中垂線。",
+  "call": {
+   "name": "perpendicular_bisector",
+   "args": {
+    "p1": "(6, 5)",
+    "p2": "(12, 3)"
+   }
+  },
+  "result": {
+   "midpoint": "(9, 4)",
+   "equation": "3x − y − 23 = 0",
+   "A": "3",
+   "B": "-1",
+   "C": "-23",
+   "slope": "3",
+   "form": "y = 3x − 23",
+   "yIntercept": "−23",
+   "xIntercept": "23/3"
+  }
+ },
+ {
+  "id": "intersect-1",
+  "kind": "intersect",
+  "question": "解聯立 −2x − 3y = 0、−3x − 2y = 0",
+  "lead": "交點就是兩條線同時成立的點，我解一下。",
+  "call": {
+   "name": "intersect",
+   "args": {
+    "line1": "−2x − 3y = 0",
+    "line2": "−3x − 2y = 0"
+   }
+  },
+  "result": {
+   "relation": "相交",
+   "point": "(0, 0)"
+  }
+ },
+ {
+  "id": "intersect-2",
+  "kind": "intersect",
+  "question": "求兩直線 −3x − 3y = -6、−x + 3y = 14 的交點坐標",
+  "lead": "交點就是兩條線同時成立的點，我解一下。",
+  "call": {
+   "name": "intersect",
+   "args": {
+    "line1": "−3x − 3y = -6",
+    "line2": "−x + 3y = 14"
+   }
+  },
+  "result": {
+   "relation": "相交",
+   "point": "(−2, 4)"
+  }
+ },
+ {
+  "id": "intersect-3",
+  "kind": "intersect",
+  "question": "求兩直線 −3x + 3y = -18、x − 2y = 10 的交點坐標",
+  "lead": "",
+  "call": {
+   "name": "intersect",
+   "args": {
+    "line1": "−3x + 3y = -18",
+    "line2": "x − 2y = 10"
+   }
+  },
+  "result": {
+   "relation": "相交",
+   "point": "(2, −4)"
+  }
+ },
+ {
+  "id": "intersect-4",
+  "kind": "intersect",
+  "question": "−x − 2y = -1 和 2x − 2y = 2 的交點？",
+  "lead": "我算交點。",
+  "call": {
+   "name": "intersect",
+   "args": {
+    "line1": "−x − 2y = -1",
+    "line2": "2x − 2y = 2"
+   }
+  },
+  "result": {
+   "relation": "相交",
+   "point": "(1, 0)"
+  }
+ },
+ {
+  "id": "intersect-5",
+  "kind": "intersect",
+  "question": "−x + y = -7 和 3x + y = 5 的交點？",
+  "lead": "交點就是兩條線同時成立的點，我解一下。",
+  "call": {
+   "name": "intersect",
+   "args": {
+    "line1": "−x + y = -7",
+    "line2": "3x + y = 5"
+   }
+  },
+  "result": {
+   "relation": "相交",
+   "point": "(3, −4)"
+  }
+ },
+ {
+  "id": "intersect-6",
+  "kind": "intersect",
+  "question": "2x + y = -2 和 −x − y = 0 的交點？",
+  "lead": "我算交點。",
+  "call": {
+   "name": "intersect",
+   "args": {
+    "line1": "2x + y = -2",
+    "line2": "−x − y = 0"
+   }
+  },
+  "result": {
+   "relation": "相交",
+   "point": "(−2, 2)"
+  }
+ },
+ {
+  "id": "intersect-7",
+  "kind": "intersect",
+  "question": "−x + y = -3 和 2x − 3y = 9 的交點？",
+  "lead": "交點就是兩條線同時成立的點，我解一下。",
+  "call": {
+   "name": "intersect",
+   "args": {
+    "line1": "−x + y = -3",
+    "line2": "2x − 3y = 9"
+   }
+  },
+  "result": {
+   "relation": "相交",
+   "point": "(0, −3)"
+  }
+ },
+ {
+  "id": "intersect-8",
+  "kind": "intersect",
+  "question": "解聯立 3x + y = 2、2x + y = 1",
+  "lead": "交點就是兩條線同時成立的點，我解一下。",
+  "call": {
+   "name": "intersect",
+   "args": {
+    "line1": "3x + y = 2",
+    "line2": "2x + y = 1"
+   }
+  },
+  "result": {
+   "relation": "相交",
+   "point": "(1, −1)"
+  }
+ },
+ {
+  "id": "intersect-9",
+  "kind": "intersect",
+  "question": "2x + y = 2 和 −3x − y = -4 的交點？",
+  "lead": "",
+  "call": {
+   "name": "intersect",
+   "args": {
+    "line1": "2x + y = 2",
+    "line2": "−3x − y = -4"
+   }
+  },
+  "result": {
+   "relation": "相交",
+   "point": "(2, −2)"
+  }
+ },
+ {
+  "id": "intersect-10",
+  "kind": "intersect",
+  "question": "解聯立 2x − 3y = 6、−2x + 2y = -4",
+  "lead": "",
+  "call": {
+   "name": "intersect",
+   "args": {
+    "line1": "2x − 3y = 6",
+    "line2": "−2x + 2y = -4"
+   }
+  },
+  "result": {
+   "relation": "相交",
+   "point": "(0, −2)"
+  }
+ },
+ {
+  "id": "intersect-11",
+  "kind": "intersect",
+  "question": "−x + 3y = 10 和 −3x + y = 14 的交點？",
+  "lead": "我算交點。",
+  "call": {
+   "name": "intersect",
+   "args": {
+    "line1": "−x + 3y = 10",
+    "line2": "−3x + y = 14"
+   }
+  },
+  "result": {
+   "relation": "相交",
+   "point": "(−4, 2)"
+  }
+ },
+ {
+  "id": "solve-1",
+  "kind": "solve",
+  "question": "解 x² − 4 = 0",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² − 4 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−2, 2}",
+   "steps": [
+    "因式分解：x² − 4 = (x + 2)(x − 2)",
+    "兩根為 x = −2 或 x = 2"
+   ],
+   "check": "代入 x = −2：(−2)² − 4 = 0 ✓；代入 x = 2：(2)² − 4 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-2",
+  "kind": "solve",
+  "question": "解 x² + 8x + 16 = 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 8x + 16 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−4}",
+   "steps": [
+    "因式分解：x² + 8x + 16 = (x + 4)²",
+    "重根 x = −4"
+   ],
+   "check": "代入 x = −4：(−4)² + 8(−4) + 16 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-3",
+  "kind": "solve",
+  "question": "幫我解這個方程式：x² − 5x = 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² − 5x = 0"
+   }
+  },
+  "result": {
+   "answer": "{0, 5}",
+   "steps": [
+    "因式分解：x² − 5x = x(x − 5)",
+    "兩根為 x = 0 或 x = 5"
+   ],
+   "check": "代入 x = 0：(0)² − 5(0) = 0 ✓；代入 x = 5：(5)² − 5(5) = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-4",
+  "kind": "solve",
+  "question": "幫我解這個方程式：x² + 2x − 3 = 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 2x − 3 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−3, 1}",
+   "steps": [
+    "因式分解：x² + 2x − 3 = (x + 3)(x − 1)",
+    "兩根為 x = −3 或 x = 1"
+   ],
+   "check": "代入 x = −3：(−3)² + 2(−3) − 3 = 0 ✓；代入 x = 1：(1)² + 2(1) − 3 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-5",
+  "kind": "solve",
+  "question": "幫我解這個方程式：x² + 4x + 4 = 0",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 4x + 4 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−2}",
+   "steps": [
+    "因式分解：x² + 4x + 4 = (x + 2)²",
+    "重根 x = −2"
+   ],
+   "check": "代入 x = −2：(−2)² + 4(−2) + 4 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-6",
+  "kind": "solve",
+  "question": "解 x² + 5x − 6 = 0",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 5x − 6 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−6, 1}",
+   "steps": [
+    "因式分解：x² + 5x − 6 = (x + 6)(x − 1)",
+    "兩根為 x = −6 或 x = 1"
+   ],
+   "check": "代入 x = −6：(−6)² + 5(−6) − 6 = 0 ✓；代入 x = 1：(1)² + 5(1) − 6 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-7",
+  "kind": "solve",
+  "question": "幫我解這個方程式：x² + 2x − 3 = 0",
+  "lead": "先把它解出來。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 2x − 3 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−3, 1}",
+   "steps": [
+    "因式分解：x² + 2x − 3 = (x + 3)(x − 1)",
+    "兩根為 x = −3 或 x = 1"
+   ],
+   "check": "代入 x = −3：(−3)² + 2(−3) − 3 = 0 ✓；代入 x = 1：(1)² + 2(1) − 3 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-8",
+  "kind": "solve",
+  "question": "x² + x − 20 = 0 的解是多少？",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + x − 20 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−5, 4}",
+   "steps": [
+    "因式分解：x² + x − 20 = (x + 5)(x − 4)",
+    "兩根為 x = −5 或 x = 4"
+   ],
+   "check": "代入 x = −5：(−5)² + (−5) − 20 = 0 ✓；代入 x = 4：(4)² + (4) − 20 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-9",
+  "kind": "solve",
+  "question": "幫我解這個方程式：x² + 3x − 4 = 0",
+  "lead": "先把它解出來。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 3x − 4 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−4, 1}",
+   "steps": [
+    "因式分解：x² + 3x − 4 = (x + 4)(x − 1)",
+    "兩根為 x = −4 或 x = 1"
+   ],
+   "check": "代入 x = −4：(−4)² + 3(−4) − 4 = 0 ✓；代入 x = 1：(1)² + 3(1) − 4 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-10",
+  "kind": "solve",
+  "question": "x² + x − 20 = 0 的解是多少？",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + x − 20 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−5, 4}",
+   "steps": [
+    "因式分解：x² + x − 20 = (x + 5)(x − 4)",
+    "兩根為 x = −5 或 x = 4"
+   ],
+   "check": "代入 x = −5：(−5)² + (−5) − 20 = 0 ✓；代入 x = 4：(4)² + (4) − 20 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-11",
+  "kind": "solve",
+  "question": "解 x² + 2x − 3 = 0",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 2x − 3 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−3, 1}",
+   "steps": [
+    "因式分解：x² + 2x − 3 = (x + 3)(x − 1)",
+    "兩根為 x = −3 或 x = 1"
+   ],
+   "check": "代入 x = −3：(−3)² + 2(−3) − 3 = 0 ✓；代入 x = 1：(1)² + 2(1) − 3 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-12",
+  "kind": "solve",
+  "question": "解 x² + 4x = 0",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 4x = 0"
+   }
+  },
+  "result": {
+   "answer": "{−4, 0}",
+   "steps": [
+    "因式分解：x² + 4x = (x + 4)x",
+    "兩根為 x = −4 或 x = 0"
+   ],
+   "check": "代入 x = −4：(−4)² + 4(−4) = 0 ✓；代入 x = 0：(0)² + 4(0) = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-13",
+  "kind": "solve",
+  "question": "x² − x − 30 = 0 的解是多少？",
+  "lead": "先把它解出來。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² − x − 30 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−5, 6}",
+   "steps": [
+    "因式分解：x² − x − 30 = (x + 5)(x − 6)",
+    "兩根為 x = −5 或 x = 6"
+   ],
+   "check": "代入 x = −5：(−5)² − (−5) − 30 = 0 ✓；代入 x = 6：(6)² − (6) − 30 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-14",
+  "kind": "solve",
+  "question": "x² + 7x + 6 = 0 的解是多少？",
+  "lead": "先把它解出來。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 7x + 6 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−6, −1}",
+   "steps": [
+    "因式分解：x² + 7x + 6 = (x + 6)(x + 1)",
+    "兩根為 x = −6 或 x = −1"
+   ],
+   "check": "代入 x = −6：(−6)² + 7(−6) + 6 = 0 ✓；代入 x = −1：(−1)² + 7(−1) + 6 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-15",
+  "kind": "solve",
+  "question": "幫我解這個方程式：x² + 6x + 9 = 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 6x + 9 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−3}",
+   "steps": [
+    "因式分解：x² + 6x + 9 = (x + 3)²",
+    "重根 x = −3"
+   ],
+   "check": "代入 x = −3：(−3)² + 6(−3) + 9 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-16",
+  "kind": "solve",
+  "question": "解 x² − x − 6 = 0",
+  "lead": "先把它解出來。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² − x − 6 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−2, 3}",
+   "steps": [
+    "因式分解：x² − x − 6 = (x + 2)(x − 3)",
+    "兩根為 x = −2 或 x = 3"
+   ],
+   "check": "代入 x = −2：(−2)² − (−2) − 6 = 0 ✓；代入 x = 3：(3)² − (3) − 6 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-17",
+  "kind": "solve",
+  "question": "解 x² − 16 = 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² − 16 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−4, 4}",
+   "steps": [
+    "因式分解：x² − 16 = (x + 4)(x − 4)",
+    "兩根為 x = −4 或 x = 4"
+   ],
+   "check": "代入 x = −4：(−4)² − 16 = 0 ✓；代入 x = 4：(4)² − 16 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-18",
+  "kind": "solve",
+  "question": "解 x² + 4x + 3 = 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 4x + 3 = 0"
+   }
+  },
+  "result": {
+   "answer": "{−3, −1}",
+   "steps": [
+    "因式分解：x² + 4x + 3 = (x + 3)(x + 1)",
+    "兩根為 x = −3 或 x = −1"
+   ],
+   "check": "代入 x = −3：(−3)² + 4(−3) + 3 = 0 ✓；代入 x = −1：(−1)² + 4(−1) + 3 = 0 ✓"
+  }
+ },
+ {
+  "id": "solve-19",
+  "kind": "solve",
+  "question": "解不等式 x² − 7x + 12 < 0",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² − 7x + 12 < 0"
+   }
+  },
+  "result": {
+   "answer": "(3, 4)",
+   "steps": [
+    "因式分解：x² − 7x + 12 = (x − 3)(x − 4)",
+    "兩根為 x = 3 或 x = 4",
+    "二次項係數為正，拋物線開口向上：在兩根 3 與 4 之間，值小於 0；在兩根外側，值大於 0",
+    "所以解為：3 < x < 4"
+   ],
+   "check": "取 x = 5（不在解內）：2，不滿足 < 0 ✓"
+  }
+ },
+ {
+  "id": "solve-20",
+  "kind": "solve",
+  "question": "解不等式 x² − 7x + 6 < 0",
+  "lead": "先把它解出來。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² − 7x + 6 < 0"
+   }
+  },
+  "result": {
+   "answer": "(1, 6)",
+   "steps": [
+    "因式分解：x² − 7x + 6 = (x − 1)(x − 6)",
+    "兩根為 x = 1 或 x = 6",
+    "二次項係數為正，拋物線開口向上：在兩根 1 與 6 之間，值小於 0；在兩根外側，值大於 0",
+    "所以解為：1 < x < 6"
+   ],
+   "check": "取 x = 4（在解內）：−6 < 0 ✓；取 x = 7（不在解內）：6，不滿足 < 0 ✓"
+  }
+ },
+ {
+  "id": "solve-21",
+  "kind": "solve",
+  "question": "解不等式 x² + 6x + 8 ≥ 0",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 6x + 8 ≥ 0"
+   }
+  },
+  "result": {
+   "answer": "(−∞, −4] ∪ [−2, ∞)",
+   "steps": [
+    "因式分解：x² + 6x + 8 = (x + 4)(x + 2)",
+    "兩根為 x = −4 或 x = −2",
+    "二次項係數為正，拋物線開口向上：在兩根 −4 與 −2 之間，值小於 0；在兩根外側，值大於 0",
+    "所以解為：x ≤ −4 或 x ≥ −2"
+   ],
+   "check": "取 x = -1（在解內）：3 ≥ 0 ✓；取 x = -3（不在解內）：−1，不滿足 ≥ 0 ✓"
+  }
+ },
+ {
+  "id": "solve-22",
+  "kind": "solve",
+  "question": "解不等式 x² − 8x + 12 > 0",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² − 8x + 12 > 0"
+   }
+  },
+  "result": {
+   "answer": "(−∞, 2) ∪ (6, ∞)",
+   "steps": [
+    "因式分解：x² − 8x + 12 = (x − 2)(x − 6)",
+    "兩根為 x = 2 或 x = 6",
+    "二次項係數為正，拋物線開口向上：在兩根 2 與 6 之間，值小於 0；在兩根外側，值大於 0",
+    "所以解為：x < 2 或 x > 6"
+   ],
+   "check": "取 x = 7（在解內）：5 > 0 ✓；取 x = 4（不在解內）：−4，不滿足 > 0 ✓"
+  }
+ },
+ {
+  "id": "solve-23",
+  "kind": "solve",
+  "question": "解不等式 x² + 7x + 10 < 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 7x + 10 < 0"
+   }
+  },
+  "result": {
+   "answer": "(−5, −2)",
+   "steps": [
+    "因式分解：x² + 7x + 10 = (x + 5)(x + 2)",
+    "兩根為 x = −5 或 x = −2",
+    "二次項係數為正，拋物線開口向上：在兩根 −5 與 −2 之間，值小於 0；在兩根外側，值大於 0",
+    "所以解為：−5 < x < −2"
+   ],
+   "check": "取 x = -3（在解內）：−2 < 0 ✓；取 x = -1（不在解內）：4，不滿足 < 0 ✓"
+  }
+ },
+ {
+  "id": "solve-24",
+  "kind": "solve",
+  "question": "解不等式 x² + 3x + 2 ≤ 0",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 3x + 2 ≤ 0"
+   }
+  },
+  "result": {
+   "answer": "[−2, −1]",
+   "steps": [
+    "因式分解：x² + 3x + 2 = (x + 2)(x + 1)",
+    "兩根為 x = −2 或 x = −1",
+    "二次項係數為正，拋物線開口向上：在兩根 −2 與 −1 之間，值小於 0；在兩根外側，值大於 0",
+    "所以解為：−2 ≤ x ≤ −1"
+   ],
+   "check": "取 x = 0（不在解內）：2，不滿足 ≤ 0 ✓"
+  }
+ },
+ {
+  "id": "solve-25",
+  "kind": "solve",
+  "question": "解不等式 x² − 7x + 12 ≥ 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² − 7x + 12 ≥ 0"
+   }
+  },
+  "result": {
+   "answer": "(−∞, 3] ∪ [4, ∞)",
+   "steps": [
+    "因式分解：x² − 7x + 12 = (x − 3)(x − 4)",
+    "兩根為 x = 3 或 x = 4",
+    "二次項係數為正，拋物線開口向上：在兩根 3 與 4 之間，值小於 0；在兩根外側，值大於 0",
+    "所以解為：x ≤ 3 或 x ≥ 4"
+   ],
+   "check": "取 x = 5（在解內）：2 ≥ 0 ✓"
+  }
+ },
+ {
+  "id": "solve-26",
+  "kind": "solve",
+  "question": "解不等式 x² − 1 > 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² − 1 > 0"
+   }
+  },
+  "result": {
+   "answer": "(−∞, −1) ∪ (1, ∞)",
+   "steps": [
+    "因式分解：x² − 1 = (x + 1)(x − 1)",
+    "兩根為 x = −1 或 x = 1",
+    "二次項係數為正，拋物線開口向上：在兩根 −1 與 1 之間，值小於 0；在兩根外側，值大於 0",
+    "所以解為：x < −1 或 x > 1"
+   ],
+   "check": "取 x = 2（在解內）：3 > 0 ✓；取 x = 0（不在解內）：−1，不滿足 > 0 ✓"
+  }
+ },
+ {
+  "id": "solve-27",
+  "kind": "solve",
+  "question": "解不等式 x² + 6x + 5 < 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² + 6x + 5 < 0"
+   }
+  },
+  "result": {
+   "answer": "(−5, −1)",
+   "steps": [
+    "因式分解：x² + 6x + 5 = (x + 5)(x + 1)",
+    "兩根為 x = −5 或 x = −1",
+    "二次項係數為正，拋物線開口向上：在兩根 −5 與 −1 之間，值小於 0；在兩根外側，值大於 0",
+    "所以解為：−5 < x < −1"
+   ],
+   "check": "取 x = -3（在解內）：−4 < 0 ✓；取 x = 0（不在解內）：5，不滿足 < 0 ✓"
+  }
+ },
+ {
+  "id": "solve-28",
+  "kind": "solve",
+  "question": "解不等式 x² − 7x + 10 ≥ 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² − 7x + 10 ≥ 0"
+   }
+  },
+  "result": {
+   "answer": "(−∞, 2] ∪ [5, ∞)",
+   "steps": [
+    "因式分解：x² − 7x + 10 = (x − 2)(x − 5)",
+    "兩根為 x = 2 或 x = 5",
+    "二次項係數為正，拋物線開口向上：在兩根 2 與 5 之間，值小於 0；在兩根外側，值大於 0",
+    "所以解為：x ≤ 2 或 x ≥ 5"
+   ],
+   "check": "取 x = 6（在解內）：4 ≥ 0 ✓；取 x = 4（不在解內）：−2，不滿足 ≥ 0 ✓"
+  }
+ },
+ {
+  "id": "solve-29",
+  "kind": "solve",
+  "question": "求 f(x) = 2x² − 4x + 5 的最小值",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "求 f(x) = 2x² − 4x + 5 的最小值"
+   }
+  },
+  "result": {
+   "answer": "3",
+   "steps": [
+    "配方：f(x) = 2x² − 4x + 5 = 2(x − 1)² + 3",
+    "因為 (x − 1)² ≥ 0，所以 f(x) ≥ 3，等號在 x = 1 時成立",
+    "最小值為 3（在 x = 1 時）；開口向上，x 往兩側時值無限變大，所以沒有最大值"
+   ],
+   "check": "代回 x = 1 得 3；再取 x = 2 得 5，比 3 大，符合最小值的判斷"
+  }
+ },
+ {
+  "id": "solve-30",
+  "kind": "solve",
+  "question": "求 f(x) = −2x² 的最大值",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "求 f(x) = −2x² 的最大值"
+   }
+  },
+  "result": {
+   "answer": "0",
+   "steps": [
+    "配方：f(x) = −2x² = −2x²",
+    "因為 (x − 0)² ≥ 0，所以 f(x) ≤ 0，等號在 x = 0 時成立",
+    "最大值為 0（在 x = 0 時）；開口向下，x 往兩側時值無限變小，所以沒有最小值"
+   ],
+   "check": "代回 x = 0 得 0；再取 x = 1 得 −2，比 0 小，符合最大值的判斷"
+  }
+ },
+ {
+  "id": "solve-31",
+  "kind": "solve",
+  "question": "求 f(x) = 2x² + 8x + 12 的最小值",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "求 f(x) = 2x² + 8x + 12 的最小值"
+   }
+  },
+  "result": {
+   "answer": "4",
+   "steps": [
+    "配方：f(x) = 2x² + 8x + 12 = 2(x + 2)² + 4",
+    "因為 (x − −2)² ≥ 0，所以 f(x) ≥ 4，等號在 x = −2 時成立",
+    "最小值為 4（在 x = −2 時）；開口向上，x 往兩側時值無限變大，所以沒有最大值"
+   ],
+   "check": "代回 x = −2 得 4；再取 x = −1 得 6，比 4 大，符合最小值的判斷"
+  }
+ },
+ {
+  "id": "solve-32",
+  "kind": "solve",
+  "question": "求 f(x) = x² − 2x + 3 的最小值",
+  "lead": "先把它解出來。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "求 f(x) = x² − 2x + 3 的最小值"
+   }
+  },
+  "result": {
+   "answer": "2",
+   "steps": [
+    "配方：f(x) = x² − 2x + 3 = (x − 1)² + 2",
+    "因為 (x − 1)² ≥ 0，所以 f(x) ≥ 2，等號在 x = 1 時成立",
+    "最小值為 2（在 x = 1 時）；開口向上，x 往兩側時值無限變大，所以沒有最大值"
+   ],
+   "check": "代回 x = 1 得 2；再取 x = 2 得 3，比 2 大，符合最小值的判斷"
+  }
+ },
+ {
+  "id": "solve-33",
+  "kind": "solve",
+  "question": "求 f(x) = −x² + 2 的最大值",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "求 f(x) = −x² + 2 的最大值"
+   }
+  },
+  "result": {
+   "answer": "2",
+   "steps": [
+    "配方：f(x) = −x² + 2 = −x² + 2",
+    "因為 (x − 0)² ≥ 0，所以 f(x) ≤ 2，等號在 x = 0 時成立",
+    "最大值為 2（在 x = 0 時）；開口向下，x 往兩側時值無限變小，所以沒有最小值"
+   ],
+   "check": "代回 x = 0 得 2；再取 x = 1 得 1，比 2 小，符合最大值的判斷"
+  }
+ },
+ {
+  "id": "solve-34",
+  "kind": "solve",
+  "question": "求 f(x) = 2x² + 12x + 14 的最小值",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "求 f(x) = 2x² + 12x + 14 的最小值"
+   }
+  },
+  "result": {
+   "answer": "−4",
+   "steps": [
+    "配方：f(x) = 2x² + 12x + 14 = 2(x + 3)² − 4",
+    "因為 (x − −3)² ≥ 0，所以 f(x) ≥ −4，等號在 x = −3 時成立",
+    "最小值為 −4（在 x = −3 時）；開口向上，x 往兩側時值無限變大，所以沒有最大值"
+   ],
+   "check": "代回 x = −3 得 −4；再取 x = −2 得 −2，比 −4 大，符合最小值的判斷"
+  }
+ },
+ {
+  "id": "solve-35",
+  "kind": "solve",
+  "question": "求 f(x) = 2x² − 4x + 2 的最小值",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "求 f(x) = 2x² − 4x + 2 的最小值"
+   }
+  },
+  "result": {
+   "answer": "0",
+   "steps": [
+    "配方：f(x) = 2x² − 4x + 2 = 2(x − 1)²",
+    "因為 (x − 1)² ≥ 0，所以 f(x) ≥ 0，等號在 x = 1 時成立",
+    "最小值為 0（在 x = 1 時）；開口向上，x 往兩側時值無限變大，所以沒有最大值"
+   ],
+   "check": "代回 x = 1 得 0；再取 x = 2 得 2，比 0 大，符合最小值的判斷"
+  }
+ },
+ {
+  "id": "solve-36",
+  "kind": "solve",
+  "question": "求 f(x) = −2x² + 12x − 21 的最大值",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "求 f(x) = −2x² + 12x − 21 的最大值"
+   }
+  },
+  "result": {
+   "answer": "−3",
+   "steps": [
+    "配方：f(x) = −2x² + 12x − 21 = −2(x − 3)² − 3",
+    "因為 (x − 3)² ≥ 0，所以 f(x) ≤ −3，等號在 x = 3 時成立",
+    "最大值為 −3（在 x = 3 時）；開口向下，x 往兩側時值無限變小，所以沒有最小值"
+   ],
+   "check": "代回 x = 3 得 −3；再取 x = 4 得 −5，比 −3 小，符合最大值的判斷"
+  }
+ },
+ {
+  "id": "solve-37",
+  "kind": "solve",
+  "question": "求 f(x) = 2x² + 8x + 12 的最小值",
+  "lead": "先把它解出來。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "求 f(x) = 2x² + 8x + 12 的最小值"
+   }
+  },
+  "result": {
+   "answer": "4",
+   "steps": [
+    "配方：f(x) = 2x² + 8x + 12 = 2(x + 2)² + 4",
+    "因為 (x − −2)² ≥ 0，所以 f(x) ≥ 4，等號在 x = −2 時成立",
+    "最小值為 4（在 x = −2 時）；開口向上，x 往兩側時值無限變大，所以沒有最大值"
+   ],
+   "check": "代回 x = −2 得 4；再取 x = −1 得 6，比 4 大，符合最小值的判斷"
+  }
+ },
+ {
+  "id": "solve-38",
+  "kind": "solve",
+  "question": "求 f(x) = x² − 3 的最小值",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "求 f(x) = x² − 3 的最小值"
+   }
+  },
+  "result": {
+   "answer": "−3",
+   "steps": [
+    "配方：f(x) = x² − 3 = x² − 3",
+    "因為 (x − 0)² ≥ 0，所以 f(x) ≥ −3，等號在 x = 0 時成立",
+    "最小值為 −3（在 x = 0 時）；開口向上，x 往兩側時值無限變大，所以沒有最大值"
+   ],
+   "check": "代回 x = 0 得 −3；再取 x = 1 得 −2，比 −3 大，符合最小值的判斷"
+  }
+ },
+ {
+  "id": "calc-1",
+  "kind": "calc",
+  "question": "3/6 + 1/2 等於多少？",
+  "lead": "分數加減我用工具算精確值。",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "3/6 + 1/2"
+   }
+  },
+  "result": {
+   "exact": "1",
+   "approx": 1
+  }
+ },
+ {
+  "id": "calc-2",
+  "kind": "calc",
+  "question": "算 3/3 ÷ 8/4",
+  "lead": "",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "3/3 / 8/4"
+   }
+  },
+  "result": {
+   "exact": "1/32",
+   "approx": 0.03125
+  }
+ },
+ {
+  "id": "calc-3",
+  "kind": "calc",
+  "question": "幫我算 6/9 − 7/9",
+  "lead": "分數加減我用工具算精確值。",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "6/9 - 7/9"
+   }
+  },
+  "result": {
+   "exact": "−1/9",
+   "approx": -0.1111111111
+  }
+ },
+ {
+  "id": "calc-4",
+  "kind": "calc",
+  "question": "9/7 × 2/6 等於多少？",
+  "lead": "分數加減我用工具算精確值。",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "9/7 * 2/6"
+   }
+  },
+  "result": {
+   "exact": "3/7",
+   "approx": 0.4285714286
+  }
+ },
+ {
+  "id": "calc-5",
+  "kind": "calc",
+  "question": "幫我算 1/6 + 2/8",
+  "lead": "",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "1/6 + 2/8"
+   }
+  },
+  "result": {
+   "exact": "5/12",
+   "approx": 0.4166666667
+  }
+ },
+ {
+  "id": "calc-6",
+  "kind": "calc",
+  "question": "算 5/2 × 8/3",
+  "lead": "我算一下。",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "5/2 * 8/3"
+   }
+  },
+  "result": {
+   "exact": "20/3",
+   "approx": 6.666666667
+  }
+ },
+ {
+  "id": "calc-7",
+  "kind": "calc",
+  "question": "8/8 − 8/5 等於多少？",
+  "lead": "",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "8/8 - 8/5"
+   }
+  },
+  "result": {
+   "exact": "−3/5",
+   "approx": -0.6
+  }
+ },
+ {
+  "id": "calc-8",
+  "kind": "calc",
+  "question": "算 4/3 + 2/7",
+  "lead": "分數加減我用工具算精確值。",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "4/3 + 2/7"
+   }
+  },
+  "result": {
+   "exact": "34/21",
+   "approx": 1.619047619
+  }
+ },
+ {
+  "id": "calc-9",
+  "kind": "calc",
+  "question": "幫我算 1/7 + 4/2",
+  "lead": "",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "1/7 + 4/2"
+   }
+  },
+  "result": {
+   "exact": "15/7",
+   "approx": 2.142857143
+  }
+ },
+ {
+  "id": "calc-10",
+  "kind": "calc",
+  "question": "7/6 × 4/7 等於多少？",
+  "lead": "",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "7/6 * 4/7"
+   }
+  },
+  "result": {
+   "exact": "2/3",
+   "approx": 0.6666666667
+  }
+ },
+ {
+  "id": "calc-11",
+  "kind": "calc",
+  "question": "4/8 + 8/8 等於多少？",
+  "lead": "",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "4/8 + 8/8"
+   }
+  },
+  "result": {
+   "exact": "3/2",
+   "approx": 1.5
+  }
+ },
+ {
+  "id": "calc-12",
+  "kind": "calc",
+  "question": "幫我算 4/3 + 4/6",
+  "lead": "",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "4/3 + 4/6"
+   }
+  },
+  "result": {
+   "exact": "2",
+   "approx": 2
+  }
+ },
+ {
+  "id": "calc-13",
+  "kind": "calc",
+  "question": "算 4/6 − 4/7",
+  "lead": "",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "4/6 - 4/7"
+   }
+  },
+  "result": {
+   "exact": "2/21",
+   "approx": 0.09523809524
+  }
+ },
+ {
+  "id": "calc-14",
+  "kind": "calc",
+  "question": "幫我算 1/7 + 3/2",
+  "lead": "分數加減我用工具算精確值。",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "1/7 + 3/2"
+   }
+  },
+  "result": {
+   "exact": "23/14",
+   "approx": 1.642857143
+  }
+ },
+ {
+  "id": "calc-15",
+  "kind": "calc",
+  "question": "1/9 ÷ 9/5 等於多少？",
+  "lead": "分數加減我用工具算精確值。",
+  "call": {
+   "name": "calculate",
+   "args": {
+    "expression": "1/9 / 9/5"
+   }
+  },
+  "result": {
+   "exact": "1/405",
+   "approx": 0.002469135802
+  }
+ },
+ {
+  "id": "measure-1",
+  "kind": "measure",
+  "question": "(1, -4) 和 (-3, -2) 的距離是多少？",
+  "lead": "",
+  "call": {
+   "name": "measure",
+   "args": {
+    "kind": "distance",
+    "points": [
+     "(1, -4)",
+     "(-3, -2)"
+    ]
+   }
+  },
+  "result": {
+   "distance": "2√5"
+  }
+ },
+ {
+  "id": "measure-2",
+  "kind": "measure",
+  "question": "(-1, 5) 和 (5, 1) 的距離是多少？",
+  "lead": "",
+  "call": {
+   "name": "measure",
+   "args": {
+    "kind": "distance",
+    "points": [
+     "(-1, 5)",
+     "(5, 1)"
+    ]
+   }
+  },
+  "result": {
+   "distance": "2√13"
+  }
+ },
+ {
+  "id": "measure-3",
+  "kind": "measure",
+  "question": "(2, -5)、(5, -3) 的中點在哪？",
+  "lead": "用工具算比較準。",
+  "call": {
+   "name": "measure",
+   "args": {
+    "kind": "midpoint",
+    "points": [
+     "(2, -5)",
+     "(5, -3)"
+    ]
+   }
+  },
+  "result": {
+   "midpoint": "(7/2, −4)"
+  }
+ },
+ {
+  "id": "measure-4",
+  "kind": "measure",
+  "question": "(5, 1) 和 (5, 0) 的距離是多少？",
+  "lead": "",
+  "call": {
+   "name": "measure",
+   "args": {
+    "kind": "distance",
+    "points": [
+     "(5, 1)",
+     "(5, 0)"
+    ]
+   }
+  },
+  "result": {
+   "distance": "1"
+  }
+ },
+ {
+  "id": "measure-5",
+  "kind": "measure",
+  "question": "(-2, 3)、(4, -3) 的中點在哪？",
+  "lead": "我量一下。",
+  "call": {
+   "name": "measure",
+   "args": {
+    "kind": "midpoint",
+    "points": [
+     "(-2, 3)",
+     "(4, -3)"
+    ]
+   }
+  },
+  "result": {
+   "midpoint": "(1, 0)"
+  }
+ },
+ {
+  "id": "measure-6",
+  "kind": "measure",
+  "question": "(1, 0)、(-1, 0) 的中點在哪？",
+  "lead": "用工具算比較準。",
+  "call": {
+   "name": "measure",
+   "args": {
+    "kind": "midpoint",
+    "points": [
+     "(1, 0)",
+     "(-1, 0)"
+    ]
+   }
+  },
+  "result": {
+   "midpoint": "(0, 0)"
+  }
+ },
+ {
+  "id": "measure-7",
+  "kind": "measure",
+  "question": "(3, -4)、(-2, -5) 的中點在哪？",
+  "lead": "我量一下。",
+  "call": {
+   "name": "measure",
+   "args": {
+    "kind": "midpoint",
+    "points": [
+     "(3, -4)",
+     "(-2, -5)"
+    ]
+   }
+  },
+  "result": {
+   "midpoint": "(1/2, −9/2)"
+  }
+ },
+ {
+  "id": "measure-8",
+  "kind": "measure",
+  "question": "(2, -2)、(-3, -2) 的中點在哪？",
+  "lead": "我量一下。",
+  "call": {
+   "name": "measure",
+   "args": {
+    "kind": "midpoint",
+    "points": [
+     "(2, -2)",
+     "(-3, -2)"
+    ]
+   }
+  },
+  "result": {
+   "midpoint": "(−1/2, −2)"
+  }
+ },
+ {
+  "id": "measure-9",
+  "kind": "measure",
+  "question": "(3, 5) 和 (-5, 0) 的距離是多少？",
+  "lead": "我量一下。",
+  "call": {
+   "name": "measure",
+   "args": {
+    "kind": "distance",
+    "points": [
+     "(3, 5)",
+     "(-5, 0)"
+    ]
+   }
+  },
+  "result": {
+   "distance": "√89"
+  }
+ },
+ {
+  "id": "measure-10",
+  "kind": "measure",
+  "question": "(-1, -1)、(5, 1) 的中點在哪？",
+  "lead": "我量一下。",
+  "call": {
+   "name": "measure",
+   "args": {
+    "kind": "midpoint",
+    "points": [
+     "(-1, -1)",
+     "(5, 1)"
+    ]
+   }
+  },
+  "result": {
+   "midpoint": "(2, 0)"
+  }
+ },
+ {
+  "id": "measure-11",
+  "kind": "measure",
+  "question": "三個村莊在 A(3, 0)、B(-1, 2)、C(-3, -1)，要蓋一所到三村等距的學校，學校在哪？",
+  "lead": "到三點等距就是外心，我直接算。",
+  "call": {
+   "name": "triangle_centers",
+   "args": {
+    "a": "(3, 0)",
+    "b": "(-1, 2)",
+    "c": "(-3, -1)"
+   }
+  },
+  "result": {
+   "circumcenter": "(1/16, −7/8)",
+   "centroid": "(−1/3, 1/3)",
+   "bisectorAB": "2x − y − 1 = 0",
+   "bisectorBC": "4x + 6y + 5 = 0"
+  }
+ },
+ {
+  "id": "measure-12",
+  "kind": "measure",
+  "question": "三個村莊在 A(-4, 2)、B(-2, 1)、C(4, 0)，要蓋一所到三村等距的學校，學校在哪？",
+  "lead": "到三點等距就是外心，我直接算。",
+  "call": {
+   "name": "triangle_centers",
+   "args": {
+    "a": "(-4, 2)",
+    "b": "(-2, 1)",
+    "c": "(4, 0)"
+   }
+  },
+  "result": {
+   "circumcenter": "(13/4, 14)",
+   "centroid": "(−2/3, 1)",
+   "bisectorAB": "4x − 2y + 15 = 0",
+   "bisectorBC": "12x − 2y − 11 = 0"
+  }
+ },
+ {
+  "id": "measure-13",
+  "kind": "measure",
+  "question": "三個村莊在 A(-3, 3)、B(-2, 1)、C(-4, 0)，要蓋一所到三村等距的學校，學校在哪？",
+  "lead": "到三點等距就是外心，我直接算。",
+  "call": {
+   "name": "triangle_centers",
+   "args": {
+    "a": "(-3, 3)",
+    "b": "(-2, 1)",
+    "c": "(-4, 0)"
+   }
+  },
+  "result": {
+   "circumcenter": "(−7/2, 3/2)",
+   "centroid": "(−3, 4/3)",
+   "bisectorAB": "2x − 4y + 13 = 0",
+   "bisectorBC": "4x + 2y + 11 = 0"
+  }
+ },
+ {
+  "id": "measure-14",
+  "kind": "measure",
+  "question": "三個村莊在 A(3, 4)、B(2, 0)、C(-1, 4)，要蓋一所到三村等距的學校，學校在哪？",
+  "lead": "到三點等距就是外心，我直接算。",
+  "call": {
+   "name": "triangle_centers",
+   "args": {
+    "a": "(3, 4)",
+    "b": "(2, 0)",
+    "c": "(-1, 4)"
+   }
+  },
+  "result": {
+   "circumcenter": "(1, 19/8)",
+   "centroid": "(4/3, 8/3)",
+   "bisectorAB": "2x + 8y − 21 = 0",
+   "bisectorBC": "6x − 8y + 13 = 0"
+  }
+ },
+ {
+  "id": "measure-15",
+  "kind": "measure",
+  "question": "三個村莊在 A(-2, 3)、B(0, -1)、C(-1, -2)，要蓋一所到三村等距的學校，學校在哪？",
+  "lead": "到三點等距就是外心，我直接算。",
+  "call": {
+   "name": "triangle_centers",
+   "args": {
+    "a": "(-2, 3)",
+    "b": "(0, -1)",
+    "c": "(-1, -2)"
+   }
+  },
+  "result": {
+   "circumcenter": "(−7/3, 1/3)",
+   "centroid": "(−1, 0)",
+   "bisectorAB": "x − 2y + 3 = 0",
+   "bisectorBC": "x + y + 2 = 0"
+  }
+ },
+ {
+  "id": "measure-16",
+  "kind": "measure",
+  "question": "求 A(-4, -2)、B(3, 1)、C(-1, 2) 三角形的外心",
+  "lead": "到三點等距就是外心，我直接算。",
+  "call": {
+   "name": "triangle_centers",
+   "args": {
+    "a": "(-4, -2)",
+    "b": "(3, 1)",
+    "c": "(-1, 2)"
+   }
+  },
+  "result": {
+   "circumcenter": "(5/38, −75/38)",
+   "centroid": "(−2/3, 1/3)",
+   "bisectorAB": "7x + 3y + 5 = 0",
+   "bisectorBC": "8x − 2y − 5 = 0"
+  }
+ },
+ {
+  "id": "measure-17",
+  "kind": "measure",
+  "question": "三個村莊在 A(-2, -4)、B(-3, -2)、C(3, 3)，要蓋一所到三村等距的學校，學校在哪？",
+  "lead": "到三點等距就是外心，我直接算。",
+  "call": {
+   "name": "triangle_centers",
+   "args": {
+    "a": "(-2, -4)",
+    "b": "(-3, -2)",
+    "c": "(3, 3)"
+   }
+  },
+  "result": {
+   "circumcenter": "(45/34, −37/34)",
+   "centroid": "(−2/3, −1)",
+   "bisectorAB": "2x − 4y − 7 = 0",
+   "bisectorBC": "12x + 10y − 5 = 0"
+  }
+ },
+ {
+  "id": "measure-18",
+  "kind": "measure",
+  "question": "求 A(4, 2)、B(-3, -3)、C(2, 0) 三角形的外心",
+  "lead": "到三點等距就是外心，我直接算。",
+  "call": {
+   "name": "triangle_centers",
+   "args": {
+    "a": "(4, 2)",
+    "b": "(-3, -3)",
+    "c": "(2, 0)"
+   }
+  },
+  "result": {
+   "circumcenter": "(−19/2, 27/2)",
+   "centroid": "(1, −1/3)",
+   "bisectorAB": "7x + 5y − 1 = 0",
+   "bisectorBC": "5x + 3y + 7 = 0"
+  }
+ },
+ {
+  "id": "check-1",
+  "kind": "check",
+  "question": "我算 A(5, 1)、B(0, 3) 的斜率是 2/5，對嗎？",
+  "lead": "",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(5, 1)",
+    "p2": "(0, 3)"
+   }
+  },
+  "result": {
+   "slope": "−2/5"
+  }
+ },
+ {
+  "id": "check-2",
+  "kind": "check",
+  "question": "我算 A(-2, 0)、B(-1, 3) 的斜率是 -3，對嗎？",
+  "lead": "",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-2, 0)",
+    "p2": "(-1, 3)"
+   }
+  },
+  "result": {
+   "slope": "3"
+  }
+ },
+ {
+  "id": "check-3",
+  "kind": "check",
+  "question": "我算 A(-2, 2)、B(5, -3) 的斜率是 -7/5，對嗎？",
+  "lead": "",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-2, 2)",
+    "p2": "(5, -3)"
+   }
+  },
+  "result": {
+   "slope": "−5/7"
+  }
+ },
+ {
+  "id": "check-4",
+  "kind": "check",
+  "question": "我算 A(-4, 3)、B(3, -5) 的斜率是 -7/8，對嗎？",
+  "lead": "",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-4, 3)",
+    "p2": "(3, -5)"
+   }
+  },
+  "result": {
+   "slope": "−8/7"
+  }
+ },
+ {
+  "id": "check-5",
+  "kind": "check",
+  "question": "我算 A(-1, 1)、B(4, -5) 的斜率是 6/5，對嗎？",
+  "lead": "我先算一次正確答案，再跟你的比。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-1, 1)",
+    "p2": "(4, -5)"
+   }
+  },
+  "result": {
+   "slope": "−6/5"
+  }
+ },
+ {
+  "id": "check-6",
+  "kind": "check",
+  "question": "我算 A(-4, 0)、B(-2, -1) 的斜率是 -2，對嗎？",
+  "lead": "我們算算看對不對。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-4, 0)",
+    "p2": "(-2, -1)"
+   }
+  },
+  "result": {
+   "slope": "−1/2"
+  }
+ },
+ {
+  "id": "check-7",
+  "kind": "check",
+  "question": "我算 A(-4, -4)、B(0, 1) 的斜率是 -5/4，對嗎？",
+  "lead": "",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(-4, -4)",
+    "p2": "(0, 1)"
+   }
+  },
+  "result": {
+   "slope": "5/4"
+  }
+ },
+ {
+  "id": "check-8",
+  "kind": "check",
+  "question": "我算 A(2, -2)、B(5, -4) 的斜率是 -3/2，對嗎？",
+  "lead": "我們算算看對不對。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(2, -2)",
+    "p2": "(5, -4)"
+   }
+  },
+  "result": {
+   "slope": "−2/3"
+  }
+ },
+ {
+  "id": "check-9",
+  "kind": "check",
+  "question": "我算 A(1, -5)、B(-2, -3) 的斜率是 -3/2，對嗎？",
+  "lead": "",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(1, -5)",
+    "p2": "(-2, -3)"
+   }
+  },
+  "result": {
+   "slope": "−2/3"
+  }
+ },
+ {
+  "id": "check-10",
+  "kind": "check",
+  "question": "我算 A(4, 2)、B(6, 0) 的斜率是 1，對嗎？",
+  "lead": "我們算算看對不對。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(4, 2)",
+    "p2": "(6, 0)"
+   }
+  },
+  "result": {
+   "slope": "−1"
+  }
+ },
+ {
+  "id": "check-11",
+  "kind": "check",
+  "question": "我算 A(5, 1)、B(-5, -5) 的斜率是 -3/5，對嗎？",
+  "lead": "我先算一次正確答案，再跟你的比。",
+  "call": {
+   "name": "slope",
+   "args": {
+    "p1": "(5, 1)",
+    "p2": "(-5, -5)"
+   }
+  },
+  "result": {
+   "slope": "3/5"
+  }
+ },
+ {
+  "id": "param-1",
+  "kind": "param",
+  "question": "直線 y = kx + 3k − 2 恆過哪一點？",
+  "lead": "把含 k 的項整理在一起：k(x + 3) − (y + 2) = 0。不管 k 是多少都成立，兩個括號都要等於零，我解一下。",
+  "call": {
+   "name": "solve_linear_system",
+   "args": {
+    "equations": [
+     "x + 3 = 0",
+     "y + 2 = 0"
+    ]
+   }
+  },
+  "result": {
+   "result": "唯一解",
+   "solution": {
+    "x": "−3",
+    "y": "−2"
+   }
+  }
+ },
+ {
+  "id": "param-2",
+  "kind": "param",
+  "question": "直線 (m + 1)x + y − 2m = 0 恆過哪一點？",
+  "lead": "把含 m 的項提出來：m(x − 2) + (x + y) = 0，兩部分都要等於零，我解一下。",
+  "call": {
+   "name": "solve_linear_system",
+   "args": {
+    "equations": [
+     "x − 2 = 0",
+     "x + y = 0"
+    ]
+   }
+  },
+  "result": {
+   "result": "唯一解",
+   "solution": {
+    "x": "2",
+    "y": "−2"
+   }
+  }
+ },
+ {
+  "id": "param-3",
+  "kind": "param",
+  "question": "不管 a 是多少，直線 ax − y + 2a + 1 = 0 都通過哪一點？",
+  "lead": "整理成 a(x + 2) + (−y + 1) = 0，a 的係數和剩下的部分都要是零，我解聯立。",
+  "call": {
+   "name": "solve_linear_system",
+   "args": {
+    "equations": [
+     "x + 2 = 0",
+     "−y + 1 = 0"
+    ]
+   }
+  },
+  "result": {
+   "result": "唯一解",
+   "solution": {
+    "x": "−2",
+    "y": "1"
+   }
+  }
+ },
+ {
+  "id": "param-4",
+  "kind": "param",
+  "question": "直線 y − 4 = t(x − 1) 恆過的定點是？",
+  "lead": "這是點斜式，t 怎麼變都要成立，代表 x − 1 和 y − 4 都要是零，我確認一下。",
+  "call": {
+   "name": "solve_linear_system",
+   "args": {
+    "equations": [
+     "x − 1 = 0",
+     "y − 4 = 0"
+    ]
+   }
+  },
+  "result": {
+   "result": "唯一解",
+   "solution": {
+    "x": "1",
+    "y": "4"
+   }
+  }
+ },
+ {
+  "id": "error-1",
+  "kind": "error",
+  "question": "解 x^^2 − 9 = 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x^^2 − 9 = 0"
+   }
+  },
+  "result": {
+   "error": "看不懂算式「(x^^2-9)-(0)」"
+  }
+ },
+ {
+  "id": "error-2",
+  "kind": "error",
+  "question": "解 2x + = 7",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "2x + = 7"
+   }
+  },
+  "result": {
+   "error": "看不懂算式「(2x+)-(7)」"
+  }
+ },
+ {
+  "id": "error-3",
+  "kind": "error",
+  "question": "解 x² − 4x + = 0",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x² − 4x + = 0"
+   }
+  },
+  "result": {
+   "error": "看不懂算式「(x^2-4x+)-(0)」"
+  }
+ },
+ {
+  "id": "error-4",
+  "kind": "error",
+  "question": "求 (x+1 的平方",
+  "lead": "",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "(x+1 的平方"
+   }
+  },
+  "result": {
+   "error": "看不懂算式「(x+1」"
+  }
+ },
+ {
+  "id": "error-5",
+  "kind": "error",
+  "question": "解 x²))− 1 = 0",
+  "lead": "我用工具解一下。",
+  "call": {
+   "name": "solve",
+   "args": {
+    "problem": "x²))− 1 = 0"
+   }
+  },
+  "result": {
+   "error": "看不懂算式「(x^2))-1)-(0)」"
+  }
+ }
+]

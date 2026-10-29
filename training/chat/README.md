@@ -9,10 +9,13 @@ MLC 官方已有同架構的手機版（mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC
 | 批次 | 內容 | 怎麼產生 |
 |---|---|---|
 | 1 | 不需要計算的對話：閒聊、被罵、累、題目不清楚、參數未知 | `prompts/1-chat.md` 給 Gemini |
-| 2 | 會用工具的解題對話 | 我用解題引擎產生真的工具結果，Gemini 只負責把結果講得有溫度（之後補） |
+| 2 | 會用工具的解題對話（147 題） | `tools-gen.mjs` 用固定亂數出自創題、呼叫真的解題引擎拿結果；Gemini 只寫拿到結果後老師怎麼講（`prompts/2-tools-*.md`） |
 
 `node training/chat/build.mjs check <檔案>`：檢查格式、長度、LaTeX／Markdown、老師有沒有講出學生沒給的數字、
 有沒有用到考題，合格的合併進 `data/chat.jsonl`。
+
+第 2 批：`node training/chat/build.mjs tools <Gemini 的輸出>`，把回應和題目、工具呼叫、結果組成完整對話（`data/tools.jsonl`），
+格式和網站的本機 AI 一樣（學生 → 老師說明＋`<tool>` → `<result>` → 老師回應）。訓練時 system 一律用網站的 SYSTEM_PROMPT＋工具說明。
 
 ## 方向修正（使用者回饋：AI 味太重）
 
