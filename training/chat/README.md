@@ -30,3 +30,12 @@ MLC 官方已有同架構的手機版（mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC
 ## 考題
 
 `exam.json`：20 題固定考題，訓練前後各考一次。
+
+## 訓練
+
+- `train.py`：訓練前考試 → 微調（SFT，LoRA）→ 偏好訓練（DPO）→ 訓練後考試 → 上傳到 Hugging Face（私人）。
+  斷線後重跑會跳過已完成的步驟。`--smoke` 用 0.5B 模型在 CPU 上確認流程（已在 Claude 的環境跑通）。
+- `train.ipynb`：給 Kaggle（可背景執行）或 Colab 用的筆記本，一格一格按執行。
+  Colab 直接開：https://colab.research.google.com/github/tsaibohau/-AI/blob/main/training/chat/train.ipynb
+- `data/system.txt`：網站實際用的系統提示詞＋工具說明，測試會檢查兩者一致。
+- 系統提示詞約 1800 token，所以長度上限設 2560，並開啟 gradient checkpointing 省記憶體。

@@ -196,3 +196,15 @@ describe('本機模型寫壞的工具指令不顯示給學生', () => {
     expect(r.garbled).toBe(true);
   });
 });
+
+describe('訓練用的系統提示詞和網站一致', () => {
+  it('training/chat/data/system.txt 等於 SYSTEM_PROMPT＋工具說明', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { SYSTEM_PROMPT } = await import('../src/agent/prompt.js');
+    const { toolGuide } = await import('../src/agent/local.js');
+    const { toolDeclarations } = await import('../src/agent/tools.js');
+    const saved = readFileSync(new URL('../training/chat/data/system.txt', import.meta.url), 'utf8');
+    // 不一致時：重新產生 system.txt 再訓練（模型要學的是網站實際用的提示詞）
+    expect(saved).toBe(`${SYSTEM_PROMPT}\n\n${toolGuide(toolDeclarations())}`);
+  });
+});
