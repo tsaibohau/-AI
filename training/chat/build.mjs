@@ -15,7 +15,10 @@ const BAD = [
   [/^#|\*\*|```|\|.*\|/m, 'Markdown'],
   [/顯然|如你所知|作為一個\s*AI|身為\s*AI/, '禁用語'],
   [/<\/?tool|"name"\s*:/, '工具格式'],
+  [/！[^！]*！/, '驚嘆號太多'],
 ];
+// AI 味的空話：出現兩個以上就退回（使用者回饋：看似親切卻沒重點）
+const EMPTY = /一起搞定|免驚|有我在|太棒了|你可以的|隨時都在|我都在|儘管丟|丟過來|丟出來|端上來|亮出來|大魔王|過關斬將|破關|紙老虎|王道|綽綽有餘/g;
 
 export function checkConversation(o, maxLen = 120) {
   if (!o || !Array.isArray(o.messages) || !o.messages.length) return '格式不對';
@@ -28,6 +31,7 @@ export function checkConversation(o, maxLen = 120) {
     } else {
       if (m.content.length > maxLen) return '太長';
       for (const [re, why] of BAD) if (re.test(m.content)) return why;
+      if ((m.content.match(EMPTY) || []).length >= 2) return 'AI 味空話';
       const extra = nums(m.content).filter((n) => !nums(seen).includes(n));
       if (extra.length) return '出現學生沒給的數字';
       seen += m.content;
@@ -44,6 +48,7 @@ function check(file, outName = 'chat.jsonl') {
   const seen = new Set(old.map(key));
   const skipped = {};
   const added = [];
+  const pairsAdded = [];
   for (const line of readFileSync(file, 'utf8').split('\n')) {
     const t = line.trim();
     if (!t.startsWith('{')) continue;
@@ -62,10 +67,19 @@ function check(file, outName = 'chat.jsonl') {
     }
     seen.add(key(o));
     added.push({ category: o.category || '', messages: o.messages.map(({ role, content }) => ({ role, content: content.trim() })) });
+    // 好壞對照：壞版本存進 pairs.jsonl，訓練時用來修正方向（DPO）
+    if (typeof o.rejected === 'string' && o.rejected.trim()) {
+      pairsAdded.push({ category: o.category || '', prompt: o.messages.slice(0, -1), chosen: o.messages.at(-1).content.trim(), rejected: o.rejected.trim(), why: 'Gemini 寫的 AI 味壞版本' });
+    }
   }
   const all = [...old, ...added];
   writeFileSync(out, all.map((o) => JSON.stringify(o)).join('\n') + '\n');
-  console.log(`新增 ${added.length} 段，共 ${all.length} 段`);
+  if (pairsAdded.length) {
+    const pp = join(HERE, 'data', 'pairs.jsonl');
+    const before = existsSync(pp) ? readFileSync(pp, 'utf8') : '';
+    writeFileSync(pp, before + pairsAdded.map((o) => JSON.stringify(o)).join('\n') + '\n');
+  }
+  console.log(`新增 ${added.length} 段，共 ${all.length} 段；好壞對照新增 ${pairsAdded.length} 組`);
   console.log('略過：', Object.entries(skipped).map(([k, v]) => `${k} ${v}`).join('、') || '無');
   const cats = {};
   for (const o of all) cats[o.category] = (cats[o.category] || 0) + 1;
