@@ -25,7 +25,16 @@ BASE = 'Qwen/Qwen2.5-0.5B-Instruct' if args.smoke else 'Qwen/Qwen2.5-1.5B-Instru
 OUT = args.out
 os.makedirs(OUT, exist_ok=True)
 GPU = torch.cuda.is_available()
-DTYPE = torch.bfloat16 if GPU and torch.cuda.is_bf16_supported() else (torch.float16 if GPU else torch.float32)
+# 顯示卡等級：8 以上（A100、L4…）才真正支援 bf16；T4、P100 比較舊（is_bf16_supported() 在新版 torch 會誤報）
+NEW_GPU = GPU and torch.cuda.get_device_capability(0)[0] >= 8
+DTYPE = torch.bfloat16 if NEW_GPU else (torch.float16 if GPU else torch.float32)  # 考試（推論）用
+# 訓練：新卡用 bf16；舊卡用 fp32 權重＋fp16 混合精度（較穩，不會溢位）
+TRAIN_DTYPE = torch.bfloat16 if NEW_GPU else torch.float32
+MIXED = {'bf16': NEW_GPU, 'fp16': GPU and not NEW_GPU}  # 兩個都要明寫，TRL 預設會開 bf16
+if GPU and not NEW_GPU:
+    # TRL 有一段「半精度相乘、輸出 fp32」的加速只支援新卡，舊卡改走一般算法
+    import trl.kernels.chunked_logprob as _ck
+    _ck._MM_OUT_DTYPE = False
 SYSTEM = open(os.path.join(DATA, 'system.txt'), encoding='utf-8').read()
 random.seed(0)
 torch.manual_seed(0)
@@ -65,10 +74,11 @@ def dpo_examples():
 
 # ---------- 模型 ----------
 
-def load(path):
+def load(path, dtype=DTYPE):
     from transformers import AutoTokenizer, AutoModelForCausalLM
     tok = AutoTokenizer.from_pretrained(path)
-    model = AutoModelForCausalLM.from_pretrained(path, dtype=DTYPE, device_map='auto' if GPU else None)
+    # 只用第一張卡（Kaggle 給兩張 T4 時，把模型拆兩半反而慢）
+    model = AutoModelForCausalLM.from_pretrained(path, dtype=dtype, device_map={'': 0} if GPU else None)
     return tok, model
 
 
@@ -139,7 +149,7 @@ def sft():
     if args.smoke:
         data = data[:24]
     log(f'微調資料 {len(data)} 筆')
-    tok, model = load(BASE)
+    tok, model = load(BASE, TRAIN_DTYPE)
     cfg = SFTConfig(
         output_dir=os.path.join(OUT, 'sft_ckpt'),
         num_train_epochs=1 if args.smoke else 3,
@@ -152,15 +162,14 @@ def sft():
         warmup_steps=0 if args.smoke else 20,
         logging_steps=1 if args.smoke else 10,
         save_strategy='no',
-        bf16=DTYPE == torch.bfloat16,
-        fp16=DTYPE == torch.float16,
+        **MIXED,
         max_length=2560,  # 系統提示詞約 1800 token＋對話，太短會把老師的話截掉
         completion_only_loss=True,
         report_to=[],
     )
     trainer = SFTTrainer(model=model, args=cfg, train_dataset=Dataset.from_list(data), processing_class=tok, peft_config=lora())
     trainer.train()
-    merged = trainer.model.merge_and_unload()
+    merged = trainer.model.merge_and_unload().to(DTYPE)
     path = os.path.join(OUT, 'sft')
     merged.save_pretrained(path)
     tok.save_pretrained(path)
@@ -174,7 +183,7 @@ def dpo():
     if args.smoke:
         data = data[:8]
     log(f'好壞對照 {len(data)} 組')
-    tok, model = load(os.path.join(OUT, 'sft'))
+    tok, model = load(os.path.join(OUT, 'sft'), TRAIN_DTYPE)
     cfg = DPOConfig(
         output_dir=os.path.join(OUT, 'dpo_ckpt'),
         num_train_epochs=1,
@@ -186,14 +195,13 @@ def dpo():
         beta=0.1,
         logging_steps=1 if args.smoke else 10,
         save_strategy='no',
-        bf16=DTYPE == torch.bfloat16,
-        fp16=DTYPE == torch.float16,
+        **MIXED,
         max_length=2560,  # 系統提示詞約 1800 token＋對話，太短會把老師的話截掉
         report_to=[],
     )
     trainer = DPOTrainer(model=model, args=cfg, train_dataset=Dataset.from_list(data), processing_class=tok, peft_config=lora())
     trainer.train()
-    merged = trainer.model.merge_and_unload()
+    merged = trainer.model.merge_and_unload().to(DTYPE)
     path = os.path.join(OUT, 'final')
     merged.save_pretrained(path)
     tok.save_pretrained(path)
