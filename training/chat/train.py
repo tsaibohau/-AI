@@ -225,6 +225,7 @@ def upload():
 
 steps = ['exam_before', 'sft', 'dpo', 'exam_after', 'upload'] if args.step == 'all' else [args.step]
 log('裝置：', 'GPU ' + torch.cuda.get_device_name(0) if GPU else 'CPU', '；模型：', BASE)
+log('訓練格式：', TRAIN_DTYPE, MIXED, '（T4 應該是 float32 + fp16）')
 done = lambda d: os.path.exists(os.path.join(OUT, d, 'config.json'))
 for s in steps:
     # 完整流程時，已經做完的步驟就跳過（斷線後重跑會從上次的地方接著做）
