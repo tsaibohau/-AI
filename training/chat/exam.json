@@ -1,0 +1,25 @@
+{
+  "note": "第二階段固定考題（全部自創）。訓練前後各考一次。檢查：不出現工具亂碼、LaTeX、Markdown 標題；回答中的數字必須來自工具結果或學生的話；閒聊要先回應再帶回數學；參數未知不可自己假設。tone 由擁有者評分。",
+  "cases": [
+    { "id": "chat-rude-1", "user": "你在供三小", "expect": "不生氣、輕鬆回應、問想練哪一題", "tools": false },
+    { "id": "chat-praise", "user": "你好帥", "expect": "謝謝誇獎、自然帶回數學", "tools": false },
+    { "id": "chat-tired", "user": "我好累不想讀了", "expect": "同理、給小目標、不說教", "tools": false },
+    { "id": "chat-hello", "user": "嗨", "expect": "打招呼、問想做什麼", "tools": false },
+    { "id": "chat-offtopic", "user": "今天午餐要吃什麼", "expect": "輕鬆回一句、帶回數學", "tools": false },
+    { "id": "chat-homework", "user": "直接給我答案就好，我要交作業", "expect": "尊重需求但說明會附步驟，問題目", "tools": false },
+    { "id": "chat-scold", "user": "你很爛欸都教不會", "expect": "不辯解、道歉、換方式", "tools": false },
+    { "id": "chat-anxious", "user": "明天段考我好怕", "expect": "安撫、建議先練哪類題", "tools": false },
+    { "id": "param-1", "user": "直線 y = mx + 2m − 4 恆過哪一點？", "expect": "不假設 m 的值；說明恆過點要讓 m 消失；用工具解聯立", "tools": true },
+    { "id": "param-2", "user": "k 是多少的時候 x² + kx + 4 = 0 有重根？", "expect": "不猜 k；用判別式並呼叫工具", "tools": true },
+    { "id": "calc-slope", "user": "A(2, 1)、B(6, 9) 的斜率是多少？", "expect": "呼叫 slope 工具，答案 2", "tools": true },
+    { "id": "calc-bisector", "user": "A(−3, −2)、B(3, 10) 的中垂線方程式？", "expect": "呼叫 perpendicular_bisector，x + 2y − 8 = 0", "tools": true },
+    { "id": "calc-solve", "user": "解 x² − 5x + 6 = 0", "expect": "呼叫 solve，x = 2 或 3", "tools": true },
+    { "id": "calc-intersect", "user": "x + 2y = 8 和 x − y = −1 的交點？", "expect": "呼叫 intersect 或 solve_linear_system，(2, 3)", "tools": true },
+    { "id": "unclear", "user": "這題怎麼算", "expect": "請學生把題目打出來或拍照，不亂猜", "tools": false },
+    { "id": "unclear-2", "user": "x 等於多少", "expect": "問是哪一題", "tools": false },
+    { "id": "tool-error", "user": "解 x^^2 = 4", "expect": "工具回錯時請學生確認題目寫法，不自己編答案", "tools": true },
+    { "id": "concept", "user": "為什麼垂直的兩條線斜率相乘是 −1？", "expect": "用比喻或例子解釋（手機轉 90°），不用 LaTeX", "tools": false },
+    { "id": "mixed", "user": "哈哈我又來了，幫我算 3/4 + 5/6", "expect": "先接招呼，再呼叫 calculate，19/12", "tools": true },
+    { "id": "wrong-student", "user": "我算 A(1,2)、B(3,8) 斜率是 1/3 對嗎", "expect": "呼叫 slope 得 3，溫和指出上下顛倒", "tools": true }
+  ]
+}
