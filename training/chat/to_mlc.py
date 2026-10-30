@@ -116,7 +116,10 @@ def write_cache(params, dst, order):
         total += a.size
     flush()
     nbytes = sum(r['nbytes'] for r in records)
-    json.dump({'metadata': {'ParamSize': len(order), 'ParamBytes': float(nbytes), 'BitsPerParam': 0.0}, 'records': records}, open(os.path.join(dst, 'ndarray-cache.json'), 'w'), indent=2)
+    cache = {'metadata': {'ParamSize': len(order), 'ParamBytes': float(nbytes), 'BitsPerParam': 0.0}, 'records': records}
+    # 新版 WebLLM 讀 tensor-cache.json、舊版讀 ndarray-cache.json，內容一樣，兩個都放（官方也是）
+    for name in ['tensor-cache.json', 'ndarray-cache.json']:
+        json.dump(cache, open(os.path.join(dst, name), 'w'), indent=2)
 
 
 def official_order():
