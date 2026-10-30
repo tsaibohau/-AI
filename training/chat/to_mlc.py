@@ -151,6 +151,11 @@ if args.verify:
     sys.exit(1 if bad else 0)
 
 src = args.src or os.path.join(args.out, 'final')
+if not os.path.exists(os.path.join(src, 'config.json')):
+    # 這次沒有訓練（例如只想重新轉檔）：從 Hugging Face 抓已上傳的私人模型
+    from huggingface_hub import snapshot_download
+    print('找不到剛訓練的模型，從 Hugging Face 下載 HauHau2010/math-tutor-qwen2.5-1.5b …', flush=True)
+    snapshot_download('HauHau2010/math-tutor-qwen2.5-1.5b', local_dir=src, token=os.environ.get('HF_TOKEN'), allow_patterns=['*.json', '*.safetensors', '*.txt', '*.jinja'])
 dst = os.path.join(args.out, 'mlc')
 params = convert(src)
 cache, order = official_order()

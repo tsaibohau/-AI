@@ -2,6 +2,7 @@
 import { runAgent } from '../agent/agent.js';
 import { geminiProvider, listGeminiModels, DEFAULT_GEMINI_MODEL } from '../agent/gemini.js';
 import { localProvider } from '../agent/local.js';
+import { serverProvider } from '../agent/server.js';
 import { cleanText } from '../tutor/llm.js';
 import * as llm from '../tutor/llm.js';
 import { createDiagram } from './diagram.js';
@@ -109,7 +110,7 @@ async function resizeImage(file, max = 1600) {
 
 export function mountChat(root, { onTeach } = {}) {
   const st = {
-    provider: get(KEY.provider, 'local'),
+    provider: get(KEY.provider, 'server'),
     history: [], // 給模型的對話
     log: [], // 畫面上的紀錄
     images: [],
@@ -144,9 +145,10 @@ export function mountChat(root, { onTeach } = {}) {
 
   const provider = () => {
     if (st.provider === 'gemini') return geminiProvider({ apiKey: get(KEY.gkey), model: get(KEY.gmodel, DEFAULT_GEMINI_MODEL) });
+    if (st.provider === 'server') return serverProvider();
     return localProvider();
   };
-  const canUse = () => (st.provider === 'gemini' ? !!get(KEY.gkey) : llm.isReady());
+  const canUse = () => (st.provider === 'gemini' ? !!get(KEY.gkey) : st.provider === 'server' ? true : llm.isReady());
 
   const save = () => {
     // 圖片不存，避免塞爆手機空間
@@ -158,10 +160,12 @@ export function mountChat(root, { onTeach } = {}) {
   let aiCard = null;
   function renderSettings() {
     const g = st.provider === 'gemini';
+    const sv = st.provider === 'server';
     const ready = canUse();
-    settingsEl.innerHTML = `<details ${ready ? '' : 'open'}><summary class="label">AI 大腦：${esc(g ? `Gemini（${get(KEY.gmodel, DEFAULT_GEMINI_MODEL)}）` : '本機 AI')} ${ready ? '' : '（尚未設定）'}</summary>
+    settingsEl.innerHTML = `<details ${ready ? '' : 'open'}><summary class="label">AI 大腦：${esc(g ? `Gemini（${get(KEY.gmodel, DEFAULT_GEMINI_MODEL)}）` : sv ? '數學解惑老師（伺服器）' : '本機 AI')} ${ready ? '' : '（尚未設定）'}</summary>
       <div class="opts">
-        <button type="button" class="opt ${!g ? 'picked' : ''}" data-prov="local">本機 AI（免費、離線、不讀照片）</button>
+        <button type="button" class="opt ${sv ? 'picked' : ''}" data-prov="server">數學解惑老師（免下載，我們訓練的）</button>
+        <button type="button" class="opt ${!g && !sv ? 'picked' : ''}" data-prov="local">本機 AI（下載到手機、離線、不讀照片）</button>
         <button type="button" class="opt ${g ? 'picked' : ''}" data-prov="gemini">Gemini（免費額度、能讀照片、較聰明）</button>
       </div>
       <div id="prov-body"></div></details>`;
@@ -178,6 +182,8 @@ export function mountChat(root, { onTeach } = {}) {
           .join('')}</select><button type="button" class="ghost" id="gmodels">列出可用模型</button></div>
         <p class="mini" id="gmsg">${key ? '金鑰已儲存。' : ''}</p>
         ${key ? '<button type="button" class="link small" id="gkey-del">刪除金鑰</button>' : ''}`;
+    } else if (sv) {
+      body.innerHTML = '<p class="mini">我們自己訓練的 AI 老師，放在免費的伺服器上，不用下載。伺服器只有 CPU，回答會慢慢出來；很久沒人用時會休眠，第一次要等大約一分鐘。</p><p class="mini warn-text">你打的字會傳到伺服器（不會記名）。不要輸入姓名、學校、聯絡方式等個資。</p>';
     } else {
       body.innerHTML = '<p class="mini">本機 AI 在你的裝置上執行，不用金鑰、不會上傳；但小模型的推理能力有限，複雜的題目可能解不完整，也不能讀照片。電腦上可以選「進階」或「最強」模型。</p><div id="local-ai"></div>';
       aiCard = document.createElement('section');
@@ -231,10 +237,10 @@ export function mountChat(root, { onTeach } = {}) {
     hint.textContent = !canUse()
       ? st.provider === 'gemini'
         ? '請先在上方設定貼上 Gemini 金鑰。'
-        : '請先在上方設定下載並啟用本機 AI，或改用 Gemini。'
+        : '請先在上方設定下載並啟用本機 AI，或改用「數學解惑老師」。'
       : vision
         ? 'AI 的每一個數字都由計算工具算出；可以拍照上傳題目或你的作答。'
-        : 'AI 的每一個數字都由計算工具算出。本機 AI 不能讀照片，請用打字的。';
+        : 'AI 的每一個數字都由計算工具算出。這個 AI 不能讀照片，請用打字的。';
   }
 
   // ---------- 對話紀錄 ----------

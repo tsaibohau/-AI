@@ -49,6 +49,27 @@ export function parseToolCalls(raw) {
   return { text: text.trim(), toolCalls: calls, garbled: !calls.length && text !== before };
 }
 
+/**
+ * 小模型常把系統提示詞的規則原封不動念給學生（例如「學生問為什麼時，先用 concept 工具查…」）。
+ * 回覆裡跟提示詞有一長段完全一樣的句子就刪掉（純函式，可測試）。
+ */
+export function stripPromptEcho(text, prompt, minLen = 14) {
+  const norm = (t) => String(t).replace(/\s+/g, '');
+  const p = norm(prompt);
+  const echoes = (sentence) => {
+    const s = norm(sentence);
+    if (s.length < minLen) return false;
+    for (let i = 0; i + minLen <= s.length; i += 4) if (p.includes(s.slice(i, i + minLen))) return true;
+    return false;
+  };
+  return String(text || '')
+    .split('\n')
+    .map((line) => line.split(/(?<=[。！？；])/).filter((x) => !echoes(x)).join(''))
+    .filter((line, i, all) => line.trim() || (i > 0 && all[i - 1].trim()))
+    .join('\n')
+    .trim();
+}
+
 /** 通用訊息 → WebLLM 對話格式（純函式，可測試） */
 export function toChat(system, tools, messages) {
   const out = [{ role: 'system', content: `${system}\n\n${toolGuide(tools)}` }];
@@ -71,7 +92,7 @@ export function localProvider() {
     async complete({ system, messages, tools }) {
       const raw = await chatRaw(toChat(system, tools, messages));
       const { text, toolCalls } = parseToolCalls(raw);
-      return { text, toolCalls, raw };
+      return { text: stripPromptEcho(text, `${system}\n${toolGuide(tools)}`), toolCalls, raw };
     },
   };
 }

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { runAgent, MAX_ROUNDS } from '../src/agent/agent.js';
 import { runTool, toolDeclarations, TOOLS } from '../src/agent/tools.js';
 import { geminiProvider, toContents, fromResponse } from '../src/agent/gemini.js';
@@ -280,5 +280,33 @@ describe('本機 AI 不會鬼打牆', () => {
     await runAgent({ provider: fakeProvider([bad('一'), bad('二'), { text: '算不出來', toolCalls: [] }]), history: [], user: { text: '?' }, onEvent: (e) => events.push(e) });
     const tools = events.filter((e) => e.type === 'tool');
     expect(tools[1].result.error).toContain('不要重試');
+  });
+});
+
+describe('伺服器版 AI 老師', () => {
+  it('用同樣的文字工具協定，回覆會擋掉照念的系統提示詞', async () => {
+    const { serverProvider } = await import('../src/agent/server.js');
+    const { SYSTEM_PROMPT } = await import('../src/agent/prompt.js');
+    const { toolDeclarations } = await import('../src/agent/tools.js');
+    let body;
+    const fetchFn = async (url, opt) => {
+      body = JSON.parse(opt.body);
+      const content = '學生問「為什麼」或某個觀念時，先用 concept 工具查，照查到的定義、推導、比喻講。\n查一下。\n<tool>{"name":"concept","args":{"name":"加法"}}</tool>';
+      return { ok: true, status: 200, json: async () => ({ choices: [{ message: { content } }] }) };
+    };
+    const r = await serverProvider({ url: 'https://x', fetchFn }).complete({ system: SYSTEM_PROMPT, messages: [{ role: 'user', text: '為什麼1+1=2' }], tools: toolDeclarations() });
+    expect(body.messages[0].role).toBe('system');
+    expect(r.toolCalls[0]).toMatchObject({ name: 'concept', args: { name: '加法' } });
+    expect(r.text).toBe('查一下。');
+  });
+  it('伺服器在休眠（503）會等一下再試', async () => {
+    const { serverProvider } = await import('../src/agent/server.js');
+    vi.useFakeTimers();
+    let n = 0;
+    const fetchFn = async () => (++n < 2 ? { ok: false, status: 503 } : { ok: true, status: 200, json: async () => ({ choices: [{ message: { content: '來。' } }] }) });
+    const p = serverProvider({ url: 'https://x', fetchFn }).complete({ system: '', messages: [{ role: 'user', text: '嗨' }], tools: [] });
+    await vi.advanceTimersByTimeAsync(5000);
+    expect((await p).text).toBe('來。');
+    vi.useRealTimers();
   });
 });

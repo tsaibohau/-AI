@@ -48,6 +48,7 @@
   2. 使用者貼回最後一格「訓練前 vs 訓練後」對照 → 檢查自動檢查結果、請使用者評語氣；有問題就補資料重訓。
   3. 手機版：**已完成**。`training/chat/to_mlc.py`（自寫轉檔，已和官方逐位元比對）由筆記本第 7 格自動轉、公開上傳到 `HauHau2010/math-tutor-qwen2.5-1.5b-q4f16_1-MLC`（使用者已同意公開）。
   4. 網站：**已接上**，`src/tutor/llm.js` 的 MODELS 第一個「數學解惑老師」（第二輪跑完上傳後才能下載）。
+  4b. 伺服器版（使用者要求「不要本機下載」）：`to_server.py`＋`space/` 建免費 HF Space（llama.cpp），網站預設用它（`src/agent/server.js`）；`deploy.ipynb` 只轉檔不訓練。第一次在 Kaggle 跑要看輸出（本機沒試過 GGUF 轉檔）。
   5. 第三階段「問校務」：先確認學校同意與公開資料來源。
 - 待做：更多應用問題類型、3D 圖解、錯題本與回饋表、換數字出類似題。
 - 待使用者決定：`eval/problems.json` 第 3～5 題的 `needs_diagram` 要不要改成 `true`。

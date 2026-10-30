@@ -70,3 +70,13 @@ MLC 官方已有同架構的手機版（mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC
 - 系統提示詞第 11 條；`max_length` 調到 2816（最長的對話約 2470 token）。
 - 新工具 `fixed_point`（恆過定點，一次算完）；`round2/param-apply.mjs` 把恆過題的訓練資料改用它。
 - 網站修鬼打牆（`src/agent/agent.js`）：失敗過的同一個指令不再重試、模型整段重複就停、連續兩輪工具全失敗就停。
+
+## 伺服器版（學生不用下載，網站預設）
+
+使用者希望「不要本機下載，直接用我們訓練的」：
+- `to_server.py`：用 llama.cpp 官方 `convert_hf_to_gguf.py` 轉 GGUF（q8_0），公開上傳到 `HauHau2010/math-tutor-qwen2.5-1.5b-GGUF`，
+  並建立免費 Docker Space `HauHau2010/math-tutor`（`space/`：llama.cpp server，OpenAI 相容 API），網址 https://hauhau2010-math-tutor.hf.space。
+  （Claude 的環境不允許執行從網路抓的 llama.cpp 程式，所以這一步沒在本機試過，第一次在 Kaggle 跑要看輸出。）
+- 網站 `src/agent/server.js`：預設用這台伺服器；休眠中（503／連不上）會等一下重試；回覆一樣擋掉照念的系統提示詞。
+- `deploy.ipynb`：不訓練、只轉檔＋架伺服器（不用 GPU）；`to_mlc.py`／`to_server.py` 找不到剛訓練的模型時，會從 HF 抓私人模型。
+- 筆記本 `train.ipynb` 第 8 格也會自動做。
