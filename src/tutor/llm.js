@@ -2,7 +2,14 @@
 // 數學內容一律來自解題引擎；AI 回覆中出現步驟裡沒有的數字時會標示提醒。
 // 模型只在使用者按下「下載」後才載入；問題不會傳到任何伺服器。
 
+// 我們自己訓練的老師（第二階段，見 training/chat/）：權重放在使用者的 Hugging Face（公開），
+// 架構和官方 Qwen2.5-1.5B 一樣，直接用官方編譯好的網頁執行檔
+export const TUTOR_MODEL_ID = 'math-tutor-qwen2.5-1.5b-q4f16_1-MLC';
+const TUTOR_MODEL_URL = 'https://huggingface.co/HauHau2010/math-tutor-qwen2.5-1.5b-q4f16_1-MLC';
+const BASE_FOR_TUTOR = 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC';
+
 export const MODELS = [
+  { id: TUTOR_MODEL_ID, label: '數學解惑老師（我們訓練的，約 1 GB）', vramMB: 1630 },
   { id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC', label: '標準（約 1 GB，手機可用）', vramMB: 1630 },
   { id: 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC', label: '輕量（約 0.4 GB，較快、較不準）', vramMB: 950 },
   { id: 'Qwen2.5-3B-Instruct-q4f16_1-MLC', label: '進階（約 2 GB，建議電腦或新手機）', vramMB: 2505 },
@@ -51,13 +58,22 @@ export async function supportStatus() {
 let engine = null;
 let loadedId = null;
 
+/** WebLLM 的模型清單：官方的＋我們訓練的老師（純函式，可測試） */
+export function appConfigFor(webllm) {
+  const list = webllm.prebuiltAppConfig.model_list;
+  const base = list.find((m) => m.model_id === BASE_FOR_TUTOR);
+  if (!base) return webllm.prebuiltAppConfig;
+  const tutor = { ...base, model: TUTOR_MODEL_URL, model_id: TUTOR_MODEL_ID };
+  return { ...webllm.prebuiltAppConfig, model_list: [...list.filter((m) => m.model_id !== TUTOR_MODEL_ID), tutor] };
+}
+
 export const isReady = () => engine !== null;
 
 /** 下載（第一次）並載入模型；onProgress({ progress: 0~1, text }) */
 export async function loadModel(id, onProgress = () => {}) {
   if (engine && loadedId === id) return engine;
   const webllm = await import('@mlc-ai/web-llm');
-  engine = await webllm.CreateMLCEngine(id, { initProgressCallback: (r) => onProgress({ progress: r.progress ?? 0, text: r.text || '' }) });
+  engine = await webllm.CreateMLCEngine(id, { appConfig: appConfigFor(webllm), initProgressCallback: (r) => onProgress({ progress: r.progress ?? 0, text: r.text || '' }) });
   loadedId = id;
   saveModel(id);
   return engine;
@@ -67,7 +83,7 @@ export async function loadModel(id, onProgress = () => {}) {
 export async function isDownloaded(id) {
   try {
     const webllm = await import('@mlc-ai/web-llm');
-    return await webllm.hasModelInCache(id);
+    return await webllm.hasModelInCache(id, appConfigFor(webllm));
   } catch {
     return false;
   }
@@ -83,7 +99,7 @@ export async function deleteModel(id) {
   }
   engine = null;
   loadedId = null;
-  await webllm.deleteModelAllInfoInCache(id);
+  await webllm.deleteModelAllInfoInCache(id, appConfigFor(webllm));
   saveModel(null);
 }
 

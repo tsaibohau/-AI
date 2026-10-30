@@ -217,3 +217,15 @@ describe('calculate 可以檢查沒有未知數的等式', () => {
     expect(runTool('calculate', { expression: '1/2+1/3=5/6' }).correct).toBe(true);
   });
 });
+
+describe('網站可以選我們訓練的老師', () => {
+  it('沿用官方 Qwen2.5-1.5B 的網頁執行檔，只換權重網址', async () => {
+    const { appConfigFor, TUTOR_MODEL_ID, MODELS } = await import('../src/tutor/llm.js');
+    const base = { model: 'https://huggingface.co/mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC', model_id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC', model_lib: 'lib.wasm', overrides: { context_window_size: 4096 } };
+    const cfg = appConfigFor({ prebuiltAppConfig: { model_list: [base] } });
+    const tutor = cfg.model_list.find((m) => m.model_id === TUTOR_MODEL_ID);
+    expect(tutor.model).toBe('https://huggingface.co/HauHau2010/math-tutor-qwen2.5-1.5b-q4f16_1-MLC');
+    expect(tutor.model_lib).toBe('lib.wasm');
+    expect(MODELS[0].id).toBe(TUTOR_MODEL_ID);
+  });
+});

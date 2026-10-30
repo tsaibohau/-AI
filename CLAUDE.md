@@ -45,8 +45,8 @@
   - **第二輪資料已完成（快、狠、準，見 `docs/老師個性.md`、`training/chat/README.md`）**，等使用者在 Kaggle 重跑同一本筆記本。
   1. **等使用者在 Kaggle（建議，可背景）或 Colab 跑 `train.ipynb`**（約 1.5～2 小時，需 GPU、Internet、密鑰 `HF_TOKEN`），模型以私人上傳到 `HauHau2010/math-tutor-qwen2.5-1.5b`。
   2. 使用者貼回最後一格「訓練前 vs 訓練後」對照 → 檢查自動檢查結果、請使用者評語氣；有問題就補資料重訓。
-  3. 效果好 → 轉 MLC 格式（`mlc_llm convert_weight`，沿用 mlc-ai 現成 Qwen2.5-1.5B q4f16_1 函式庫）放 HF；網站要能載入需改公開，**先問使用者**。
-  4. 接進網站（`src/tutor/llm.js`、`src/agent/local.js` 換模型網址）。
+  3. 手機版：**已完成**。`training/chat/to_mlc.py`（自寫轉檔，已和官方逐位元比對）由筆記本第 7 格自動轉、公開上傳到 `HauHau2010/math-tutor-qwen2.5-1.5b-q4f16_1-MLC`（使用者已同意公開）。
+  4. 網站：**已接上**，`src/tutor/llm.js` 的 MODELS 第一個「數學解惑老師」（第二輪跑完上傳後才能下載）。
   5. 第三階段「問校務」：先確認學校同意與公開資料來源。
 - 待做：更多應用問題類型、3D 圖解、錯題本與回饋表、換數字出類似題。
 - 待使用者決定：`eval/problems.json` 第 3～5 題的 `needs_diagram` 要不要改成 `true`。
