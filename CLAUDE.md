@@ -49,7 +49,7 @@
   3. 手機版：**已完成**。`training/chat/to_mlc.py`（自寫轉檔，已和官方逐位元比對）由筆記本第 7 格自動轉、公開上傳到 `HauHau2010/math-tutor-qwen2.5-1.5b-q4f16_1-MLC`（使用者已同意公開）。
   4. 網站：**已接上**，`src/tutor/llm.js` 的 MODELS 第一個「數學解惑老師」（第二輪跑完上傳後才能下載）。
   4b. 伺服器版（使用者要求「不要本機下載」）：`to_server.py`＋`space/` 建免費 HF Space（llama.cpp），網站預設用它（`src/agent/server.js`）；`deploy.ipynb` 只轉檔不訓練。第一次在 Kaggle 跑要看輸出（本機沒試過 GGUF 轉檔）。
-  4c. 現況（10/30）：第二輪訓練、手機版、GGUF 都已上傳。Docker Space 免費帳號不能建，改成 Gradio Space（`space/app.py`，本機不准跑 llama.cpp，沒試過）；使用者要跑 `deploy.ipynb`（ONLY_SERVER=True，只架伺服器）。訓練前後對照（第 6 格）還沒拿到。
+  4c. 現況（10/30）：HF 免費帳號只能建 Static Space，伺服器版不可行（程式保留，網站已隱藏，預設改回本機「數學解惑老師」）。使用者選擇另外練 0.5B（`train.ipynb` 的 SIZE='0.5b'，上傳 `math-tutor-qwen2.5-0.5b-q4f16_1-MLC`，網站已列為「數學解惑老師・小」）。訓練前後對照（第 6 格）還沒拿到。
   5. 第三階段「問校務」：先確認學校同意與公開資料來源。
 - 待做：更多應用問題類型、3D 圖解、錯題本與回饋表、換數字出類似題。
 - 待使用者決定：`eval/problems.json` 第 3～5 題的 `needs_diagram` 要不要改成 `true`。

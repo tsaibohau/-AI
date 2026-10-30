@@ -230,6 +230,13 @@ describe('網站可以選我們訓練的老師', () => {
     expect(tutor.model_lib).toBe('lib.wasm');
     expect(MODELS[0].id).toBe(TUTOR_MODEL_ID);
   });
+  it('小一號的老師沿用官方 0.5B', async () => {
+    const { appConfigFor, TUTOR_SMALL_ID } = await import('../src/tutor/llm.js');
+    const base = { model: 'x', model_id: 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC', model_lib: 'small.wasm' };
+    const small = appConfigFor({ prebuiltAppConfig: { model_list: [base] } }).model_list.find((m) => m.model_id === TUTOR_SMALL_ID);
+    expect(small.model).toBe('https://huggingface.co/HauHau2010/math-tutor-qwen2.5-0.5b-q4f16_1-MLC');
+    expect(small.model_lib).toBe('small.wasm');
+  });
 });
 
 describe('concept：查觀念工具', () => {

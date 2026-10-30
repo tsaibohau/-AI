@@ -110,7 +110,8 @@ async function resizeImage(file, max = 1600) {
 
 export function mountChat(root, { onTeach } = {}) {
   const st = {
-    provider: get(KEY.provider, 'server'),
+    // 伺服器版暫停（免費帳號不能架伺服器），存過的設定改回本機
+    provider: get(KEY.provider, 'local') === 'server' ? 'local' : get(KEY.provider, 'local'),
     history: [], // 給模型的對話
     log: [], // 畫面上的紀錄
     images: [],
@@ -164,8 +165,7 @@ export function mountChat(root, { onTeach } = {}) {
     const ready = canUse();
     settingsEl.innerHTML = `<details ${ready ? '' : 'open'}><summary class="label">AI 大腦：${esc(g ? `Gemini（${get(KEY.gmodel, DEFAULT_GEMINI_MODEL)}）` : sv ? '數學解惑老師（伺服器）' : '本機 AI')} ${ready ? '' : '（尚未設定）'}</summary>
       <div class="opts">
-        <button type="button" class="opt ${sv ? 'picked' : ''}" data-prov="server">數學解惑老師（免下載，我們訓練的）</button>
-        <button type="button" class="opt ${!g && !sv ? 'picked' : ''}" data-prov="local">本機 AI（下載到手機、離線、不讀照片）</button>
+        <button type="button" class="opt ${!g && !sv ? 'picked' : ''}" data-prov="local">數學解惑老師（我們訓練的，下載一次就能離線用）</button>
         <button type="button" class="opt ${g ? 'picked' : ''}" data-prov="gemini">Gemini（免費額度、能讀照片、較聰明）</button>
       </div>
       <div id="prov-body"></div></details>`;
@@ -185,7 +185,7 @@ export function mountChat(root, { onTeach } = {}) {
     } else if (sv) {
       body.innerHTML = '<p class="mini">我們自己訓練的 AI 老師，放在免費的伺服器上，不用下載。伺服器只有 CPU，回答會慢慢出來；很久沒人用時會休眠，第一次要等大約一分鐘。</p><p class="mini warn-text">你打的字會傳到伺服器（不會記名）。不要輸入姓名、學校、聯絡方式等個資。</p>';
     } else {
-      body.innerHTML = '<p class="mini">本機 AI 在你的裝置上執行，不用金鑰、不會上傳；但小模型的推理能力有限，複雜的題目可能解不完整，也不能讀照片。電腦上可以選「進階」或「最強」模型。</p><div id="local-ai"></div>';
+      body.innerHTML = '<p class="mini">在你的手機上執行：第一次要下載（約 1 GB；舊手機選「小」，約 0.3 GB），之後存在手機裡、可以離線，問題不會上傳。不能讀照片。</p><div id="local-ai"></div>';
       aiCard = document.createElement('section');
       aiCard.className = 'card inner';
       body.querySelector('#local-ai').appendChild(aiCard);

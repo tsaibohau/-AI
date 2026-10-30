@@ -3,13 +3,19 @@
 // 模型只在使用者按下「下載」後才載入；問題不會傳到任何伺服器。
 
 // 我們自己訓練的老師（第二階段，見 training/chat/）：權重放在使用者的 Hugging Face（公開），
-// 架構和官方 Qwen2.5-1.5B 一樣，直接用官方編譯好的網頁執行檔
-export const TUTOR_MODEL_ID = 'math-tutor-qwen2.5-1.5b-q4f16_1-MLC';
-const TUTOR_MODEL_URL = 'https://huggingface.co/HauHau2010/math-tutor-qwen2.5-1.5b-q4f16_1-MLC';
-const BASE_FOR_TUTOR = 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC';
+// 架構和官方 Qwen2.5 一樣，直接用官方編譯好的網頁執行檔，只換權重網址
+const tutorOf = (size) => ({
+  id: `math-tutor-qwen2.5-${size}-q4f16_1-MLC`,
+  url: `https://huggingface.co/HauHau2010/math-tutor-qwen2.5-${size}-q4f16_1-MLC`,
+  base: `Qwen2.5-${size.toUpperCase()}-Instruct-q4f16_1-MLC`,
+});
+export const TUTORS = [tutorOf('1.5b'), tutorOf('0.5b')];
+export const TUTOR_MODEL_ID = TUTORS[0].id;
+export const TUTOR_SMALL_ID = TUTORS[1].id;
 
 export const MODELS = [
   { id: TUTOR_MODEL_ID, label: '數學解惑老師（我們訓練的，約 1 GB）', vramMB: 1630 },
+  { id: TUTOR_SMALL_ID, label: '數學解惑老師・小（我們訓練的，約 0.3 GB，舊手機用）', vramMB: 950 },
   { id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC', label: '標準（約 1 GB，手機可用）', vramMB: 1630 },
   { id: 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC', label: '輕量（約 0.4 GB，較快、較不準）', vramMB: 950 },
   { id: 'Qwen2.5-3B-Instruct-q4f16_1-MLC', label: '進階（約 2 GB，建議電腦或新手機）', vramMB: 2505 },
@@ -61,10 +67,12 @@ let loadedId = null;
 /** WebLLM 的模型清單：官方的＋我們訓練的老師（純函式，可測試） */
 export function appConfigFor(webllm) {
   const list = webllm.prebuiltAppConfig.model_list;
-  const base = list.find((m) => m.model_id === BASE_FOR_TUTOR);
-  if (!base) return webllm.prebuiltAppConfig;
-  const tutor = { ...base, model: TUTOR_MODEL_URL, model_id: TUTOR_MODEL_ID };
-  return { ...webllm.prebuiltAppConfig, model_list: [...list.filter((m) => m.model_id !== TUTOR_MODEL_ID), tutor] };
+  const ours = TUTORS.flatMap((t) => {
+    const base = list.find((m) => m.model_id === t.base);
+    return base ? [{ ...base, model: t.url, model_id: t.id }] : [];
+  });
+  const ids = new Set(ours.map((m) => m.model_id));
+  return { ...webllm.prebuiltAppConfig, model_list: [...list.filter((m) => !ids.has(m.model_id)), ...ours] };
 }
 
 export const isReady = () => engine !== null;

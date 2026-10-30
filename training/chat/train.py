@@ -21,10 +21,14 @@ p = argparse.ArgumentParser()
 p.add_argument('--smoke', action='store_true', help='CPU 小測試')
 p.add_argument('--step', default='all', choices=['all', 'exam_before', 'sft', 'dpo', 'exam_after', 'upload'])
 p.add_argument('--out', default=os.environ.get('OUT', os.path.join(HERE, 'out')))
-p.add_argument('--hub', default=os.environ.get('HUB_REPO', 'HauHau2010/math-tutor-qwen2.5-1.5b'))
+p.add_argument('--size', default=os.environ.get('SIZE', '1.5b'), choices=['1.5b', '0.5b'], help='1.5b 較聰明（手機下載約 1 GB）；0.5b 較小（約 0.3 GB）')
+p.add_argument('--hub', default=os.environ.get('HUB_REPO'))
 args = p.parse_args()
+if args.smoke:
+    args.size = '0.5b'
+args.hub = args.hub or f'HauHau2010/math-tutor-qwen2.5-{args.size}'
 
-BASE = 'Qwen/Qwen2.5-0.5B-Instruct' if args.smoke else 'Qwen/Qwen2.5-1.5B-Instruct'
+BASE = f'Qwen/Qwen2.5-{args.size.upper()}-Instruct'
 OUT = args.out
 os.makedirs(OUT, exist_ok=True)
 GPU = torch.cuda.is_available()

@@ -20,10 +20,14 @@ from safetensors import safe_open
 p = argparse.ArgumentParser()
 p.add_argument('--out', default=os.environ.get('OUT', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'out')))
 p.add_argument('--src', default=None, help='要轉的模型資料夾（預設 OUT/final）')
-p.add_argument('--official', default='mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC', help='沿用設定檔的官方手機版')
-p.add_argument('--hub', default=os.environ.get('HUB_MLC_REPO', 'HauHau2010/math-tutor-qwen2.5-1.5b-q4f16_1-MLC'))
+p.add_argument('--size', default=os.environ.get('SIZE', '1.5b'), choices=['1.5b', '0.5b'])
+p.add_argument('--official', default=None, help='沿用設定檔的官方手機版（預設依 --size）')
+p.add_argument('--hub', default=os.environ.get('HUB_MLC_REPO'))
 p.add_argument('--verify', default=None, help='驗證模式：轉這個 HF 模型資料夾，和 --official 逐位元比對')
 args = p.parse_args()
+args.official = args.official or f'mlc-ai/Qwen2.5-{args.size.upper()}-Instruct-q4f16_1-MLC'
+args.hub = args.hub or f'HauHau2010/math-tutor-qwen2.5-{args.size}-q4f16_1-MLC'
+SRC_REPO = f'HauHau2010/math-tutor-qwen2.5-{args.size}'
 
 GROUP = 32
 MAX_INT = 7
@@ -157,8 +161,8 @@ src = args.src or os.path.join(args.out, 'final')
 if not os.path.exists(os.path.join(src, 'config.json')):
     # 這次沒有訓練（例如只想重新轉檔）：從 Hugging Face 抓已上傳的私人模型
     from huggingface_hub import snapshot_download
-    print('找不到剛訓練的模型，從 Hugging Face 下載 HauHau2010/math-tutor-qwen2.5-1.5b …', flush=True)
-    snapshot_download('HauHau2010/math-tutor-qwen2.5-1.5b', local_dir=src, token=os.environ.get('HF_TOKEN'), allow_patterns=['*.json', '*.safetensors', '*.txt', '*.jinja'])
+    print(f'找不到剛訓練的模型，從 Hugging Face 下載 {SRC_REPO} …', flush=True)
+    snapshot_download(SRC_REPO, local_dir=src, token=os.environ.get('HF_TOKEN'), allow_patterns=['*.json', '*.safetensors', '*.txt', '*.jinja'])
 dst = os.path.join(args.out, 'mlc')
 params = convert(src)
 cache, order = official_order()
