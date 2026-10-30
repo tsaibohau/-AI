@@ -43,6 +43,7 @@
 - **第二階段進度（下一步從這裡接）**：訓練程式 `training/chat/train.py`＋筆記本 `training/chat/train.ipynb` 已完成，已在 CPU 用 0.5B 跑通（`--smoke`）。資料：`data/chat.jsonl` 245、`tools.jsonl` 147、`pairs.jsonl` 392（DPO）、考題 `exam.json` 20 題。
   - 第一輪已在 Kaggle 跑完（T4；修過 torchao、bf16、記憶體不足，改用 transformers 4.56／TRL 0.23／PEFT 0.17），考試 8/20 → 17/20，已上傳（私人）。
   - **第二輪資料已完成（快、狠、準，見 `docs/老師個性.md`、`training/chat/README.md`）**，等使用者在 Kaggle 重跑同一本筆記本。
+  - 數學理論基礎（使用者要求）：`definitions.json` 補數與運算的基礎 19 個概念＋比喻；新工具 `concept`（查觀念，查不到就說沒有）；「為什麼」訓練資料改成先查再講（`round2/why-*`）。
   1. **等使用者在 Kaggle（建議，可背景）或 Colab 跑 `train.ipynb`**（約 1.5～2 小時，需 GPU、Internet、密鑰 `HF_TOKEN`），模型以私人上傳到 `HauHau2010/math-tutor-qwen2.5-1.5b`。
   2. 使用者貼回最後一格「訓練前 vs 訓練後」對照 → 檢查自動檢查結果、請使用者評語氣；有問題就補資料重訓。
   3. 手機版：**已完成**。`training/chat/to_mlc.py`（自寫轉檔，已和官方逐位元比對）由筆記本第 7 格自動轉、公開上傳到 `HauHau2010/math-tutor-qwen2.5-1.5b-q4f16_1-MLC`（使用者已同意公開）。
