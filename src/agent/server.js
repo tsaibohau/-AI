@@ -33,6 +33,7 @@ export function serverProvider({ url = SERVER_URL, fetchFn = (...a) => fetch(...
             signal,
           });
           if (r.status === 503 || r.status === 502) throw Object.assign(new Error('伺服器正在醒來'), { retry: true });
+          if (r.status === 404) throw new Error('AI 老師伺服器還沒架好（或正在建置），先改用本機 AI 或 Gemini。');
           if (!r.ok) throw new Error(`伺服器回應錯誤（${r.status}）`);
           const data = await r.json();
           const raw = data.choices?.[0]?.message?.content || '';
