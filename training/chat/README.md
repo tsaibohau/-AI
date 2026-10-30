@@ -68,3 +68,5 @@ MLC 官方已有同架構的手機版（mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC
 - 新工具 `concept`：查到定義／推導／比喻／從哪些觀念來（`comes_from`）；學生追問就往下查一層；查不到就說沒有。
 - `round2/why-tools.jsonl` → `round2/why-apply.mjs`：「為什麼」對話全部改成先查工具再講（取代 extra-why 的不查工具版本）。
 - 系統提示詞第 11 條；`max_length` 調到 2816（最長的對話約 2470 token）。
+- 新工具 `fixed_point`（恆過定點，一次算完）；`round2/param-apply.mjs` 把恆過題的訓練資料改用它。
+- 網站修鬼打牆（`src/agent/agent.js`）：失敗過的同一個指令不再重試、模型整段重複就停、連續兩輪工具全失敗就停。

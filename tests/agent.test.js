@@ -117,7 +117,9 @@ describe('對話流程', () => {
   });
 
   it('超過回合上限會停下來', async () => {
-    const loop = { async complete() { return { text: '', toolCalls: [{ id: 'x', name: 'calculate', args: { expression: '1+1' } }] }; } };
+    let n = 0;
+    // 每輪換不同算式（完全重複會被「鬼打牆」偵測先擋下來）
+    const loop = { async complete() { n++; return { text: '', toolCalls: [{ id: 'x', name: 'calculate', args: { expression: `${n}+1` } }] }; } };
     const events = [];
     await runAgent({ provider: loop, history: [], user: { text: 'loop' }, onEvent: (e) => events.push(e), maxRounds: 3 });
     expect(events.at(-1)).toMatchObject({ type: 'done', truncated: true });
@@ -246,5 +248,37 @@ describe('concept：查觀念工具', () => {
   it('查不到就說沒有，不亂給', async () => {
     const { runTool } = await import('../src/agent/tools.js');
     expect(runTool('concept', { name: '三角函數' }).error).toContain('沒有');
+  });
+});
+
+describe('fixed_point：恆過定點', () => {
+  it('y = mx + 2m − 4 恆過 (−2, −4)', async () => {
+    const { runTool } = await import('../src/agent/tools.js');
+    expect(runTool('fixed_point', { equation: 'y = mx + 2m − 4' }).point).toBe('(−2, −4)');
+    expect(runTool('fixed_point', { equation: '(2k+1)x + (k-1)y = 4' }).point).toBe('(4/3, −8/3)');
+    expect(runTool('fixed_point', { equation: 'y = 2x + m' }).point).toBeUndefined();
+  });
+});
+
+describe('本機 AI 不會鬼打牆', () => {
+  const fakeProvider = (replies) => {
+    let i = 0;
+    return { complete: async () => replies[Math.min(i++, replies.length - 1)] };
+  };
+  it('同一段話、同一個工具重複：停下來', async () => {
+    const { runAgent } = await import('../src/agent/agent.js');
+    const same = { text: '我用工具算', toolCalls: [{ id: 'a', name: 'solve', args: { problem: 'y = mx + 2m − 4 恆過哪一點' } }] };
+    const events = [];
+    await runAgent({ provider: fakeProvider([same]), history: [], user: { text: '恆過哪一點' }, onEvent: (e) => events.push(e) });
+    expect(events.filter((e) => e.type === 'tool').length).toBe(1);
+    expect(events.at(-1)).toMatchObject({ type: 'done', looped: true });
+  });
+  it('失敗過的指令不再真的執行', async () => {
+    const { runAgent } = await import('../src/agent/agent.js');
+    const bad = (t) => ({ text: t, toolCalls: [{ id: 'a', name: 'calculate', args: { expression: 'x +' } }] });
+    const events = [];
+    await runAgent({ provider: fakeProvider([bad('一'), bad('二'), { text: '算不出來', toolCalls: [] }]), history: [], user: { text: '?' }, onEvent: (e) => events.push(e) });
+    const tools = events.filter((e) => e.type === 'tool');
+    expect(tools[1].result.error).toContain('不要重試');
   });
 });

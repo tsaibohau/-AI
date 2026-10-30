@@ -305,7 +305,7 @@ const containsVarAny = (n) => {
 
 /** 依題目判斷要做什麼；回傳四階段結果，看不出要做什麼就丟出 EngineError */
 export function solveGeneral(an) {
-  if (an.param) throw new EngineError(`題目含參數 ${an.param}，通用解法無法處理`);
+  if (an.param) throw new EngineError(`題目含參數 ${an.param}，通用解法無法處理（問直線恆過哪一點，請改用 fixed_point）`);
   const s = sides(an);
   if (!an.x) return evaluate(an, s);
   if (an.main.kind === 'rel') {

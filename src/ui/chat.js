@@ -39,6 +39,7 @@ const TOOL_LABEL = {
   measure: '量測',
   translate_line: '直線平移',
   triangle_centers: '外心與重心',
+  fixed_point: '恆過定點',
   concept: '查觀念',
   draw: '畫圖',
 };
@@ -356,6 +357,7 @@ export function mountChat(root, { onTeach } = {}) {
               teach: ev.call.name === 'solve' && !ev.result?.error ? ev.call.args?.problem : null,
             });
           }
+          if (ev.type === 'done' && ev.looped) st.log.push({ type: 'error', text: 'AI 卡住了（一直重複或工具一直失敗），先停下來。可以換個說法再問一次。' });
           if (ev.type === 'done' && ev.truncated) st.log.push({ type: 'error', text: '這題需要的步驟比較多，AI 先停在這裡。可以回覆「繼續」讓它接著做。' });
           renderLog();
           logEl.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'end' });

@@ -52,7 +52,7 @@
   {
    "id": "param-1",
    "user": "直線 y = mx + 2m − 4 恆過哪一點？",
-   "expect": "不假設 m 的值；說明恆過點要讓 m 消失；用工具解聯立",
+   "expect": "不假設 m 的值；用 fixed_point 工具，恆過 (−2, −4)",
    "tools": true
   },
   {

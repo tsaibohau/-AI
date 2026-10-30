@@ -68,6 +68,51 @@ function solveLinearSystem(equations, variables) {
   return { result: '唯一解', solution: sol };
 }
 
+
+/** 恆過定點：方程式按參數整理，參數的每一次方的係數（和常數部分）都要等於零 */
+function fixedPoint(equation, param) {
+  const t = normalizeProblem(equation).replace(/\s+/g, '');
+  const parts = t.split('=');
+  if (parts.length !== 2) throw new EngineError(`「${equation}」要有一個等號`);
+  const node = parseText(`(${parts[0]})-(${parts[1]})`);
+  const others = symbolsOf(node).filter((v) => !['x', 'y', 'pi', 'e'].includes(v));
+  const k = param || others[0];
+  if (!k) throw new EngineError('找不到參數（例如 m、k）');
+  if (others.some((v) => v !== k)) throw new EngineError(`參數不只一個：${others.join('、')}`);
+  const vars = ['x', 'y', k];
+  const P = toMPoly(node, vars);
+  const groups = new Map();
+  for (const [key, q] of P.terms) {
+    const [ex, ey, ek] = key.split(',').map(Number);
+    if (ex + ey > 1) throw new EngineError('x、y 不是一次式，這個工具只處理直線');
+    if (!groups.has(ek)) groups.set(ek, [new Q(0n), new Q(0n), new Q(0n)]);
+    const g = groups.get(ek);
+    const at = ex ? 0 : ey ? 1 : 2;
+    g[at] = g[at].add(q);
+  }
+  const fmt = ([a, b, c]) => {
+    const terms = [];
+    const put = (q, v) => {
+      if (q.isZero()) return;
+      const neg = q.sign() < 0;
+      const abs = neg ? q.neg() : q;
+      const num = v && abs.pretty() === '1' ? '' : abs.pretty();
+      terms.push({ neg, txt: `${num}${v}` });
+    };
+    put(a, 'x');
+    put(b, 'y');
+    put(c, '');
+    if (!terms.length) return '0 = 0';
+    return terms.map((t, i) => (i === 0 ? (t.neg ? '−' : '') + t.txt : (t.neg ? ' − ' : ' + ') + t.txt)).join('') + ' = 0';
+  };
+  const order = [...groups.keys()].sort((a, b) => b - a);
+  const equations = order.map((e) => fmt(groups.get(e)));
+  const grouped = order.map((e) => (e === 0 ? `(${equations[order.indexOf(e)].replace(' = 0', '')})` : `${e === 1 ? k : `${k}^${e}`}(${equations[order.indexOf(e)].replace(' = 0', '')})`)).join(' + ') + ' = 0';
+  const r = solveLinearSystem(equations.map((x) => x.replace(/−/g, '-')), ['x', 'y']);
+  if (r.result !== '唯一解') return { param: k, grouped, equations, result: `沒有恆過的定點（${r.result}）` };
+  return { param: k, grouped, equations, point: `(${r.solution.x}, ${r.solution.y})` };
+}
+
 /** 直線參數：可以是方程式文字 */
 const lineArg = (t) => L.parseLine(t);
 
@@ -205,6 +250,12 @@ export const TOOLS = [
       const r = L.triangleCenters(a, b, c);
       return { circumcenter: r.circumcenter, centroid: r.centroid, bisectorAB: r.bisectorAB, bisectorBC: r.bisectorBC };
     },
+  },
+  {
+    name: 'fixed_point',
+    description: '求含參數（例如 m、k）的直線「恆過哪一點」：按參數整理，每一部分都等於零再解聯立。',
+    parameters: { type: 'object', properties: { equation: str('直線方程式，例如 y = mx + 2m − 4'), param: str('參數名稱，例如 m（可省略）') }, required: ['equation'] },
+    run: ({ equation, param }) => fixedPoint(equation, param),
   },
   {
     name: 'concept',
