@@ -39,3 +39,15 @@ MLC 官方已有同架構的手機版（mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC
   Colab 直接開：https://colab.research.google.com/github/tsaibohau/-AI/blob/main/training/chat/train.ipynb
 - `data/system.txt`：網站實際用的系統提示詞＋工具說明，測試會檢查兩者一致。
 - 系統提示詞約 1800 token，所以長度上限設 2560，並開啟 gradient checkpointing 省記憶體。
+
+## 第二輪（快、狠、準）
+
+第一輪訓練後考試 8/20 → 17/20，但語氣仍是客氣的 AI 味，還有亂給建議、聽不懂口語、開場白講錯數學。
+使用者提供了一段真實上課錄音（不放進儲存庫），整理成 `docs/老師個性.md`：**快、狠、準**，一句能講完不講兩句。
+
+- `round2/`：Claude 依老師個性改寫的全部回答（`chat-new.txt`、`tools-new.txt`）＋補強弱點的新對話
+  （台灣口語、觀念用比喻、解題先講架構、恆過定點用工具；`extra-*.jsonl`，每題附壞例子）。
+  `round2/apply.mjs` 已經跑過一次，結果就是現在的 `data/`（不要再跑）。
+- `pairs.jsonl` 全部換成「新（快狠準）＝好、舊（太長客套）＝壞」，加上第一輪模型的爛回答當壞例子。
+- 網站的系統提示詞第 9 條改成快狠準，`system.txt` 同步。
+- 考試多兩項自動檢查：不用工具的回答超過 60 字、用工具前的開場白超過 40 字，算「太長」。

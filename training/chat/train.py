@@ -107,7 +107,7 @@ BAD = [(re.compile(r'\\[a-z]+|\\[()\[\]]|\$'), 'LaTeX'), (re.compile(r'[们这�
 
 
 def grade(case, reply):
-    """自動檢查：工具格式、亂碼、有沒有編數字（不含工具的題目）。語氣由擁有者評分"""
+    """自動檢查：工具格式、亂碼、長度、有沒有編數字（不含工具的題目）。語氣由擁有者評分"""
     notes = []
     calls = TOOL_RE.findall(reply)
     text = TOOL_RE.sub('', reply)
@@ -121,6 +121,11 @@ def grade(case, reply):
     for re_, why in BAD:
         if re_.search(text):
             notes.append(why)
+    # 快狠準（docs/老師個性.md）：不用工具的回答、用工具前的開場白都要短
+    if not case['tools'] and len(text.strip()) > 60:
+        notes.append(f'太長（{len(text.strip())} 字）')
+    if case['tools'] and calls and len(text.strip()) > 40:
+        notes.append(f'開場太長（{len(text.strip())} 字）')
     if not case['tools']:
         extra = [n for n in re.findall(r'\d+', text) if n not in re.findall(r'\d+', case['user'])]
         if extra:
