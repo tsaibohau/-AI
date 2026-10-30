@@ -181,7 +181,7 @@ def sft():
         logging_steps=1 if args.smoke else 10,
         save_strategy='no',
         **MIXED,
-        max_length=2560,  # 系統提示詞約 1800 token＋對話，太短會把老師的話截掉
+        max_length=2816,  # 系統提示詞約 2050 token＋對話（最長約 2470），太短會把老師的話截掉
         completion_only_loss=True,
         report_to=[],
     )
@@ -215,7 +215,7 @@ def dpo():
         logging_steps=1 if args.smoke else 10,
         save_strategy='no',
         **MIXED,
-        max_length=2560,  # 系統提示詞約 1800 token＋對話，太短會把老師的話截掉
+        max_length=2816,  # 系統提示詞約 2050 token＋對話（最長約 2470），太短會把老師的話截掉
         report_to=[],
     )
     trainer = DPOTrainer(model=model, args=cfg, train_dataset=Dataset.from_list(data), processing_class=tok, peft_config=lora())

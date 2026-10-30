@@ -106,8 +106,8 @@
   {
    "id": "concept",
    "user": "為什麼垂直的兩條線斜率相乘是 −1？",
-   "expect": "用比喻或例子解釋（手機轉 90°），不用 LaTeX",
-   "tools": false
+   "expect": "先用 concept 工具查，再用比喻講出為什麼；用比喻或例子解釋（手機轉 90°），不用 LaTeX",
+   "tools": true
   },
   {
    "id": "mixed",
@@ -124,8 +124,8 @@
   {
    "id": "why-basic",
    "user": "為什麼 2+2=4",
-   "expect": "講出為什麼（合起來數、往後數），不是重複「因為 2+2 等於 4」",
-   "tools": false
+   "expect": "先用 concept 工具查，再用比喻講出為什麼；講出為什麼（合起來數、往後數），不是重複「因為 2+2 等於 4」",
+   "tools": true
   }
  ]
 }

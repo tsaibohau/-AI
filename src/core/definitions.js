@@ -65,3 +65,36 @@ export function findByCues(text) {
 }
 
 export const allDefinitions = () => data.definitions;
+
+const plain = (t) => String(t || '').normalize('NFKC').toLowerCase().replace(/[\s，。,.!！?？、「」]+/g, '');
+
+/** 用學生的說法找概念（id、名稱、常見問法；越長的比對越優先）。找不到回傳 null */
+export function findConcept(query) {
+  const q = plain(query);
+  if (!q) return null;
+  let best = null;
+  for (const d of data.definitions) {
+    for (const key of [d.id, d.name, ...(d.aliases || [])]) {
+      const k = plain(key);
+      if (!k) continue;
+      const score = q === k ? 1000 + k.length : q.includes(k) || k.includes(q) ? k.length : 0;
+      if (score && (!best || score > best.score)) best = { score, d };
+    }
+  }
+  return best?.d || null;
+}
+
+/** 查觀念工具的回傳：定義或導出、推導、比喻、從哪些概念來（學生追問就往這些查） */
+export function explainConcept(query) {
+  const d = findConcept(query);
+  if (!d) return null;
+  const names = (ids) => (ids || []).map((x) => DEF.get(x)?.name).filter(Boolean);
+  return {
+    name: d.name,
+    kind: d.kind === 'definition' ? '定義（規定的，不用證明）' : '導出（可以從更基本的推出來）',
+    meaning: d.hs,
+    ...(d.derivation ? { why: d.derivation } : {}),
+    ...(d.analogy ? { analogy: d.analogy } : {}),
+    ...(d.prereq.length ? { comes_from: names(d.prereq) } : {}),
+  };
+}

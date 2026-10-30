@@ -229,3 +229,22 @@ describe('網站可以選我們訓練的老師', () => {
     expect(MODELS[0].id).toBe(TUTOR_MODEL_ID);
   });
 });
+
+describe('concept：查觀念工具', () => {
+  it('1+1 查到加法（定義），還能往下追到自然數', async () => {
+    const { runTool } = await import('../src/agent/tools.js');
+    const r = runTool('concept', { name: '1+1' });
+    expect(r.name).toBe('加法');
+    expect(r.kind).toContain('定義');
+    expect(r.comes_from).toContain('自然數');
+  });
+  it('導出的觀念附推導', async () => {
+    const { runTool } = await import('../src/agent/tools.js');
+    expect(runTool('concept', { name: '為什麼不能除以0' }).why).toContain('乘');
+    expect(runTool('concept', { name: '負負得正' }).why).toContain('分配');
+  });
+  it('查不到就說沒有，不亂給', async () => {
+    const { runTool } = await import('../src/agent/tools.js');
+    expect(runTool('concept', { name: '三角函數' }).error).toContain('沒有');
+  });
+});

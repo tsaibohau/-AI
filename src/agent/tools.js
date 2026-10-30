@@ -8,6 +8,7 @@ import { Q } from '../engine/num.js';
 import * as L from '../engine/lines.js';
 import { toolGraphSpec } from '../engine/tools.js';
 import { validateDiagram, describeDiagram } from '../core/diagram.js';
+import { explainConcept, allDefinitions } from '../core/definitions.js';
 
 const str = (description) => ({ type: 'string', description });
 const strArr = (description) => ({ type: 'array', items: { type: 'string' }, description });
@@ -203,6 +204,16 @@ export const TOOLS = [
     run: ({ a, b, c }) => {
       const r = L.triangleCenters(a, b, c);
       return { circumcenter: r.circumcenter, centroid: r.centroid, bisectorAB: r.bisectorAB, bisectorBC: r.bisectorBC };
+    },
+  },
+  {
+    name: 'concept',
+    description: '查一個數學觀念：是定義（不用證明）還是導出（附推導）、淺白比喻、從哪些更基本的觀念來。學生問「為什麼」時先查，追問就查 comes_from 裡的觀念。',
+    parameters: { type: 'object', properties: { name: str('觀念名稱或學生的問法，例如 加法、負負得正、為什麼不能除以0、中垂線') }, required: ['name'] },
+    run: ({ name }) => {
+      const r = explainConcept(name);
+      if (r) return r;
+      return { error: `資料庫裡沒有「${name}」`, known: allDefinitions().map((d) => d.name) };
     },
   },
   {

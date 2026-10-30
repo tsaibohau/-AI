@@ -39,6 +39,7 @@ const TOOL_LABEL = {
   measure: '量測',
   translate_line: '直線平移',
   triangle_centers: '外心與重心',
+  concept: '查觀念',
   draw: '畫圖',
 };
 
