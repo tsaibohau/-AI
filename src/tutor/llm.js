@@ -34,13 +34,19 @@ export async function chatRaw(messages, { maxTokens = 700, temperature = 0.2 } =
     const id = loadedId;
     engine = null;
     loadedId = null;
-    await loadModel(id);
+    try {
+      await loadModel(id);
+    } catch {
+      throw new Error(GPU_GONE);
+    }
     return await ask();
   }
 }
 
+const GPU_GONE = '手機把 GPU 收回去了（通常是記憶體不夠）。請把網頁完全關掉再打開；如果常常這樣，改選「數學解惑老師・小」。';
+
 /** GPU 被系統收回的錯誤（WebLLM／TVM 的訊息） */
-export const isGpuLost = (e) => /disposed|device (was |is )?lost|GPUDevice|destroyed/i.test(String(e?.message || e));
+export const isGpuLost = (e) => /disposed|device (was |is )?lost|GPUDevice|destroyed|compatible GPU/i.test(String(e?.message || e));
 
 export const loadedModel = () => loadedId;
 
@@ -94,10 +100,20 @@ export const isReady = () => engine !== null;
 export async function loadModel(id, onProgress = () => {}) {
   if (engine && loadedId === id) return engine;
   const webllm = await import('@mlc-ai/web-llm');
-  engine = await webllm.CreateMLCEngine(id, { appConfig: appConfigFor(webllm), initProgressCallback: (r) => onProgress({ progress: r.progress ?? 0, text: r.text || '' }) });
+  engine = await createEngine(webllm, id, onProgress);
   loadedId = id;
   saveModel(id);
   return engine;
+}
+
+
+async function createEngine(webllm, id, onProgress) {
+  try {
+    return await webllm.CreateMLCEngine(id, { appConfig: appConfigFor(webllm), initProgressCallback: (r) => onProgress({ progress: r.progress ?? 0, text: r.text || '' }) });
+  } catch (e) {
+    if (/compatible GPU/i.test(String(e?.message))) throw new Error(GPU_GONE);
+    throw e;
+  }
 }
 
 /** 這台裝置是否已經下載過模型 */
