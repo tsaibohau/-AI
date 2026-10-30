@@ -73,13 +73,23 @@ const lineArg = (t) => L.parseLine(t);
 export const TOOLS = [
   {
     name: 'calculate',
-    description: '計算一個沒有未知數的算式，回傳精確值（分數、根號、對數）與近似值。支援 sqrt、log(真數, 底)、log 是以 10 為底、ln、sin/cos/tan（角度寫 72°）、abs、π。',
+    description: '計算一個沒有未知數的算式，回傳精確值（分數、根號、對數）與近似值；有等號（例如 1+1=2）時回答兩邊相不相等。支援 sqrt、log(真數, 底)、log 是以 10 為底、ln、sin/cos/tan（角度寫 72°）、abs、π。',
     parameters: { type: 'object', properties: { expression: str('算式，例如 (3*1.5-5)/2、tan(72°)、log(8, 2)') }, required: ['expression'] },
     run: ({ expression }) => {
-      const node = parseText(normalizeProblem(expression).replace(/\s+/g, ''));
-      const left = symbolsOf(node).filter((s) => !['pi', 'e'].includes(s));
-      if (left.length) throw new EngineError(`算式含未知數 ${left.join('、')}，請改用 solve 或 solve_linear_system`);
-      return exact(compile(node)({}));
+      const value = (text) => {
+        const node = parseText(normalizeProblem(text).replace(/\s+/g, ''));
+        const left = symbolsOf(node).filter((s) => !['pi', 'e'].includes(s));
+        if (left.length) throw new EngineError(`算式含未知數 ${left.join('、')}，請改用 solve 或 solve_linear_system`);
+        return exact(compile(node)({}));
+      };
+      // 學生打「1+1=2」這種沒有未知數的等式：兩邊各算一次，回答對不對
+      const sides = String(expression).split(/(?<![<>!≤≥])=(?!=)/);
+      if (sides.length === 2) {
+        const [a, b] = sides.map(value);
+        const same = a.exact === b.exact || Math.abs(a.approx - b.approx) < 1e-9 * Math.max(1, Math.abs(a.approx));
+        return { left: a.exact, right: b.exact, correct: same };
+      }
+      return value(expression);
     },
   },
   {

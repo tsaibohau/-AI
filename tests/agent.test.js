@@ -208,3 +208,12 @@ describe('訓練用的系統提示詞和網站一致', () => {
     expect(saved).toBe(`${SYSTEM_PROMPT}\n\n${toolGuide(toolDeclarations())}`);
   });
 });
+
+describe('calculate 可以檢查沒有未知數的等式', () => {
+  it('1+1=2 對、1+1=3 錯', async () => {
+    const { runTool } = await import('../src/agent/tools.js');
+    expect(runTool('calculate', { expression: '1+1=2' })).toEqual({ left: '2', right: '2', correct: true });
+    expect(runTool('calculate', { expression: '1+1=3' }).correct).toBe(false);
+    expect(runTool('calculate', { expression: '1/2+1/3=5/6' }).correct).toBe(true);
+  });
+});
