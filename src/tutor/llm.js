@@ -25,9 +25,22 @@ export const MODELS = [
 /** 直接用已載入的本機模型對話（給 AI 對話頁用） */
 export async function chatRaw(messages, { maxTokens = 700, temperature = 0.2 } = {}) {
   if (!engine) throw new Error('本機 AI 尚未載入，請先到設定下載並啟用');
-  const res = await engine.chat.completions.create({ messages, temperature, max_tokens: maxTokens });
-  return res.choices?.[0]?.message?.content || '';
+  const ask = async () => (await engine.chat.completions.create({ messages, temperature, max_tokens: maxTokens })).choices?.[0]?.message?.content || '';
+  try {
+    return await ask();
+  } catch (e) {
+    if (!isGpuLost(e) || !loadedId) throw e;
+    // 手機切到別的 App 或記憶體不夠時，系統會收回 GPU，模型就失效了：從手機裡的檔案重新載入（不用重新下載）再試一次
+    const id = loadedId;
+    engine = null;
+    loadedId = null;
+    await loadModel(id);
+    return await ask();
+  }
 }
+
+/** GPU 被系統收回的錯誤（WebLLM／TVM 的訊息） */
+export const isGpuLost = (e) => /disposed|device (was |is )?lost|GPUDevice|destroyed/i.test(String(e?.message || e));
 
 export const loadedModel = () => loadedId;
 

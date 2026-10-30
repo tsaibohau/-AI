@@ -230,6 +230,12 @@ describe('網站可以選我們訓練的老師', () => {
     expect(tutor.model_lib).toBe('lib.wasm');
     expect(MODELS[0].id).toBe(TUTOR_MODEL_ID);
   });
+  it('認得 GPU 被收回的錯誤（會自動重新載入）', async () => {
+    const { isGpuLost } = await import('../src/tutor/llm.js');
+    expect(isGpuLost(new Error('Object has already been disposed'))).toBe(true);
+    expect(isGpuLost(new Error('Device was lost'))).toBe(true);
+    expect(isGpuLost(new Error('網路錯誤'))).toBe(false);
+  });
   it('小一號的老師沿用官方 0.5B', async () => {
     const { appConfigFor, TUTOR_SMALL_ID } = await import('../src/tutor/llm.js');
     const base = { model: 'x', model_id: 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC', model_lib: 'small.wasm' };
