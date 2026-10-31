@@ -107,6 +107,46 @@ export function appConfigFor(webllm) {
 
 export const isReady = () => engine !== null;
 
+/**
+ * iPhone 除錯：一步一步測，回傳每一步的結果（文字）。
+ * 失敗後同一個頁面的 GPU 就不能再用，所以只測一次、測完請重開網頁。
+ */
+export async function selfTest(id, onStep = () => {}) {
+  const out = [];
+  const step = (s) => {
+    out.push(s);
+    onStep([...out]);
+  };
+  const lost = () => (lastLost ? `（GPU：${lastLost.slice(0, 160)}）` : '');
+  const t0 = Date.now();
+  const sec = () => `${((Date.now() - t0) / 1000).toFixed(1)} 秒`;
+  try {
+    await loadModel(id);
+    const p = engine?.loadedModelIdToPipeline?.get?.(id);
+    step(`1. 載入：成功（${sec()}，分段 ${p?.prefillChunkSize ?? '?'}）`);
+  } catch (e) {
+    step(`1. 載入：失敗 ${String(e?.message || e).slice(0, 120)}${lost()}`);
+    return out;
+  }
+  const run = async (name, messages) => {
+    try {
+      const r = await engine.chat.completions.create({ messages, max_tokens: 8, temperature: 0 });
+      step(`${name}：成功（${sec()}）「${(r.choices?.[0]?.message?.content || '').slice(0, 20)}」`);
+      return true;
+    } catch (e) {
+      step(`${name}：失敗 ${String(e?.message || e).slice(0, 120)}${lost()}`);
+      return false;
+    }
+  };
+  if (!(await run('2. 短句', [{ role: 'user', content: '1+1=?' }]))) return out;
+  await engine.resetChat?.();
+  await run('3. 長文（約 2000 字）', [
+    { role: 'system', content: '你是數學老師，回答要短。'.repeat(170) },
+    { role: 'user', content: '1+1=?' },
+  ]);
+  return out;
+}
+
 /** 下載（第一次）並載入模型；onProgress({ progress: 0~1, text }) */
 export async function loadModel(id, onProgress = () => {}) {
   if (engine && loadedId === id) return engine;
