@@ -28,6 +28,12 @@ if '--status' in sys.argv:
             refs.append(f'{user}/{extra}')
     for ref in refs:
         print(ref.split('/')[1], '→', kaggle('kernels', 'status', ref, check=False).splitlines()[-1].split('status')[-1], flush=True)
+    # 自動那本最近一次的報告（跑完才有）
+    out = os.path.join(os.environ.get('RUNNER_TEMP', '/tmp'), 'kernel-out')
+    kaggle('kernels', 'output', SLUG, '-p', out, '--file-pattern', r'report\.txt$', check=False)
+    for root, _, files in os.walk(out):
+        for f in files:
+            print(f'\n===== {f} =====\n' + open(os.path.join(root, f), encoding='utf-8', errors='replace').read(), flush=True)
     sys.exit(0)
 work = os.path.join(os.environ.get('RUNNER_TEMP', '/tmp'), 'kernel')
 shutil.rmtree(work, ignore_errors=True)
