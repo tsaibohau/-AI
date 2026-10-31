@@ -16,11 +16,11 @@ export const TUTOR_SMALL_ID = TUTORS[1].id;
 /** 手機 CPU 版老師（GGUF，wllama 跑）：iPhone 的 WebGPU 會把 GPU 收回，改用 CPU */
 export const CPU_TUTOR = {
   id: 'math-tutor-qwen2.5-0.5b-gguf-cpu',
-  url: 'https://huggingface.co/HauHau2010/math-tutor-qwen2.5-0.5b-GGUF/resolve/main/math-tutor-0.5b-q8_0.gguf',
+  url: 'https://huggingface.co/HauHau2010/math-tutor-qwen2.5-0.5b-GGUF/resolve/main/math-tutor-0.5b-q4_k_m-00001-of-00006.gguf',
 };
 
 export const MODELS = [
-  { id: CPU_TUTOR.id, label: '數學解惑老師・手機版（我們訓練的，約 0.5 GB，用 CPU，iPhone 選這個）', vramMB: 0, cpu: true, url: CPU_TUTOR.url },
+  { id: CPU_TUTOR.id, label: '數學解惑老師・手機版（我們訓練的，約 0.4 GB，用 CPU，iPhone 選這個）', vramMB: 0, cpu: true, url: CPU_TUTOR.url },
   { id: TUTOR_MODEL_ID, label: '數學解惑老師（我們訓練的，約 1 GB）', vramMB: 1630 },
   { id: TUTOR_SMALL_ID, label: '數學解惑老師・小（我們訓練的，約 0.3 GB，舊手機用）', vramMB: 950 },
   { id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC', label: '標準（約 1 GB，手機可用）', vramMB: 1630 },
