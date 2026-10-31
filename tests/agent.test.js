@@ -243,6 +243,20 @@ describe('網站可以選我們訓練的老師', () => {
     expect(modelName(TUTOR_SMALL_ID)).toBe('數學解惑老師・小');
     expect(modelName(TUTOR_MODEL_ID)).toBe('數學解惑老師');
   });
+  it('iPhone 上把 GPU 每次的運算切小', async () => {
+    const { shrinkPrefill, isAppleMobile, IOS_PREFILL_CHUNK } = await import('../src/tutor/llm.js');
+    const iphone = { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X)', maxTouchPoints: 5 };
+    const ipad = { userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', maxTouchPoints: 5 };
+    const mac = { userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', maxTouchPoints: 0 };
+    expect([iphone, ipad, mac].map((n) => isAppleMobile(n))).toEqual([true, true, false]);
+    const pipe = { prefillChunkSize: 1024 };
+    const eng = { loadedModelIdToPipeline: new Map([['m', pipe]]) };
+    expect(shrinkPrefill(eng, 'm', mac)).toBe(false);
+    expect(pipe.prefillChunkSize).toBe(1024);
+    expect(shrinkPrefill(eng, 'm', iphone)).toBe(true);
+    expect(pipe.prefillChunkSize).toBe(IOS_PREFILL_CHUNK);
+    expect(shrinkPrefill({}, 'm', iphone)).toBe(false);
+  });
   it('小一號的老師沿用官方 0.5B', async () => {
     const { appConfigFor, TUTOR_SMALL_ID } = await import('../src/tutor/llm.js');
     const base = { model: 'x', model_id: 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC', model_lib: 'small.wasm' };

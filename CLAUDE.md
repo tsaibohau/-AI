@@ -52,7 +52,7 @@
   4c. 現況（10/30）：HF 免費帳號只能建 Static Space，伺服器版不可行（程式保留，網站已隱藏，預設改回本機「數學解惑老師」）。使用者選擇另外練 0.5B（`train.ipynb` 的 SIZE='0.5b'，上傳 `math-tutor-qwen2.5-0.5b-q4f16_1-MLC`，網站已列為「數學解惑老師・小」）。訓練前後對照（第 6 格）還沒拿到。
   4d. 0.5B 第二輪考試 4/21 → 20/21（語氣對了）。毛病：判別式求參數自己猜 k、「供三小」當成數學、稱讚回得怪 → 第三輪補強 `round3/`（apply.mjs 可重跑；判別式 10 段、嗆聲稱讚 15 段），提示詞第 10 條加判別式。下一步：使用者確認小模型能在 iPhone 跑，再重訓 0.5B。
   4e. **全自動（GitHub 觸發）**：`.github/workflows/kaggle.yml` → `kaggle_remote.py` 把 `kaggle.ipynb` 推到使用者 Kaggle（`<KAGGLE_USERNAME>/math-tutor-auto`）、等跑完、下載 `report.txt` 印在 Actions 記錄（我可用 GitHub 工具讀 job logs）。改 `training/chat/job.json`（size、gpu、run 數字加一）推上 main 就開跑。需要 GitHub Secrets：KAGGLE_USERNAME＋KAGGLE_API_TOKEN（或 KAGGLE_KEY）；HF_TOKEN 要使用者在 Kaggle 那本筆記本的 Secrets 勾一次。HF 已確認 Gradio／Docker Space 要 PRO（402），伺服器版放棄。
-  4f. （10/31）0.5B 第三輪（自動觸發成功）：考試 7/21 → 20/21，判別式會用工具、嗆聲不再當數學；手機版已公開上傳（0.29 GB）。剩：「x 等於多少」回「任意數」＋簡體「没」→ 已補 4 段（未重訓）；concept 工具現在把「2+2」等純算式對到該運算。等使用者在 iPhone 試「數學解惑老師・小」。查狀態：觸發 kaggle.yml（workflow_dispatch，status=true）讀 job logs。
+  4f. （10/31）0.5B 第三輪（自動觸發成功）：考試 7/21 → 20/21，判別式會用工具、嗆聲不再當數學；手機版已公開上傳（0.29 GB）。剩：「x 等於多少」回「任意數」＋簡體「没」→ 已補 4 段（未重訓）；concept 工具現在把「2+2」等純算式對到該運算。等使用者在 iPhone 試「數學解惑老師・小」。（11/1）iPhone 17 Pro Max 上小模型一問就 GPU 被收回（不是記憶體）→ iOS 載入後把 prefill 分段 1024 調成 128（`shrinkPrefill`），錯誤訊息附技術訊息。查狀態：觸發 kaggle.yml（workflow_dispatch，status=true）讀 job logs。
   5. 第三階段「問校務」：先確認學校同意與公開資料來源。
 - 待做：更多應用問題類型、3D 圖解、錯題本與回饋表、換數字出類似題。
 - 待使用者決定：`eval/problems.json` 第 3～5 題的 `needs_diagram` 要不要改成 `true`。

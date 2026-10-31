@@ -37,7 +37,7 @@ export async function chatRaw(messages, { maxTokens = 700, temperature = 0.2 } =
     try {
       await loadModel(id);
     } catch {
-      throw new Error(gpuGoneMessage(id));
+      throw new Error(`${gpuGoneMessage(id)}（技術訊息：${String(e?.message || e).slice(0, 120)}）`);
     }
     return await ask();
   }
@@ -111,11 +111,30 @@ export async function loadModel(id, onProgress = () => {}) {
   if (engine && loadedId === id) return engine;
   const webllm = await import('@mlc-ai/web-llm');
   engine = await createEngine(webllm, id, onProgress);
+  shrinkPrefill(engine, id);
   loadedId = id;
   saveModel(id);
   return engine;
 }
 
+
+/** iPhone／iPad（iPadOS 會假裝是 Mac） */
+export const isAppleMobile = (nav = typeof navigator === 'undefined' ? null : navigator) =>
+  !!nav && (/iPhone|iPad|iPod/.test(nav.userAgent || '') || (/Macintosh/.test(nav.userAgent || '') && nav.maxTouchPoints > 1));
+
+/**
+ * iOS Safari 一次送太多運算給 GPU 會把 GPU 弄丟（跟記憶體大小無關）。
+ * WebLLM 的分段大小寫死在模型程式裡（1024 字），設定檔改不到，只能載入後調小：
+ * 只會變慢一點，不影響答案。
+ */
+export const IOS_PREFILL_CHUNK = 128;
+export function shrinkPrefill(eng, id, nav) {
+  if (!isAppleMobile(nav)) return false;
+  const p = eng?.loadedModelIdToPipeline?.get?.(id);
+  if (!p || !(p.prefillChunkSize > IOS_PREFILL_CHUNK)) return false;
+  p.prefillChunkSize = IOS_PREFILL_CHUNK;
+  return true;
+}
 
 async function createEngine(webllm, id, onProgress) {
   try {
