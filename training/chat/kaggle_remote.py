@@ -32,7 +32,12 @@ def kaggle(*args, check=True):
 
 
 print('推到 Kaggle：', SLUG, '（GPU）' if job.get('gpu') else '（不用 GPU）', flush=True)
-print(kaggle('kernels', 'push', '-p', work), flush=True)
+pushed = kaggle('kernels', 'push', '-p', work)
+print(pushed, flush=True)
+if 'error' in pushed.lower():
+    if 'session count' in pushed.lower():
+        sys.exit('Kaggle 同時只能跑 2 個 GPU 工作：請到 Kaggle 右上角「View Active Events」把還在跑的停掉，再重跑')
+    sys.exit('推到 Kaggle 失敗（看上一行）')
 time.sleep(60)
 start = time.time()
 while True:
