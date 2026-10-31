@@ -19,13 +19,42 @@ export async function createCpuEngine(url, onProgress = () => {}) {
       /* 忽略 */
     }
   }
-  wllama = new Wllama({ default: wasmUrl }, { logger: LoggerWithoutDebug, allowOffline: true });
-  await wllama.loadModelFromUrl(url, {
+  // 記下錯誤：iPhone 上 worker 出錯時 wllama 只寫 console，網頁會一直卡著
+  const errors = [];
+  const logger = {
+    ...LoggerWithoutDebug,
+    error: (...a) => {
+      errors.push(a.map((x) => x?.message || String(x)).join(' ').slice(0, 160));
+      console.error(...a);
+    },
+  };
+  wllama = new Wllama({ default: wasmUrl }, { logger, allowOffline: true });
+  let downloaded = false;
+  const load = wllama.loadModelFromUrl(url, {
     n_ctx: 4096,
     n_batch: 512,
     n_gpu_layers: 0, // 只用 CPU
-    progressCallback: ({ loaded, total }) => onProgress({ progress: total ? loaded / total : 0, text: `下載中 ${(loaded / 1e6).toFixed(0)} / ${(total / 1e6).toFixed(0)} MB` }),
+    progressCallback: ({ loaded, total }) => {
+      if (total && loaded >= total) {
+        downloaded = true;
+        onProgress({ progress: 1, text: '下載完成，載入中（約半分鐘）…' });
+      } else onProgress({ progress: total ? loaded / total : 0, text: `下載中 ${(loaded / 1e6).toFixed(0)} / ${(total / 1e6).toFixed(0)} MB` });
+    },
   });
+  // 看門狗：下載完 3 分鐘還沒載入好，就不要讓畫面永遠卡著
+  let timer;
+  const watchdog = new Promise((_, reject) => {
+    const tick = () => {
+      if (!downloaded) return (timer = setTimeout(tick, 5000));
+      timer = setTimeout(() => reject(new Error(`載入太久沒有回應${errors.length ? `（${errors.slice(-2).join('；')}）` : ''}。請把網頁完全關掉再打開，再按一次（已下載的不用重新下載）。`)), 180000);
+    };
+    tick();
+  });
+  try {
+    await Promise.race([load, watchdog]);
+  } finally {
+    clearTimeout(timer);
+  }
   onProgress({ progress: 1, text: '載入完成' });
   const w = wllama;
   return {
