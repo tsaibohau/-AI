@@ -21,10 +21,13 @@ def kaggle(*args, check=True):
 
 if '--status' in sys.argv:
     # 只查狀態：列出每本筆記本最新一次執行的狀態
-    for line in kaggle('kernels', 'list', '--mine', '--csv', check=False).splitlines()[1:]:
-        ref = line.split(',')[0]
-        if '/' in ref:
-            print(ref.split('/')[1], '→', kaggle('kernels', 'status', ref, check=False).splitlines()[-1].split('status')[-1], flush=True)
+    refs = [l.split(',')[0] for l in kaggle('kernels', 'list', '--mine', '--csv', '--page-size', '100', check=False).splitlines()[1:]]
+    refs = [r for r in refs if '/' in r]
+    for extra in ['notebookcb7bb615e4', 'math-tutor-auto']:
+        if f'{user}/{extra}' not in refs:
+            refs.append(f'{user}/{extra}')
+    for ref in refs:
+        print(ref.split('/')[1], '→', kaggle('kernels', 'status', ref, check=False).splitlines()[-1].split('status')[-1], flush=True)
     sys.exit(0)
 work = os.path.join(os.environ.get('RUNNER_TEMP', '/tmp'), 'kernel')
 shutil.rmtree(work, ignore_errors=True)
