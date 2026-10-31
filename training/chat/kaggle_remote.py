@@ -9,6 +9,23 @@ user = os.environ.get('KAGGLE_USERNAME')
 if not user or not (os.environ.get('KAGGLE_API_TOKEN') or os.environ.get('KAGGLE_KEY')):
     sys.exit('GitHub Secrets 缺 KAGGLE_USERNAME 或 KAGGLE_API_TOKEN／KAGGLE_KEY')
 SLUG = f'{user}/math-tutor-auto'
+
+
+def kaggle(*args, check=True):
+    r = subprocess.run(['kaggle', *args], capture_output=True, text=True)
+    out = (r.stdout + r.stderr).strip()
+    if check and r.returncode:
+        sys.exit(f'kaggle {" ".join(args)} 失敗：{out}')
+    return out
+
+
+if '--status' in sys.argv:
+    # 只查狀態：列出每本筆記本最新一次執行的狀態
+    for line in kaggle('kernels', 'list', '--mine', '--csv', check=False).splitlines()[1:]:
+        ref = line.split(',')[0]
+        if '/' in ref:
+            print(ref.split('/')[1], '→', kaggle('kernels', 'status', ref, check=False).splitlines()[-1].split('status')[-1], flush=True)
+    sys.exit(0)
 work = os.path.join(os.environ.get('RUNNER_TEMP', '/tmp'), 'kernel')
 shutil.rmtree(work, ignore_errors=True)
 os.makedirs(work)
@@ -23,12 +40,6 @@ if job.get('gpu'):
 json.dump(meta, open(os.path.join(work, 'kernel-metadata.json'), 'w'))
 
 
-def kaggle(*args, check=True):
-    r = subprocess.run(['kaggle', *args], capture_output=True, text=True)
-    out = (r.stdout + r.stderr).strip()
-    if check and r.returncode:
-        sys.exit(f'kaggle {" ".join(args)} 失敗：{out}')
-    return out
 
 
 print('推到 Kaggle：', SLUG, '（GPU）' if job.get('gpu') else '（不用 GPU）', flush=True)

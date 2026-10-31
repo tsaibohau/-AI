@@ -4,6 +4,11 @@ name: Kaggle 訓練
 
 on:
   workflow_dispatch:
+    inputs:
+      status:
+        description: '只查 Kaggle 筆記本狀態，不開跑'
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths: ['training/chat/job.json']
@@ -27,4 +32,4 @@ jobs:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
           KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
-        run: python training/chat/kaggle_remote.py
+        run: python training/chat/kaggle_remote.py ${{ inputs.status && '--status' || '' }}
