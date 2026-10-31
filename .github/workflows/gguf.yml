@@ -20,6 +20,18 @@ jobs:
           python-version: '3.12'
       - name: 安裝（CPU 版 torch）
         run: pip install -q torch --index-url https://download.pytorch.org/whl/cpu && pip install -q transformers safetensors huggingface_hub numpy
+      - name: 下載 llama.cpp 官方編好的工具（量化、切檔）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/lcpp" && cd "$RUNNER_TEMP/lcpp"
+          gh release download -R ggml-org/llama.cpp --pattern '*bin-ubuntu-x64.zip' || gh release download -R ggml-org/llama.cpp --pattern '*bin-ubuntu-x64.tar.gz'
+          for f in *.zip; do [ -f "$f" ] && unzip -q "$f" || true; done
+          for f in *.tar.gz; do [ -f "$f" ] && tar xzf "$f" || true; done
+          BIN=$(dirname "$(find . -name llama-quantize -type f | head -1)")
+          echo "LLAMA_BIN=$RUNNER_TEMP/lcpp/$BIN" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$RUNNER_TEMP/lcpp/$BIN" >> "$GITHUB_ENV"
+          ls "$RUNNER_TEMP/lcpp/$BIN" | head -50
       - name: 轉檔並上傳
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
