@@ -34,9 +34,22 @@ def kaggle(*args, check=True):
 print('推到 Kaggle：', SLUG, '（GPU）' if job.get('gpu') else '（不用 GPU）', flush=True)
 pushed = kaggle('kernels', 'push', '-p', work)
 print(pushed, flush=True)
+if 'session count' in pushed.lower():
+    # 列出 Kaggle 認為還在跑的筆記本，方便查原因
+    print('--- 你的筆記本狀態 ---', flush=True)
+    for line in kaggle('kernels', 'list', '--mine', '--csv', check=False).splitlines()[1:]:
+        ref = line.split(',')[0]
+        if '/' in ref:
+            print(ref, '→', kaggle('kernels', 'status', ref, check=False).splitlines()[-1], flush=True)
+    if 'machine_shape' in meta:
+        print('改用預設 GPU 再試一次', flush=True)
+        del meta['machine_shape']
+        json.dump(meta, open(os.path.join(work, 'kernel-metadata.json'), 'w'))
+        pushed = kaggle('kernels', 'push', '-p', work)
+        print(pushed, flush=True)
 if 'error' in pushed.lower():
     if 'session count' in pushed.lower():
-        sys.exit('Kaggle 同時只能跑 2 個 GPU 工作：請到 Kaggle 右上角「View Active Events」把還在跑的停掉，再重跑')
+        sys.exit('Kaggle 說同時跑的 GPU 工作已滿 2 個：請到 Kaggle「View Active Events」把還在跑的停掉，再重跑')
     sys.exit('推到 Kaggle 失敗（看上一行）')
 time.sleep(60)
 start = time.time()
