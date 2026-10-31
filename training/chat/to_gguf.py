@@ -14,7 +14,7 @@ SRC_REPO = f'HauHau2010/math-tutor-qwen2.5-{args.size}'
 REPO = f'{SRC_REPO}-GGUF'
 # iPhone Safari 一次吃 500 MB 大檔會卡住：改 Q4_K_M（約 0.4 GB）、切成 64 MB 小塊
 STEM = f'math-tutor-{args.size}-q4_k_m'
-BIN = os.environ.get('LLAMA_BIN', '')  # llama.cpp 官方編好的 llama-quantize、llama-gguf-split 所在資料夾
+
 
 token = os.environ.get('HF_TOKEN')
 if not token:
@@ -42,6 +42,11 @@ if not os.path.exists(lcpp):
 run(sys.executable, '-m', 'pip', 'install', '-q', os.path.join(lcpp, 'gguf-py'), 'sentencepiece')
 gdir = os.path.join(args.out, 'gguf')
 os.makedirs(gdir, exist_ok=True)
+# 量化與切檔工具：從原始碼只編這兩個（約 3～5 分鐘）
+BIN = os.path.join(lcpp, 'build', 'bin')
+if not os.path.exists(os.path.join(BIN, 'llama-gguf-split')):
+    run('cmake', '-S', lcpp, '-B', os.path.join(lcpp, 'build'), '-DGGML_NATIVE=OFF', '-DLLAMA_CURL=OFF', '-DBUILD_SHARED_LIBS=OFF', '-DCMAKE_BUILD_TYPE=Release')
+    run('cmake', '--build', os.path.join(lcpp, 'build'), '--target', 'llama-quantize', 'llama-gguf-split', '-j', str(os.cpu_count() or 2))
 f16 = os.path.join(gdir, 'f16.gguf')
 run(sys.executable, os.path.join(lcpp, 'convert_hf_to_gguf.py'), src, '--outtype', 'f16', '--outfile', f16)
 q4 = os.path.join(gdir, 'q4.gguf')
