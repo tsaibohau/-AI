@@ -236,6 +236,13 @@ describe('網站可以選我們訓練的老師', () => {
     expect(isGpuLost(new Error('Device was lost'))).toBe(true);
     expect(isGpuLost(new Error('網路錯誤'))).toBe(false);
   });
+  it('GPU 被收回：已經用小模型就不要再叫人選小的；設定顯示模型名稱', async () => {
+    const { gpuGoneMessage, modelName, TUTOR_MODEL_ID, TUTOR_SMALL_ID } = await import('../src/tutor/llm.js');
+    expect(gpuGoneMessage(TUTOR_MODEL_ID)).toMatch(/改選「數學解惑老師・小」/);
+    expect(gpuGoneMessage(TUTOR_SMALL_ID)).toMatch(/老師帶我做/);
+    expect(modelName(TUTOR_SMALL_ID)).toBe('數學解惑老師・小');
+    expect(modelName(TUTOR_MODEL_ID)).toBe('數學解惑老師');
+  });
   it('小一號的老師沿用官方 0.5B', async () => {
     const { appConfigFor, TUTOR_SMALL_ID } = await import('../src/tutor/llm.js');
     const base = { model: 'x', model_id: 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC', model_lib: 'small.wasm' };

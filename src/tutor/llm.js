@@ -37,13 +37,23 @@ export async function chatRaw(messages, { maxTokens = 700, temperature = 0.2 } =
     try {
       await loadModel(id);
     } catch {
-      throw new Error(GPU_GONE);
+      throw new Error(gpuGoneMessage(id));
     }
     return await ask();
   }
 }
 
 const GPU_GONE = '手機把 GPU 收回去了（通常是記憶體不夠）。請把網頁完全關掉再打開；如果常常這樣，改選「數學解惑老師・小」。';
+const GPU_GONE_SMALL = '這支手機的記憶體跑不動本機 AI（連最小的模型也被收回 GPU）。可以先用上方的「老師帶我做」（不需要 AI），或把其他 App 和分頁都關掉再試一次。';
+
+/** GPU 被收回時給的建議：已經是小模型就不要再叫人選小的 */
+export function gpuGoneMessage(id) {
+  const small = MODELS.find((m) => m.id === id)?.vramMB <= 1000;
+  return small ? GPU_GONE_SMALL : GPU_GONE;
+}
+
+/** 設定裡顯示用的模型名稱（括號前那段） */
+export const modelName = (id) => MODELS.find((m) => m.id === id)?.label.replace(/（.*$/, '') || '';
 
 /** GPU 被系統收回的錯誤（WebLLM／TVM 的訊息） */
 export const isGpuLost = (e) => /disposed|device (was |is )?lost|GPUDevice|destroyed|compatible GPU/i.test(String(e?.message || e));
@@ -111,7 +121,7 @@ async function createEngine(webllm, id, onProgress) {
   try {
     return await webllm.CreateMLCEngine(id, { appConfig: appConfigFor(webllm), initProgressCallback: (r) => onProgress({ progress: r.progress ?? 0, text: r.text || '' }) });
   } catch (e) {
-    if (/compatible GPU/i.test(String(e?.message))) throw new Error(GPU_GONE);
+    if (/compatible GPU/i.test(String(e?.message))) throw new Error(gpuGoneMessage(id));
     if (/Response is not OK/i.test(String(e?.message))) {
       throw new Error(TUTORS.some((t) => t.id === id) ? '這個模型還沒準備好（可能還在訓練或上傳中），先選別的模型。' : '下載失敗，請檢查網路再試一次。');
     }

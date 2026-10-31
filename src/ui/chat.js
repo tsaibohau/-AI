@@ -163,7 +163,7 @@ export function mountChat(root, { onTeach } = {}) {
     const g = st.provider === 'gemini';
     const sv = st.provider === 'server';
     const ready = canUse();
-    settingsEl.innerHTML = `<details ${ready ? '' : 'open'}><summary class="label">AI 大腦：${esc(g ? `Gemini（${get(KEY.gmodel, DEFAULT_GEMINI_MODEL)}）` : sv ? '數學解惑老師（伺服器）' : '數學解惑老師（本機）')} ${ready ? '' : '（尚未設定）'}</summary>
+    settingsEl.innerHTML = `<details ${ready ? '' : 'open'}><summary class="label">AI 大腦：${esc(g ? `Gemini（${get(KEY.gmodel, DEFAULT_GEMINI_MODEL)}）` : sv ? '數學解惑老師（伺服器）' : `${llm.modelName(llm.loadedModel() || llm.savedModel()) || '數學解惑老師'}（本機）`)} ${ready ? '' : '（尚未設定）'}</summary>
       <div class="opts">
         <button type="button" class="opt ${!g && !sv ? 'picked' : ''}" data-prov="local">數學解惑老師（我們訓練的，下載一次就能離線用）</button>
         <button type="button" class="opt ${g ? 'picked' : ''}" data-prov="gemini">Gemini（免費額度、能讀照片、較聰明）</button>
