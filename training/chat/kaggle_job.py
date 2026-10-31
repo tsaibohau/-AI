@@ -33,13 +33,14 @@ def gpu():
         return False
 
 
-report(f'模型大小：{SIZE}；' + ('有 GPU：訓練＋轉檔' if gpu() else '沒有 GPU：只轉檔'))
+TRAIN = job.get('train', True) and gpu()
+report(f'模型大小：{SIZE}；' + ('訓練＋轉檔' if TRAIN else '只轉檔（不訓練）'))
 if not os.environ.get('HF_TOKEN'):
     # 不浪費 GPU 時間：沒有金鑰就不能上傳，直接停
     report('FAILED：沒有讀到 HF_TOKEN。請到 Kaggle 打開這本筆記本 → Add-ons → Secrets → 勾選 HF_TOKEN')
     sys.exit(1)
 
-if gpu():
+if TRAIN:
     # 舊版 torchao 會讓 LoRA 出錯；用比較穩的版本（T4 也能跑）
     sh(sys.executable, '-m', 'pip', 'uninstall', '-y', '-q', 'torchao')
     sh(sys.executable, '-m', 'pip', 'install', '-q', 'transformers==4.56.2', 'trl==0.23.1', 'peft==0.17.1', 'datasets', 'accelerate', 'huggingface_hub')

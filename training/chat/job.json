@@ -1,9 +1,10 @@
 {
-  "說明": "GitHub Actions（.github/workflows/kaggle.yml）每次照這裡在 Kaggle 跑 kaggle.ipynb；改這個檔案推上 main 就會自動開跑。gpu=true：訓練＋轉檔；false：只轉檔。formats：mlc＝電腦 GPU 版、gguf＝手機 CPU 版",
+  "說明": "GitHub Actions（.github/workflows/kaggle.yml）每次照這裡在 Kaggle 跑 kaggle.ipynb；改這個檔案推上 main 就會自動開跑。train=false：只轉檔不訓練（gpu 保持 true，不用 GPU 的機器讀不到 HF_TOKEN）。formats：mlc＝電腦 GPU 版、gguf＝手機 CPU 版",
   "size": "0.5b",
-  "gpu": false,
-  "run": 6,
+  "gpu": true,
+  "run": 7,
   "formats": [
     "gguf"
-  ]
+  ],
+  "train": false
 }
