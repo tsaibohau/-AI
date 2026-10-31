@@ -80,3 +80,11 @@ MLC 官方已有同架構的手機版（mlc-ai/Qwen2.5-1.5B-Instruct-q4f16_1-MLC
 - 網站 `src/agent/server.js`：預設用這台伺服器；休眠中（503／連不上）會等一下重試；回覆一樣擋掉照念的系統提示詞。
 - `deploy.ipynb`：不訓練、只轉檔＋架伺服器（不用 GPU）；`to_mlc.py`／`to_server.py` 找不到剛訓練的模型時，會從 HF 抓私人模型。
 - 筆記本 `train.ipynb` 第 8 格也會自動做。
+
+## 第三輪補強（`round3/`）
+
+0.5B 第二輪考試 20/21 後看到的毛病：
+- 「k 為多少時有重根」自己猜 k（猜成 10）→ `disc-tools.jsonl`：先列判別式（`k^2 - 4*1*9 = 0`、`> 0`、`< 0`、`>= 0`）交給 `solve`。
+- 「供三小」被當成數學名詞（「三小就是 a²」）、「你好帥」回得怪 → `chat.jsonl`：嗆聲、稱讚回一句就拉回題目。
+
+`node training/chat/round3/apply.mjs`（可以重複跑，會先移除舊的第三輪資料）。
