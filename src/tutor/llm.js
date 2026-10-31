@@ -112,6 +112,9 @@ async function createEngine(webllm, id, onProgress) {
     return await webllm.CreateMLCEngine(id, { appConfig: appConfigFor(webllm), initProgressCallback: (r) => onProgress({ progress: r.progress ?? 0, text: r.text || '' }) });
   } catch (e) {
     if (/compatible GPU/i.test(String(e?.message))) throw new Error(GPU_GONE);
+    if (/Response is not OK/i.test(String(e?.message))) {
+      throw new Error(TUTORS.some((t) => t.id === id) ? '這個模型還沒準備好（可能還在訓練或上傳中），先選別的模型。' : '下載失敗，請檢查網路再試一次。');
+    }
     throw e;
   }
 }
