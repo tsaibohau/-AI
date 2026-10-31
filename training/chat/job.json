@@ -1,4 +1,6 @@
 {
-  "說明": "Kaggle 筆記本 kaggle.ipynb 每次照這裡做；由 Claude 修改，使用者不用改筆記本。有 GPU：訓練＋轉手機版；沒有 GPU：只轉手機版（用已上傳的模型）",
-  "size": "0.5b"
+  "說明": "GitHub Actions（.github/workflows/kaggle.yml）每次照這裡在 Kaggle 跑 kaggle.ipynb；改這個檔案推上 main 就會自動開跑。gpu=true：訓練＋轉手機版；false：只轉手機版",
+  "size": "0.5b",
+  "gpu": true,
+  "run": 1
 }

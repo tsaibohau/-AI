@@ -1,0 +1,30 @@
+# 自動在 Kaggle 訓練／轉手機版：改 training/chat/job.json 推上 main 就會開跑（也可以在 Actions 手動按 Run）
+# 需要 Secrets：KAGGLE_USERNAME，以及 KAGGLE_API_TOKEN 或 KAGGLE_KEY。金鑰只放 GitHub Secrets，不進程式碼。
+name: Kaggle 訓練
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['training/chat/job.json']
+
+concurrency:
+  group: kaggle
+  cancel-in-progress: false
+
+jobs:
+  kaggle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -q kaggle==2.1.2
+      - name: 在 Kaggle 跑並等結果
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+        run: python training/chat/kaggle_remote.py
