@@ -246,6 +246,13 @@ describe('網站可以選我們訓練的老師', () => {
 });
 
 describe('concept：查觀念工具', () => {
+  it('任何純算式都查到那個運算（模型會查「2+2」）', async () => {
+    const { runTool } = await import('../src/agent/tools.js');
+    expect(runTool('concept', { name: '2+2' }).name).toBe('加法');
+    expect(runTool('concept', { name: '3 × 4' }).name).toBe('乘法');
+    expect(runTool('concept', { name: '12÷3' }).name).toBe('除法');
+    expect(runTool('concept', { name: '5-2=3' }).name).toBe('減法');
+  });
   it('1+1 查到加法（定義），還能往下追到自然數', async () => {
     const { runTool } = await import('../src/agent/tools.js');
     const r = runTool('concept', { name: '1+1' });

@@ -69,9 +69,19 @@ export const allDefinitions = () => data.definitions;
 const plain = (t) => String(t || '').normalize('NFKC').toLowerCase().replace(/[\s，。,.!！?？、「」]+/g, '');
 
 /** 用學生的說法找概念（id、名稱、常見問法；越長的比對越優先）。找不到回傳 null */
+// 「2+2」「3×4」這種純算式：查的是那個運算本身
+const OP_OF = [
+  [/^\d+(?:\.\d+)?[+＋]\d+(?:\.\d+)?(?:=\d+)?$/, 'num.addition'],
+  [/^\d+(?:\.\d+)?[-−－]\d+(?:\.\d+)?(?:=-?\d+)?$/, 'num.subtraction'],
+  [/^\d+(?:\.\d+)?[×x*＊·]\d+(?:\.\d+)?(?:=\d+)?$/, 'num.multiplication'],
+  [/^\d+(?:\.\d+)?[÷/／]\d+(?:\.\d+)?(?:=\d+(?:\.\d+)?)?$/, 'num.division'],
+];
+
 export function findConcept(query) {
   const q = plain(query);
   if (!q) return null;
+  const expr = String(query).normalize('NFKC').replace(/\s+/g, '').replace(/^為什麼/, '');
+  for (const [re, id] of OP_OF) if (re.test(expr) && DEF.get(id)) return DEF.get(id);
   let best = null;
   for (const d of data.definitions) {
     for (const key of [d.id, d.name, ...(d.aliases || [])]) {
