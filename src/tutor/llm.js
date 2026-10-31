@@ -13,7 +13,14 @@ export const TUTORS = [tutorOf('1.5b'), tutorOf('0.5b')];
 export const TUTOR_MODEL_ID = TUTORS[0].id;
 export const TUTOR_SMALL_ID = TUTORS[1].id;
 
+/** 手機 CPU 版老師（GGUF，wllama 跑）：iPhone 的 WebGPU 會把 GPU 收回，改用 CPU */
+export const CPU_TUTOR = {
+  id: 'math-tutor-qwen2.5-0.5b-gguf-cpu',
+  url: 'https://huggingface.co/HauHau2010/math-tutor-qwen2.5-0.5b-GGUF/resolve/main/math-tutor-0.5b-q8_0.gguf',
+};
+
 export const MODELS = [
+  { id: CPU_TUTOR.id, label: '數學解惑老師・手機版（我們訓練的，約 0.5 GB，用 CPU，iPhone 選這個）', vramMB: 0, cpu: true, url: CPU_TUTOR.url },
   { id: TUTOR_MODEL_ID, label: '數學解惑老師（我們訓練的，約 1 GB）', vramMB: 1630 },
   { id: TUTOR_SMALL_ID, label: '數學解惑老師・小（我們訓練的，約 0.3 GB，舊手機用）', vramMB: 950 },
   { id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC', label: '標準（約 1 GB，手機可用）', vramMB: 1630 },
@@ -44,8 +51,8 @@ export async function chatRaw(messages, { maxTokens = 700, temperature = 0.2 } =
   }
 }
 
-const GPU_GONE = '手機把 GPU 收回去了（通常是記憶體不夠）。請把網頁完全關掉再打開；如果常常這樣，改選「數學解惑老師・小」。';
-const GPU_GONE_SMALL = '這支手機的記憶體跑不動本機 AI（連最小的模型也被收回 GPU）。可以先用上方的「老師帶我做」（不需要 AI），或把其他 App 和分頁都關掉再試一次。';
+const GPU_GONE = '手機把 GPU 收回去了。請把網頁完全關掉再打開；如果常常這樣，改選「數學解惑老師・手機版」（用 CPU，不會被收回）。';
+const GPU_GONE_SMALL = '這支手機的 GPU 跑不動網頁 AI。請把網頁完全關掉再打開，改選「數學解惑老師・手機版」（用 CPU）。';
 
 /** GPU 被收回時給的建議：已經是小模型就不要再叫人選小的 */
 export function gpuGoneMessage(id) {
@@ -81,15 +88,18 @@ function saveModel(id) {
 
 /** 瀏覽器是否支援（需要 WebGPU） */
 export async function supportStatus() {
-  if (typeof navigator === 'undefined' || !navigator.gpu) return { ok: false, reason: '這個瀏覽器不支援 WebGPU，無法執行本機 AI。可以改用較新版的 Chrome、Edge 或 Safari。' };
+  // CPU 版只要 WebAssembly；GPU 版另外要 WebGPU（iPhone 不碰 GPU，免得一開始就被收回）
+  if (typeof WebAssembly === 'undefined') return { ok: false, reason: '這個瀏覽器太舊，無法執行本機 AI。' };
+  if (isAppleMobile() || typeof navigator === 'undefined' || !navigator.gpu) return { ok: true, gpu: false };
   try {
-    const adapter = await navigator.gpu.requestAdapter();
-    if (!adapter) return { ok: false, reason: '找不到可用的 GPU，無法執行本機 AI。' };
-    return { ok: true };
+    return { ok: true, gpu: !!(await navigator.gpu.requestAdapter()) };
   } catch {
-    return { ok: false, reason: '無法啟用 GPU，無法執行本機 AI。' };
+    return { ok: true, gpu: false };
   }
 }
+
+/** 這台裝置可以選的模型 */
+export const usableModels = (support) => MODELS.filter((m) => m.cpu || support?.gpu);
 
 let engine = null;
 let loadedId = null;
@@ -150,6 +160,20 @@ export async function selfTest(id, onStep = () => {}) {
 /** 下載（第一次）並載入模型；onProgress({ progress: 0~1, text }) */
 export async function loadModel(id, onProgress = () => {}) {
   if (engine && loadedId === id) return engine;
+  if (isCpuModel(id)) {
+    const { createCpuEngine } = await import('./cpu.js');
+    engine = null;
+    loadedId = null;
+    try {
+      engine = await createCpuEngine(MODELS.find((m) => m.id === id).url, onProgress);
+    } catch (e) {
+      if (/404|not found|Response/i.test(String(e?.message))) throw new Error('手機版老師還沒準備好（可能還在轉檔上傳），先選別的模型。');
+      throw e;
+    }
+    loadedId = id;
+    saveModel(id);
+    return engine;
+  }
   watchDeviceLost();
   const webllm = await import('@mlc-ai/web-llm');
   engine = await createEngine(webllm, id, onProgress);
@@ -179,6 +203,11 @@ function watchDeviceLost() {
 export const lastDeviceLost = () => lastLost;
 
 /** iPhone／iPad（iPadOS 會假裝是 Mac） */
+export const isCpuModel = (id) => !!MODELS.find((m) => m.id === id)?.cpu;
+
+/** 預設模型：iPhone／iPad 用 CPU 版，其他用 GPU 版老師 */
+export const defaultModel = (nav) => (isAppleMobile(nav) ? CPU_TUTOR.id : TUTOR_MODEL_ID);
+
 export const isAppleMobile = (nav = typeof navigator === 'undefined' ? null : navigator) =>
   !!nav && (/iPhone|iPad|iPod/.test(nav.userAgent || '') || (/Macintosh/.test(nav.userAgent || '') && nav.maxTouchPoints > 1));
 
@@ -210,6 +239,7 @@ async function createEngine(webllm, id, onProgress) {
 
 /** 這台裝置是否已經下載過模型 */
 export async function isDownloaded(id) {
+  if (isCpuModel(id)) return (await import('./cpu.js')).isCpuDownloaded(MODELS.find((m) => m.id === id).url);
   try {
     const webllm = await import('@mlc-ai/web-llm');
     return await webllm.hasModelInCache(id, appConfigFor(webllm));
@@ -220,6 +250,13 @@ export async function isDownloaded(id) {
 
 /** 刪除已下載的模型檔案，釋放手機空間 */
 export async function deleteModel(id) {
+  if (isCpuModel(id)) {
+    engine = null;
+    loadedId = null;
+    await (await import('./cpu.js')).deleteCpuModel(MODELS.find((m) => m.id === id).url);
+    saveModel(null);
+    return;
+  }
   const webllm = await import('@mlc-ai/web-llm');
   try {
     await engine?.unload?.();

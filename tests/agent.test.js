@@ -228,7 +228,7 @@ describe('網站可以選我們訓練的老師', () => {
     const tutor = cfg.model_list.find((m) => m.model_id === TUTOR_MODEL_ID);
     expect(tutor.model).toBe('https://huggingface.co/HauHau2010/math-tutor-qwen2.5-1.5b-q4f16_1-MLC');
     expect(tutor.model_lib).toBe('lib.wasm');
-    expect(MODELS[0].id).toBe(TUTOR_MODEL_ID);
+    expect(MODELS.some((m) => m.id === TUTOR_MODEL_ID)).toBe(true);
   });
   it('認得 GPU 被收回的錯誤（會自動重新載入）', async () => {
     const { isGpuLost } = await import('../src/tutor/llm.js');
@@ -238,10 +238,22 @@ describe('網站可以選我們訓練的老師', () => {
   });
   it('GPU 被收回：已經用小模型就不要再叫人選小的；設定顯示模型名稱', async () => {
     const { gpuGoneMessage, modelName, TUTOR_MODEL_ID, TUTOR_SMALL_ID } = await import('../src/tutor/llm.js');
-    expect(gpuGoneMessage(TUTOR_MODEL_ID)).toMatch(/改選「數學解惑老師・小」/);
-    expect(gpuGoneMessage(TUTOR_SMALL_ID)).toMatch(/老師帶我做/);
+    expect(gpuGoneMessage(TUTOR_MODEL_ID)).toMatch(/手機版/);
+    expect(gpuGoneMessage(TUTOR_SMALL_ID)).toMatch(/手機版/);
     expect(modelName(TUTOR_SMALL_ID)).toBe('數學解惑老師・小');
     expect(modelName(TUTOR_MODEL_ID)).toBe('數學解惑老師');
+  });
+  it('iPhone 預設用 CPU 手機版，不能用 GPU 時只列 CPU 模型', async () => {
+    const { defaultModel, usableModels, isCpuModel, CPU_TUTOR, TUTOR_MODEL_ID, modelName } = await import('../src/tutor/llm.js');
+    const iphone = { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X)', maxTouchPoints: 5 };
+    expect(defaultModel(iphone)).toBe(CPU_TUTOR.id);
+    expect(defaultModel({ userAgent: 'Windows', maxTouchPoints: 0 })).toBe(TUTOR_MODEL_ID);
+    expect(usableModels({ ok: true, gpu: false }).map((m) => m.id)).toEqual([CPU_TUTOR.id]);
+    expect(usableModels({ ok: true, gpu: true }).length).toBeGreaterThan(3);
+    expect(isCpuModel(CPU_TUTOR.id)).toBe(true);
+    expect(isCpuModel(TUTOR_MODEL_ID)).toBe(false);
+    expect(modelName(CPU_TUTOR.id)).toBe('數學解惑老師・手機版');
+    expect(CPU_TUTOR.url).toMatch(/^https:\/\/huggingface\.co\/HauHau2010\/math-tutor-qwen2\.5-0\.5b-GGUF\/resolve\/main\/.+\.gguf$/);
   });
   it('iPhone 上把 GPU 每次的運算切小', async () => {
     const { shrinkPrefill, isAppleMobile, IOS_PREFILL_CHUNK } = await import('../src/tutor/llm.js');
