@@ -24,3 +24,4 @@ Thumbs.db
 *.log
 training/nlu/model/
 training/chat/out/
+__pycache__/

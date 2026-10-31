@@ -33,7 +33,7 @@ def gpu():
         return False
 
 
-report(f'模型大小：{SIZE}；' + ('有 GPU：訓練＋轉手機版' if gpu() else '沒有 GPU：只轉手機版'))
+report(f'模型大小：{SIZE}；' + ('有 GPU：訓練＋轉檔' if gpu() else '沒有 GPU：只轉檔'))
 if not os.environ.get('HF_TOKEN'):
     # 不浪費 GPU 時間：沒有金鑰就不能上傳，直接停
     report('FAILED：沒有讀到 HF_TOKEN。請到 Kaggle 打開這本筆記本 → Add-ons → Secrets → 勾選 HF_TOKEN')
@@ -65,12 +65,22 @@ if gpu():
 else:
     sh(sys.executable, '-m', 'pip', 'install', '-q', '-U', 'huggingface_hub', 'safetensors')
 
-try:
-    sh(sys.executable, os.path.join(HERE, 'to_mlc.py'), '--out', OUT, '--size', SIZE)
-except subprocess.CalledProcessError:
-    report('FAILED：轉手機版失敗（錯誤在記錄最後面）')
-    raise
-report(f'手機版已上傳：https://huggingface.co/HauHau2010/math-tutor-qwen2.5-{SIZE}-q4f16_1-MLC')
+# formats：mlc＝電腦 GPU 版（WebLLM）；gguf＝手機 CPU 版（wllama，iPhone 用）
+formats = job.get('formats', ['mlc', 'gguf'])
+if 'mlc' in formats:
+    try:
+        sh(sys.executable, os.path.join(HERE, 'to_mlc.py'), '--out', OUT, '--size', SIZE)
+    except subprocess.CalledProcessError:
+        report('FAILED：轉 GPU 版失敗（錯誤在記錄最後面）')
+        raise
+    report(f'GPU 版已上傳：https://huggingface.co/HauHau2010/math-tutor-qwen2.5-{SIZE}-q4f16_1-MLC')
+if 'gguf' in formats:
+    try:
+        sh(sys.executable, os.path.join(HERE, 'to_gguf.py'), '--out', OUT, '--size', SIZE)
+    except subprocess.CalledProcessError:
+        report('FAILED：轉手機 CPU 版失敗（錯誤在記錄最後面）')
+        raise
+    report(f'手機 CPU 版已上傳：https://huggingface.co/HauHau2010/math-tutor-qwen2.5-{SIZE}-GGUF')
 # 模型都已上傳 Hugging Face：刪掉大檔，Kaggle 的輸出只留報告與記錄（GitHub 只下載小檔）
 for name in ['final', 'mlc', 'sft', 'dpo', 'sft_ckpt', 'dpo_ckpt', 'verify', 'gguf', 'llama.cpp']:
     shutil.rmtree(os.path.join(OUT, name), ignore_errors=True)
