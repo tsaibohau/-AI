@@ -18,6 +18,7 @@ export const MODELS = [
   { id: TUTOR_SMALL_ID, label: '數學解惑老師・小（我們訓練的，約 0.3 GB，舊手機用）', vramMB: 950 },
   { id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC', label: '標準（約 1 GB，手機可用）', vramMB: 1630 },
   { id: 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC', label: '輕量（約 0.4 GB，較快、較不準）', vramMB: 950 },
+  { id: 'Qwen2.5-0.5B-Instruct-q4f32_1-MLC', label: '輕量・相容版（約 0.5 GB，iPhone 跑不動時試這個）', vramMB: 1060 },
   { id: 'Qwen2.5-3B-Instruct-q4f16_1-MLC', label: '進階（約 2 GB，建議電腦或新手機）', vramMB: 2505 },
   { id: 'Qwen2.5-7B-Instruct-q4f16_1-MLC', label: '最強（約 5 GB，只適合有獨立顯示卡的電腦）', vramMB: 5107 },
 ];
@@ -37,7 +38,7 @@ export async function chatRaw(messages, { maxTokens = 700, temperature = 0.2 } =
     try {
       await loadModel(id);
     } catch {
-      throw new Error(`${gpuGoneMessage(id)}（技術訊息：${String(e?.message || e).slice(0, 120)}）`);
+      throw new Error(`${gpuGoneMessage(id)}（技術訊息：${String(e?.message || e).slice(0, 80)}${lastLost ? `；GPU：${lastLost.slice(0, 160)}` : ''}）`);
     }
     return await ask();
   }
@@ -109,6 +110,7 @@ export const isReady = () => engine !== null;
 /** 下載（第一次）並載入模型；onProgress({ progress: 0~1, text }) */
 export async function loadModel(id, onProgress = () => {}) {
   if (engine && loadedId === id) return engine;
+  watchDeviceLost();
   const webllm = await import('@mlc-ai/web-llm');
   engine = await createEngine(webllm, id, onProgress);
   shrinkPrefill(engine, id);
@@ -117,6 +119,24 @@ export async function loadModel(id, onProgress = () => {}) {
   return engine;
 }
 
+
+/** 記下 GPU 被收回的原因（iPhone 除錯用；WebLLM 只寫在 console，手機看不到） */
+let lastLost = '';
+let watching = false;
+function watchDeviceLost() {
+  const A = typeof GPUAdapter === 'undefined' ? null : GPUAdapter;
+  if (watching || !A?.prototype?.requestDevice) return;
+  watching = true;
+  const orig = A.prototype.requestDevice;
+  A.prototype.requestDevice = async function (...args) {
+    const dev = await orig.apply(this, args);
+    dev.lost?.then?.((info) => {
+      lastLost = `${info?.reason || ''} ${info?.message || ''}`.trim();
+    });
+    return dev;
+  };
+}
+export const lastDeviceLost = () => lastLost;
 
 /** iPhone／iPad（iPadOS 會假裝是 Mac） */
 export const isAppleMobile = (nav = typeof navigator === 'undefined' ? null : navigator) =>
