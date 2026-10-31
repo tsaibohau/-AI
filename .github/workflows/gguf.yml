@@ -1,0 +1,28 @@
+# 手機 CPU 版（GGUF）直接在 GitHub 轉檔，不經過 Kaggle（Kaggle 被 API 推上去的執行讀不到密鑰）
+# 需要 Secret：HF_TOKEN（讀私人模型、上傳公開 GGUF）。金鑰只放 GitHub Secrets，不進程式碼。
+name: 轉手機 CPU 版（GGUF）
+
+on:
+  workflow_dispatch:
+    inputs:
+      size:
+        description: '模型大小'
+        default: '0.5b'
+
+jobs:
+  gguf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 安裝（CPU 版 torch）
+        run: pip install -q torch --index-url https://download.pytorch.org/whl/cpu && pip install -q transformers safetensors huggingface_hub numpy
+      - name: 轉檔並上傳
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          if [ -z "$HF_TOKEN" ]; then echo "FAILED：GitHub Secrets 沒有 HF_TOKEN"; exit 1; fi
+          python training/chat/to_gguf.py --out "$RUNNER_TEMP/out" --size "${{ inputs.size || '0.5b' }}"
