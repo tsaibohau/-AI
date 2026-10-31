@@ -33,7 +33,17 @@ if '--status' in sys.argv:
     kaggle('kernels', 'output', SLUG, '-p', out, '--file-pattern', r'report\.txt$', check=False)
     for root, _, files in os.walk(out):
         for f in files:
-            print(f'\n===== {f} =====\n' + open(os.path.join(root, f), encoding='utf-8', errors='replace').read(), flush=True)
+            text = open(os.path.join(root, f), encoding='utf-8', errors='replace').read()
+            if f.endswith('.log'):
+                # 執行記錄是 JSON：只留看得懂的輸出（去掉進度條）
+                try:
+                    lines = [e['data'] for e in json.loads(text) if e.get('stream_name') == 'stdout']
+                    text = ''.join(l for l in lines if '%|' not in l and l.strip())
+                except Exception:
+                    pass
+                i = text.find('自動檢查通過')
+                text = text[i - 200:] if i >= 0 else text[-3000:]
+            print(f'\n===== {f} =====\n' + text, flush=True)
     sys.exit(0)
 work = os.path.join(os.environ.get('RUNNER_TEMP', '/tmp'), 'kernel')
 shutil.rmtree(work, ignore_errors=True)
