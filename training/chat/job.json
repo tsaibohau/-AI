@@ -2,5 +2,5 @@
   "說明": "GitHub Actions（.github/workflows/kaggle.yml）每次照這裡在 Kaggle 跑 kaggle.ipynb；改這個檔案推上 main 就會自動開跑。gpu=true：訓練＋轉手機版；false：只轉手機版",
   "size": "0.5b",
   "gpu": true,
-  "run": 4
+  "run": 5
 }
